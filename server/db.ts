@@ -1659,7 +1659,61 @@ export function processExpiredCdaProposalTimers(
 export function getGameLeaderboard(): GameScore[] {
   const db = initDB();
   const scores = db.gameScores || [];
+  let modified = false;
+  scores.forEach((s) => {
+    if (!s.id) {
+      s.id = crypto.randomUUID();
+      modified = true;
+    }
+  });
+  if (modified) {
+    saveLocalDB(db);
+  }
   return [...scores].sort((a, b) => b.score - a.score).slice(0, 50);
+}
+
+export function deleteGameScore(id: string): GameScore[] {
+  const db = initDB();
+  if (!db.gameScores) db.gameScores = [];
+
+  const cleanId = String(id || "").trim();
+  const target = db.gameScores.find((s) => s.id === cleanId);
+
+  if (target) {
+    db.gameScores = db.gameScores.filter((s) => s.id !== cleanId);
+    saveLocalDB(db);
+
+    if (firestoreDb && !firestoreQuotaExhausted) {
+      deleteDoc(doc(firestoreDb, "game_scores", cleanId)).catch((e) =>
+        handleFirestoreError("deleteGameScore", e)
+      );
+    }
+  }
+
+  return getGameLeaderboard();
+}
+
+export function deleteGameScores(ids: string[]): GameScore[] {
+  const db = initDB();
+  if (!db.gameScores) db.gameScores = [];
+
+  const idSet = new Set((ids || []).map((i) => String(i).trim()).filter(Boolean));
+  const toDelete = db.gameScores.filter((s) => idSet.has(s.id));
+
+  if (toDelete.length > 0) {
+    db.gameScores = db.gameScores.filter((s) => !idSet.has(s.id));
+    saveLocalDB(db);
+
+    if (firestoreDb && !firestoreQuotaExhausted) {
+      toDelete.forEach((scoreObj) => {
+        deleteDoc(doc(firestoreDb, "game_scores", scoreObj.id)).catch((e) =>
+          handleFirestoreError("deleteGameScores", e)
+        );
+      });
+    }
+  }
+
+  return getGameLeaderboard();
 }
 
 export function addGameScore(name: string, score: number, level: number): GameScore[] {

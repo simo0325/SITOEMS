@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Camera, Play, Pause, RotateCcw, Award, User, ShieldAlert, Sparkles, Volume2, VolumeX, ArrowUp, ArrowDown, ExternalLink, X, Heart, Activity, Music, Sliders, Key, Lock, Unlock, Upload, FileAudio, Disc, Trash2, SkipForward, SkipBack } from "lucide-react";
+import { Camera, Play, Pause, RotateCcw, Award, User, ShieldAlert, Sparkles, Volume2, VolumeX, ArrowUp, ArrowDown, ExternalLink, X, Heart, Activity, Music, Sliders, Key, Lock, Unlock, Upload, FileAudio, Disc, Trash2, SkipForward, SkipBack, Check, CheckSquare, Square, AlertTriangle, ShieldCheck } from "lucide-react";
 import { GameScore } from "../types.js";
 
 import trackMarioDesk from "../assets/images/Mario Jordan Al Desk.mp3";
@@ -37,17 +37,59 @@ export default function HospitalDinoGame({ onClose }: HospitalDinoGameProps) {
   const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
-  // Master Key verification & level selector state (no key strings hardcoded on client)
+  // Master Key / Owner Key verification & score management state (server-validated)
+  const [verifiedOwnerKey, setVerifiedOwnerKey] = useState<string>(() => {
+    if (typeof window === "undefined") return "";
+    try {
+      const rawSession = localStorage.getItem("discordUserSession");
+      if (rawSession) {
+        const parsed = JSON.parse(rawSession);
+        const cleanRole = (parsed.roleName || "").toLowerCase();
+        const token = (parsed.token || "").toUpperCase();
+        if (
+          parsed.isMaster === true ||
+          cleanRole.includes("proprietario") ||
+          cleanRole.includes("master") ||
+          token === "EMS-2410PROP" ||
+          token === "EMS-ARPROP" ||
+          token === "EMS-GMPROP" ||
+          token === "EMS-SRPROP"
+        ) {
+          return parsed.token || "";
+        }
+      }
+    } catch {}
+    return "";
+  });
+
+  const [ownerName, setOwnerName] = useState<string>(() => {
+    if (typeof window === "undefined") return "";
+    try {
+      const rawSession = localStorage.getItem("discordUserSession");
+      if (rawSession) {
+        const parsed = JSON.parse(rawSession);
+        return parsed.username || parsed.name || "";
+      }
+    } catch {}
+    return "";
+  });
+
   const [isMasterUnlocked, setIsMasterUnlocked] = useState<boolean>(() => {
     if (typeof window === "undefined") return false;
     try {
       const rawSession = localStorage.getItem("discordUserSession");
       if (rawSession) {
         const parsed = JSON.parse(rawSession);
+        const cleanRole = (parsed.roleName || "").toLowerCase();
+        const token = (parsed.token || "").toUpperCase();
         if (
           parsed.isMaster === true ||
-          parsed.roleName === "Proprietario" ||
-          parsed.roleName === "Vice Proprietario"
+          cleanRole.includes("proprietario") ||
+          cleanRole.includes("master") ||
+          token === "EMS-2410PROP" ||
+          token === "EMS-ARPROP" ||
+          token === "EMS-GMPROP" ||
+          token === "EMS-SRPROP"
         ) {
           return true;
         }
@@ -60,6 +102,16 @@ export default function HospitalDinoGame({ onClose }: HospitalDinoGameProps) {
   const [masterKeyInput, setMasterKeyInput] = useState<string>("");
   const [showMasterUnlockInput, setShowMasterUnlockInput] = useState<boolean>(false);
   const [masterUnlockError, setMasterUnlockError] = useState<string | null>(null);
+
+  // Score management states for owner keys
+  const [selectedScoreIds, setSelectedScoreIds] = useState<string[]>([]);
+  const [isDeletingScores, setIsDeletingScores] = useState<boolean>(false);
+  const [scoreFeedback, setScoreFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
+  const [scoreToDeleteConfirm, setScoreToDeleteConfirm] = useState<GameScore | null>(null);
+  const [showBulkDeleteConfirm, setShowBulkDeleteConfirm] = useState<boolean>(false);
+  const [showLeaderboardUnlockInput, setShowLeaderboardUnlockInput] = useState<boolean>(false);
+  const [leaderboardUnlockInput, setLeaderboardUnlockInput] = useState<string>("");
+  const [filterPlayerSearch, setFilterPlayerSearch] = useState<string>("");
 
   // Test Run indicator state (starts from level > 1)
   const [isTestRun, setIsTestRun] = useState<boolean>(false);
@@ -178,32 +230,147 @@ export default function HospitalDinoGame({ onClose }: HospitalDinoGameProps) {
     fetchLeaderboard();
   }, []);
 
-  // Master Key verification handler via backend API (keeps key secret on server)
-  const handleVerifyMasterKey = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
+  // Master / Owner Key verification handler via backend API (keeps key secret on server)
+  const handleVerifyMasterKey = async (overrideKey?: string) => {
     setMasterUnlockError(null);
-    const clean = masterKeyInput.trim();
+    const clean = String(overrideKey !== undefined ? overrideKey : masterKeyInput).trim();
     if (!clean) {
-      setMasterUnlockError("Inserisci la Chiave Master.");
+      setMasterUnlockError("Inserisci la Chiave Proprietario.");
       return;
     }
 
     try {
       const res = await fetch("/api/game/verify-master-key", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${clean}`,
+          "x-owner-key": clean,
+        },
         body: JSON.stringify({ masterKey: clean }),
       });
       const data = await res.json();
       if (data.success && data.isMaster) {
         setIsMasterUnlocked(true);
+        setVerifiedOwnerKey(clean);
+        if (data.ownerName) setOwnerName(data.ownerName);
         setShowMasterUnlockInput(false);
+        setShowLeaderboardUnlockInput(false);
         setMasterKeyInput("");
+        setLeaderboardUnlockInput("");
+        setScoreFeedback({
+          type: "success",
+          message: `Accesso Proprietario sbloccato con successo (${data.ownerName || "Proprietario"})!`,
+        });
       } else {
-        setMasterUnlockError("Chiave Master non valida o non autorizzata.");
+        const errMsg = data.error || "Chiave Proprietario non valida o non autorizzata.";
+        setMasterUnlockError(errMsg);
+        setScoreFeedback({ type: "error", message: errMsg });
       }
     } catch {
       setMasterUnlockError("Errore di connessione durante la verifica.");
+    }
+  };
+
+  // Auto-dismiss score feedback
+  useEffect(() => {
+    if (scoreFeedback) {
+      const timer = setTimeout(() => setScoreFeedback(null), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [scoreFeedback]);
+
+  // Score management handlers (only for owners)
+  const handleToggleSelectScore = (id: string) => {
+    setSelectedScoreIds((prev) =>
+      prev.includes(id) ? prev.filter((sId) => sId !== id) : [...prev, id]
+    );
+  };
+
+  const handleSelectAllScores = () => {
+    const allIds = leaderboard.map((s) => s.id).filter(Boolean);
+    setSelectedScoreIds(allIds);
+  };
+
+  const handleDeselectAllScores = () => {
+    setSelectedScoreIds([]);
+  };
+
+  const executeDeleteSingleScore = async (scoreObj: GameScore) => {
+    if (!scoreObj || !scoreObj.id) return;
+    setIsDeletingScores(true);
+    setScoreFeedback(null);
+    try {
+      const activeKey = verifiedOwnerKey || masterKeyInput;
+      const res = await fetch(`/api/game/leaderboard/${encodeURIComponent(scoreObj.id)}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${activeKey}`,
+          "x-owner-key": activeKey,
+        },
+        body: JSON.stringify({ ownerKey: activeKey }),
+      });
+      const data = await res.json();
+      if (data.success && Array.isArray(data.scores)) {
+        setLeaderboard(data.scores);
+        setSelectedScoreIds((prev) => prev.filter((id) => id !== scoreObj.id));
+        setScoreFeedback({
+          type: "success",
+          message: `Score di "${scoreObj.name}" (${scoreObj.score} pts) rimosso con successo.`,
+        });
+        setScoreToDeleteConfirm(null);
+      } else {
+        setScoreFeedback({
+          type: "error",
+          message: data.error || "Impossibile rimuovere lo score. Verifica i permessi della chiave proprietario.",
+        });
+      }
+    } catch (err) {
+      setScoreFeedback({ type: "error", message: "Errore di connessione durante l'eliminazione dello score." });
+    } finally {
+      setIsDeletingScores(false);
+    }
+  };
+
+  const executeDeleteMultipleScores = async () => {
+    if (selectedScoreIds.length === 0) return;
+    setIsDeletingScores(true);
+    setScoreFeedback(null);
+    try {
+      const activeKey = verifiedOwnerKey || masterKeyInput;
+      const res = await fetch("/api/game/leaderboard/delete", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${activeKey}`,
+          "x-owner-key": activeKey,
+        },
+        body: JSON.stringify({
+          ids: selectedScoreIds,
+          ownerKey: activeKey,
+        }),
+      });
+      const data = await res.json();
+      if (data.success && Array.isArray(data.scores)) {
+        setLeaderboard(data.scores);
+        const count = data.deletedCount || selectedScoreIds.length;
+        setSelectedScoreIds([]);
+        setShowBulkDeleteConfirm(false);
+        setScoreFeedback({
+          type: "success",
+          message: `${count} ${count === 1 ? "score rimosso" : "score rimossi"} con successo dalla classifica.`,
+        });
+      } else {
+        setScoreFeedback({
+          type: "error",
+          message: data.error || "Impossibile eliminare gli score selezionati.",
+        });
+      }
+    } catch (err) {
+      setScoreFeedback({ type: "error", message: "Errore di connessione durante la rimozione degli score." });
+    } finally {
+      setIsDeletingScores(false);
     }
   };
 
@@ -2098,7 +2265,7 @@ export default function HospitalDinoGame({ onClose }: HospitalDinoGameProps) {
                     className="text-xs text-amber-400 hover:text-amber-300 font-bold underline cursor-pointer flex items-center gap-1.5 transition-colors"
                   >
                     <Key size={14} className="text-amber-400" />
-                    <span>Hai la Chiave Master? Sblocca la selezione del livello di partenza</span>
+                    <span>Hai una Chiave Proprietario / Master? Sblocca i livelli e la gestione score</span>
                   </button>
 
                   {showMasterUnlockInput && (
@@ -2106,14 +2273,20 @@ export default function HospitalDinoGame({ onClose }: HospitalDinoGameProps) {
                       <div className="flex items-center gap-2">
                         <input
                           type="password"
-                          placeholder="Inserisci Chiave Master"
+                          placeholder="Inserisci Chiave Proprietario"
                           value={masterKeyInput}
                           onChange={(e) => setMasterKeyInput(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              e.preventDefault();
+                              handleVerifyMasterKey();
+                            }
+                          }}
                           className="flex-1 bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-amber-300 font-mono focus:outline-none focus:border-amber-500"
                         />
                         <button
                           type="button"
-                          onClick={handleVerifyMasterKey}
+                          onClick={() => handleVerifyMasterKey()}
                           className="px-3.5 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs rounded-xl cursor-pointer transition-all shadow-md"
                         >
                           Sblocca
@@ -2372,7 +2545,19 @@ export default function HospitalDinoGame({ onClose }: HospitalDinoGameProps) {
                           <Award size={16} className="text-amber-400" />
                           <span>Classifica Punteggi EMS</span>
                         </div>
-                        {isSubmitting && <span className="text-[10px] text-pink-400 animate-pulse">Salvataggio...</span>}
+                        <div className="flex items-center gap-2">
+                          {isSubmitting && <span className="text-[10px] text-pink-400 animate-pulse">Salvataggio...</span>}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setIsLeaderboardOpen(true);
+                              fetchLeaderboard();
+                            }}
+                            className="text-[11px] font-bold text-amber-400 hover:text-amber-300 underline cursor-pointer"
+                          >
+                            {isMasterUnlocked ? "👑 Gestione Classifica" : "Vedi Tutto"}
+                          </button>
+                        </div>
                       </div>
 
                       <div className="bg-[#090a0f] border border-slate-800 rounded-2xl overflow-hidden max-h-48 overflow-y-auto dark-scrollbar">
@@ -2388,6 +2573,9 @@ export default function HospitalDinoGame({ onClose }: HospitalDinoGameProps) {
                                 <th className="py-2 px-3">Medico</th>
                                 <th className="py-2 px-3 text-right">Livello</th>
                                 <th className="py-2 px-3 text-right">Punti</th>
+                                {isMasterUnlocked && (
+                                  <th className="py-2 px-2 text-center w-8 text-rose-400">Azioni</th>
+                                )}
                               </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-800/60 font-medium">
@@ -2406,6 +2594,21 @@ export default function HospitalDinoGame({ onClose }: HospitalDinoGameProps) {
                                     <td className="py-2 px-3 text-right font-mono font-bold text-amber-300">
                                       {item.score}
                                     </td>
+                                    {isMasterUnlocked && (
+                                      <td className="py-2 px-2 text-center">
+                                        <button
+                                          type="button"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            setScoreToDeleteConfirm(item);
+                                          }}
+                                          title="Rimuovi score (Proprietario)"
+                                          className="p-1 rounded-lg text-rose-400 hover:text-rose-300 hover:bg-rose-500/20 transition-all cursor-pointer"
+                                        >
+                                          <Trash2 size={13} />
+                                        </button>
+                                      </td>
+                                    )}
                                   </tr>
                                 );
                               })}
@@ -2592,73 +2795,354 @@ export default function HospitalDinoGame({ onClose }: HospitalDinoGameProps) {
       {/* STANDALONE LEADERBOARD MODAL OVERLAY */}
       {isLeaderboardOpen && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-fadeIn">
-          <div className="w-full max-w-lg bg-[#12141f] border border-amber-500/40 rounded-3xl p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto dark-scrollbar relative">
+          <div className="w-full max-w-2xl bg-[#12141f] border border-amber-500/40 rounded-3xl p-6 shadow-2xl space-y-4 max-h-[92vh] overflow-y-auto dark-scrollbar relative">
             <button
-              onClick={() => setIsLeaderboardOpen(false)}
+              onClick={() => {
+                setIsLeaderboardOpen(false);
+                setSelectedScoreIds([]);
+                setScoreToDeleteConfirm(null);
+                setShowBulkDeleteConfirm(false);
+              }}
               className="absolute top-4 right-4 p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition-all cursor-pointer"
             >
               <X size={18} />
             </button>
 
-            <div className="flex items-center gap-3 border-b border-slate-800 pb-4">
-              <div className="w-12 h-12 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shadow-lg">
-                <Award size={26} />
+            {/* Header */}
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-4 pr-8">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shadow-lg shrink-0">
+                  <Award size={26} />
+                </div>
+                <div>
+                  <h3 className="text-xl font-black text-white uppercase tracking-wide">
+                    Classifica Generale EMS
+                  </h3>
+                  <p className="text-xs text-slate-400">
+                    Fuga dall'Ospedale - I migliori record di tutti i medici
+                  </p>
+                </div>
               </div>
-              <div>
-                <h3 className="text-xl font-black text-white uppercase tracking-wide">
-                  Classifica Generale EMS
-                </h3>
-                <p className="text-xs text-slate-400">
-                  I migliori record di fuga dei medici dall'ospedale
-                </p>
-              </div>
+
+              {isMasterUnlocked && (
+                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 text-xs font-black shadow-sm">
+                  <ShieldCheck size={14} className="text-amber-400" />
+                  <span>Proprietario: {ownerName || "Autorizzato"}</span>
+                </div>
+              )}
             </div>
 
-            <div className="bg-[#090a0f] border border-slate-800 rounded-2xl overflow-hidden max-h-72 overflow-y-auto dark-scrollbar">
+            {/* Feedback message banner */}
+            {scoreFeedback && (
+              <div
+                className={`p-3 rounded-2xl border flex items-center justify-between gap-2 text-xs font-bold animate-fadeIn ${
+                  scoreFeedback.type === "success"
+                    ? "bg-emerald-950/60 border-emerald-500/50 text-emerald-300 shadow-lg shadow-emerald-950/20"
+                    : "bg-rose-950/60 border-rose-500/50 text-rose-300 shadow-lg shadow-rose-950/20"
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  {scoreFeedback.type === "success" ? (
+                    <Check size={16} className="text-emerald-400 shrink-0" />
+                  ) : (
+                    <AlertTriangle size={16} className="text-rose-400 shrink-0" />
+                  )}
+                  <span>{scoreFeedback.message}</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setScoreFeedback(null)}
+                  className="p-1 rounded-lg hover:bg-white/10 text-slate-400 hover:text-white cursor-pointer"
+                >
+                  <X size={14} />
+                </button>
+              </div>
+            )}
+
+            {/* Owner Management Bar */}
+            {isMasterUnlocked ? (
+              <div className="p-3.5 bg-amber-950/40 border border-amber-500/40 rounded-2xl space-y-2">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse" />
+                    <span className="text-xs font-black text-amber-300 uppercase tracking-wide flex items-center gap-1.5">
+                      <Key size={13} />
+                      <span>Strumenti Proprietario: Rimozione Score Giocatori</span>
+                    </span>
+                  </div>
+
+                  {selectedScoreIds.length > 0 ? (
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-black text-amber-200 bg-amber-500/20 px-2 py-0.5 rounded-lg border border-amber-500/30">
+                        {selectedScoreIds.length} selezionat{selectedScoreIds.length === 1 ? "o" : "i"}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setShowBulkDeleteConfirm(true)}
+                        disabled={isDeletingScores}
+                        className="px-3 py-1.5 bg-rose-600 hover:bg-rose-500 disabled:opacity-50 text-white rounded-xl text-xs font-black flex items-center gap-1.5 transition-all shadow-md shadow-rose-600/30 cursor-pointer"
+                      >
+                        <Trash2 size={13} />
+                        <span>Rimuovi Selezionati ({selectedScoreIds.length})</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleDeselectAllScores}
+                        className="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold transition-all cursor-pointer"
+                      >
+                        Annulla
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={handleSelectAllScores}
+                        className="text-xs font-bold text-amber-400 hover:text-amber-300 underline cursor-pointer"
+                      >
+                        Seleziona tutti ({leaderboard.length})
+                      </button>
+                    </div>
+                  )}
+                </div>
+                <p className="text-[11px] text-amber-200/80 leading-relaxed">
+                  Hai l'autorizzazione esclusiva per rimuovere score non conformi, score di test o buggati. Puoi eliminare i record uno ad uno o selezionarne più di uno per la cancellazione simultanea.
+                </p>
+              </div>
+            ) : (
+              /* If not yet unlocked, allow owner to enter key */
+              <div className="p-3 bg-slate-900/60 border border-slate-800 rounded-2xl space-y-2">
+                <button
+                  type="button"
+                  onClick={() => setShowLeaderboardUnlockInput(!showLeaderboardUnlockInput)}
+                  className="text-xs text-amber-400 hover:text-amber-300 font-bold flex items-center gap-1.5 cursor-pointer underline transition-colors"
+                >
+                  <Key size={14} className="text-amber-400" />
+                  <span>Sei un Proprietario? Sblocca la gestione e rimozione degli score</span>
+                </button>
+                {showLeaderboardUnlockInput && (
+                  <div className="pt-1.5 flex items-center gap-2 animate-fadeIn">
+                    <input
+                      type="password"
+                      placeholder="Inserisci la tua Chiave Proprietario"
+                      value={leaderboardUnlockInput}
+                      onChange={(e) => setLeaderboardUnlockInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          handleVerifyMasterKey(leaderboardUnlockInput);
+                        }
+                      }}
+                      className="flex-1 bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-amber-300 font-mono focus:outline-none focus:border-amber-500"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => handleVerifyMasterKey(leaderboardUnlockInput)}
+                      className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs rounded-xl cursor-pointer transition-all shadow-md shrink-0"
+                    >
+                      Sblocca
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Filter Search input */}
+            <div className="flex items-center justify-between gap-3">
+              <input
+                type="text"
+                placeholder="Filtra per nome medico..."
+                value={filterPlayerSearch}
+                onChange={(e) => setFilterPlayerSearch(e.target.value)}
+                className="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-500/50"
+              />
+              <span className="text-xs text-slate-400 shrink-0 font-medium">
+                Totale: <strong className="text-amber-300 font-mono">{leaderboard.length}</strong> score
+              </span>
+            </div>
+
+            {/* Table Container */}
+            <div className="bg-[#090a0f] border border-slate-800 rounded-2xl overflow-hidden max-h-80 overflow-y-auto dark-scrollbar">
               {isLoadingLeaderboard ? (
-                <div className="p-6 text-center text-xs text-slate-500">Caricamento classifica in corso...</div>
+                <div className="p-8 text-center text-xs text-slate-500">Caricamento classifica in corso...</div>
               ) : leaderboard.length === 0 ? (
-                <div className="p-6 text-center text-xs text-slate-500">Nessun punteggio registrato. Gioca per primo!</div>
+                <div className="p-8 text-center text-xs text-slate-500">Nessun punteggio registrato. Gioca per primo!</div>
               ) : (
                 <table className="w-full text-left text-xs">
-                  <thead className="bg-slate-900 text-[11px] text-slate-400 uppercase tracking-wider border-b border-slate-800 sticky top-0">
+                  <thead className="bg-slate-900 text-[11px] text-slate-400 uppercase tracking-wider border-b border-slate-800 sticky top-0 z-10 shadow-sm">
                     <tr>
-                      <th className="py-2.5 px-3.5"># Pos</th>
-                      <th className="py-2.5 px-3.5">Medico</th>
-                      <th className="py-2.5 px-3.5 text-right">Livello</th>
-                      <th className="py-2.5 px-3.5 text-right">Record Punti</th>
+                      {isMasterUnlocked && (
+                        <th className="py-2.5 px-3 text-center w-10">
+                          <input
+                            type="checkbox"
+                            checked={leaderboard.length > 0 && selectedScoreIds.length === leaderboard.length}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                handleSelectAllScores();
+                              } else {
+                                handleDeselectAllScores();
+                              }
+                            }}
+                            title="Seleziona o deseleziona tutti"
+                            className="w-4 h-4 rounded border-slate-700 bg-slate-950 text-amber-500 focus:ring-amber-500 cursor-pointer"
+                          />
+                        </th>
+                      )}
+                      <th className="py-2.5 px-3"># Pos</th>
+                      <th className="py-2.5 px-3">Medico</th>
+                      <th className="py-2.5 px-3 text-right">Livello</th>
+                      <th className="py-2.5 px-3 text-right">Record Punti</th>
+                      {isMasterUnlocked && (
+                        <th className="py-2.5 px-3 text-center w-20 text-rose-400">Rimuovi</th>
+                      )}
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-800/60 font-medium">
-                    {leaderboard.map((item, idx) => {
-                      const isCurrent = item.name.toLowerCase() === playerName.toLowerCase();
-                      return (
-                        <tr
-                          key={item.id || idx}
-                          className={`${
-                            isCurrent
-                              ? "bg-pink-950/40 text-pink-300 font-bold"
-                              : "text-slate-300 hover:bg-slate-800/40"
-                          }`}
-                        >
-                          <td className="py-2.5 px-3.5 text-slate-500 font-mono text-xs">
-                            {idx === 0 ? "🥇 1°" : idx === 1 ? "🥈 2°" : idx === 2 ? "🥉 3°" : `#${idx + 1}`}
-                          </td>
-                          <td className="py-2.5 px-3.5 font-bold text-slate-200">{item.name}</td>
-                          <td className="py-2.5 px-3.5 text-right text-slate-400 font-mono">L{item.level || 1}</td>
-                          <td className="py-2.5 px-3.5 text-right font-mono font-black text-amber-300 text-sm">
-                            {item.score} pts
-                          </td>
-                        </tr>
-                      );
-                    })}
+                    {leaderboard
+                      .filter((item) =>
+                        filterPlayerSearch.trim() === ""
+                          ? true
+                          : item.name.toLowerCase().includes(filterPlayerSearch.toLowerCase())
+                      )
+                      .map((item, idx) => {
+                        const isCurrent = item.name.toLowerCase() === playerName.toLowerCase();
+                        const isSelected = !!item.id && selectedScoreIds.includes(item.id);
+                        return (
+                          <tr
+                            key={item.id || idx}
+                            className={`transition-colors ${
+                              isSelected
+                                ? "bg-amber-950/30 text-amber-200"
+                                : isCurrent
+                                ? "bg-pink-950/40 text-pink-300 font-bold"
+                                : "text-slate-300 hover:bg-slate-800/40"
+                            }`}
+                          >
+                            {isMasterUnlocked && (
+                              <td className="py-2.5 px-3 text-center">
+                                <input
+                                  type="checkbox"
+                                  checked={isSelected}
+                                  onChange={() => item.id && handleToggleSelectScore(item.id)}
+                                  className="w-4 h-4 rounded border-slate-700 bg-slate-950 text-amber-500 focus:ring-amber-500 cursor-pointer"
+                                />
+                              </td>
+                            )}
+                            <td className="py-2.5 px-3 text-slate-500 font-mono text-xs">
+                              {idx === 0 ? "🥇 1°" : idx === 1 ? "🥈 2°" : idx === 2 ? "🥉 3°" : `#${idx + 1}`}
+                            </td>
+                            <td className="py-2.5 px-3 font-bold text-slate-200">{item.name}</td>
+                            <td className="py-2.5 px-3 text-right text-slate-400 font-mono">L{item.level || 1}</td>
+                            <td className="py-2.5 px-3 text-right font-mono font-black text-amber-300 text-sm">
+                              {item.score} pts
+                            </td>
+                            {isMasterUnlocked && (
+                              <td className="py-2.5 px-3 text-center">
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setScoreToDeleteConfirm(item);
+                                  }}
+                                  title={`Rimuovi punteggio di ${item.name}`}
+                                  className="p-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-600 text-rose-400 hover:text-white transition-all cursor-pointer"
+                                >
+                                  <Trash2 size={14} />
+                                </button>
+                              </td>
+                            )}
+                          </tr>
+                        );
+                      })}
                   </tbody>
                 </table>
               )}
             </div>
 
+            {/* Single score deletion confirm modal */}
+            {scoreToDeleteConfirm && (
+              <div className="p-4 bg-rose-950/80 border border-rose-500/60 rounded-2xl space-y-3 animate-fadeIn">
+                <div className="flex items-start gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-rose-500/20 border border-rose-500/40 flex items-center justify-center text-rose-400 shrink-0 mt-0.5">
+                    <Trash2 size={18} />
+                  </div>
+                  <div className="space-y-1">
+                    <h4 className="text-sm font-black text-white">
+                      Conferma Eliminazione Score
+                    </h4>
+                    <p className="text-xs text-rose-200">
+                      Sei sicuro di voler rimuovere lo score del giocatore{" "}
+                      <strong className="text-white font-bold">{scoreToDeleteConfirm.name}</strong> (
+                      <span className="font-mono text-amber-300 font-bold">{scoreToDeleteConfirm.score} pts</span>, Livello {scoreToDeleteConfirm.level || 1})?
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center justify-end gap-2 pt-1">
+                  <button
+                    type="button"
+                    onClick={() => setScoreToDeleteConfirm(null)}
+                    className="px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition-all cursor-pointer"
+                  >
+                    Annulla
+                  </button>
+                  <button
+                    type="button"
+                    disabled={isDeletingScores}
+                    onClick={() => executeDeleteSingleScore(scoreToDeleteConfirm)}
+                    className="px-4 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-500 disabled:opacity-50 text-white text-xs font-black transition-all shadow-md cursor-pointer flex items-center gap-1.5"
+                  >
+                    <Trash2 size={13} />
+                    <span>{isDeletingScores ? "Eliminazione..." : "Conferma Eliminazione"}</span>
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Bulk deletion confirm modal */}
+            {showBulkDeleteConfirm && (
+              <div className="p-4 bg-rose-950/80 border border-rose-500/60 rounded-2xl space-y-3 animate-fadeIn">
+                <div className="flex items-start gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-rose-500/20 border border-rose-500/40 flex items-center justify-center text-rose-400 shrink-0 mt-0.5">
+                    <AlertTriangle size={18} />
+                  </div>
+                  <div className="space-y-1">
+                    <h4 className="text-sm font-black text-white">
+                      Conferma Eliminazione Multipla ({selectedScoreIds.length} score)
+                    </h4>
+                    <p className="text-xs text-rose-200">
+                      Sei sicuro di voler eliminare definitivamente i{" "}
+                      <strong className="text-white font-bold">{selectedScoreIds.length}</strong> punteggi selezionati dalla classifica del gioco di Filippa Cira?
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center justify-end gap-2 pt-1">
+                  <button
+                    type="button"
+                    onClick={() => setShowBulkDeleteConfirm(false)}
+                    className="px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition-all cursor-pointer"
+                  >
+                    Annulla
+                  </button>
+                  <button
+                    type="button"
+                    disabled={isDeletingScores}
+                    onClick={executeDeleteMultipleScores}
+                    className="px-4 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-500 disabled:opacity-50 text-white text-xs font-black transition-all shadow-md cursor-pointer flex items-center gap-1.5"
+                  >
+                    <Trash2 size={13} />
+                    <span>{isDeletingScores ? "Eliminazione in corso..." : `Elimina Tutti i ${selectedScoreIds.length} Score`}</span>
+                  </button>
+                </div>
+              </div>
+            )}
+
             <button
-              onClick={() => setIsLeaderboardOpen(false)}
+              onClick={() => {
+                setIsLeaderboardOpen(false);
+                setSelectedScoreIds([]);
+                setScoreToDeleteConfirm(null);
+                setShowBulkDeleteConfirm(false);
+              }}
               className="w-full py-3.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs uppercase tracking-wider transition-all cursor-pointer"
             >
               Chiudi Classifica

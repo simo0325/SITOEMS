@@ -59,6 +59,8 @@ import {
   processExpiredCdaProposalTimers,
   getGameLeaderboard,
   addGameScore,
+  deleteGameScore,
+  deleteGameScores,
 } from "./server/db.js";
 import {
   ROLE_IDS_SORTED_ASC,
@@ -1245,30 +1247,143 @@ app.post("/api/game/leaderboard", (req, res) => {
   }
 });
 
-// Verify Master Key for Game Checkpoint / Level Selection (Server-side validation)
-app.post("/api/game/verify-master-key", (req, res) => {
-  try {
-    const { masterKey } = req.body || {};
-    const input = String(masterKey || "").trim().toUpperCase();
-    const secretMaster = (process.env.MASTER_SECRET_TOKEN || "EMS-2410PROP").trim().toUpperCase();
+// Helper to check if request is authenticated with an Owner key (Master Token, Antony Romano, Giovanni Manzo, Simone Rizzus, or registered Proprietario)
+function isOwnerKeyAuthorized(req: express.Request): { authorized: boolean; ownerName?: string; reason?: string } {
+  const authHeader = req.headers.authorization;
+  let token = authHeader && authHeader.startsWith("Bearer ") ? authHeader.substring(7).trim() : "";
+  if (!token) {
+    token = String(req.headers["x-owner-key"] || req.headers["x-master-key"] || req.headers["x-employee-token"] || req.headers["x-discord-token"] || "").trim();
+  }
+  if (!token && req.body && req.body.ownerKey) {
+    token = String(req.body.ownerKey).trim();
+  }
+  if (!token && req.body && req.body.masterKey) {
+    token = String(req.body.masterKey).trim();
+  }
 
-    let isMaster = false;
-    if (input && input === secretMaster) {
-      isMaster = true;
-    } else if (input && typeof REGISTERED_DISCORD_USERS !== "undefined") {
-      const user = REGISTERED_DISCORD_USERS.get(input);
-      if (user && (user.isMaster || (user.roleName || "").toLowerCase().includes("proprietario"))) {
-        isMaster = true;
+  if (!token) {
+    return { authorized: false, reason: "Nessuna chiave di autorizzazione fornita." };
+  }
+
+  const cleanUpper = token.toUpperCase();
+  const secretMaster = (process.env.MASTER_SECRET_TOKEN || "EMS-2410PROP").trim().toUpperCase();
+
+  // 1. Master Secret Token check
+  if (cleanUpper === secretMaster) {
+    return { authorized: true, ownerName: "Proprietario (Master)" };
+  }
+
+  // 2. Official 3 Owners Seeds check (Antony Romano, Giovanni Manzo, Simone Rizzus)
+  const seedMatch = OFFICIAL_OWNERS_SEED.find((o) => o.token.toUpperCase() === cleanUpper);
+  if (seedMatch) {
+    return { authorized: true, ownerName: seedMatch.name };
+  }
+
+  // 3. Registered Discord Users check
+  if (typeof REGISTERED_DISCORD_USERS !== "undefined") {
+    const user = REGISTERED_DISCORD_USERS.get(cleanUpper);
+    if (user) {
+      const cleanRole = (user.roleName || "").toLowerCase();
+      const isOwnerRole = user.isMaster === true || cleanRole.includes("proprietario") || getRoleGrade(user.roleName) >= 99;
+      if (isOwnerRole) {
+        return { authorized: true, ownerName: user.username || user.roleName };
       }
     }
+  }
 
-    if (isMaster) {
-      return res.json({ success: true, isMaster: true });
+  // 4. Active Sessions check
+  if (typeof ACTIVE_SESSIONS !== "undefined") {
+    const sess = ACTIVE_SESSIONS.get(token);
+    if (sess) {
+      const cleanRole = (sess.employeeRoleName || "").toLowerCase();
+      const isOwnerRole = cleanRole.includes("proprietario") || getRoleGrade(sess.employeeRoleName) >= 99;
+      if (isOwnerRole) {
+        return { authorized: true, ownerName: sess.employeeUsername || "Proprietario" };
+      }
+    }
+  }
+
+  // 5. Check via caller lookup
+  const caller = getCallerGradeAndRole(req);
+  if (caller && (caller.isMaster || (caller.roleName || "").toLowerCase().includes("proprietario") || caller.grade >= 99)) {
+    return { authorized: true, ownerName: caller.username || caller.roleName };
+  }
+
+  return { authorized: false, reason: "Permesso negato: Solo le chiavi dei proprietari possono eseguire questa operazione." };
+}
+
+// Verify Master / Owner Key for Game Checkpoint / Level Selection & Score Management (Server-side validation)
+app.post("/api/game/verify-master-key", (req, res) => {
+  try {
+    const auth = isOwnerKeyAuthorized(req);
+    if (auth.authorized) {
+      return res.json({ success: true, isMaster: true, ownerName: auth.ownerName, message: "Chiave Proprietario valida." });
     } else {
-      return res.status(401).json({ success: false, isMaster: false, error: "Chiave Master non valida." });
+      return res.status(401).json({ success: false, isMaster: false, error: auth.reason || "Chiave Proprietario non valida o non autorizzata." });
     }
   } catch (error) {
-    return res.status(500).json({ success: false, error: "Errore durante la verifica." });
+    return res.status(500).json({ success: false, error: "Errore durante la verifica della chiave." });
+  }
+});
+
+// Delete single game score by ID (Owner keys only)
+app.delete("/api/game/leaderboard/:id", (req, res) => {
+  try {
+    const auth = isOwnerKeyAuthorized(req);
+    if (!auth.authorized) {
+      return res.status(403).json({
+        success: false,
+        error: "Permesso negato: L'eliminazione dei punteggi del gioco di Filippa Cira è riservata esclusivamente ai Proprietari.",
+      });
+    }
+
+    const scoreId = String(req.params.id || "").trim();
+    if (!scoreId) {
+      return res.status(400).json({ success: false, error: "ID del punteggio non specificato." });
+    }
+
+    const updatedScores = deleteGameScore(scoreId);
+    console.log(`[GAME LEADERBOARD] Score '${scoreId}' deleted by ${auth.ownerName}`);
+    return res.json({
+      success: true,
+      scores: updatedScores,
+      message: `Punteggio rimosso con successo da ${auth.ownerName}.`,
+    });
+  } catch (error) {
+    console.error("Error deleting game score:", error);
+    return res.status(500).json({ success: false, error: "Errore interno durante l'eliminazione del punteggio." });
+  }
+});
+
+// Delete multiple game scores (Owner keys only)
+app.post("/api/game/leaderboard/delete", (req, res) => {
+  try {
+    const auth = isOwnerKeyAuthorized(req);
+    if (!auth.authorized) {
+      return res.status(403).json({
+        success: false,
+        error: "Permesso negato: L'eliminazione dei punteggi del gioco di Filippa Cira è riservata esclusivamente ai Proprietari.",
+      });
+    }
+
+    const { ids } = req.body || {};
+    if (!Array.isArray(ids) || ids.length === 0) {
+      return res.status(400).json({ success: false, error: "Nessun punteggio selezionato per l'eliminazione." });
+    }
+
+    const cleanIds = ids.map((id: any) => String(id || "").trim()).filter(Boolean);
+    const updatedScores = deleteGameScores(cleanIds);
+
+    console.log(`[GAME LEADERBOARD] ${cleanIds.length} scores deleted by ${auth.ownerName}`);
+    return res.json({
+      success: true,
+      scores: updatedScores,
+      deletedCount: cleanIds.length,
+      message: `${cleanIds.length} ${cleanIds.length === 1 ? "punteggio rimosso" : "punteggi rimossi"} con successo da ${auth.ownerName}.`,
+    });
+  } catch (error) {
+    console.error("Error deleting multiple game scores:", error);
+    return res.status(500).json({ success: false, error: "Errore interno durante l'eliminazione dei punteggi." });
   }
 });
 
@@ -3797,7 +3912,7 @@ app.post("/api/candidature", (req, res) => {
       }
     }
 
-    // Check if user already has an active pending candidature
+    // Check if user already has an active pending candidature and automatically cancel/replace it to allow a fresh submission
     const existing = getCandidature();
     const pendingExisting = existing.find((c) => {
       if (c.status !== "PENDING") return false;
@@ -3806,13 +3921,10 @@ app.post("/api/candidature", (req, res) => {
       return false;
     });
 
+
     if (pendingExisting) {
-      return res.json({
-        success: true,
-        alreadyPending: true,
-        candidatura: pendingExisting,
-        message: "Hai già una candidatura in valutazione! Di seguito puoi visualizzare lo stato della tua richiesta.",
-      });
+      // Automatically cancel the old pending request so a new one can take its place
+      cancelCandidatura(pendingExisting.id, "Sostituita da una nuova candidatura inviata dall'utente.");
     }
 
     const newCand = addCandidatura({
@@ -3845,7 +3957,6 @@ app.post("/api/candidature", (req, res) => {
   }
 });
 
-// Check status of user's candidature (By token or by ID or by name)
 app.get("/api/candidature/my-status", (req, res) => {
   try {
     const queryId = req.query.id ? sanitizeString(req.query.id as string, 50) : "";
@@ -3859,40 +3970,36 @@ app.get("/api/candidature/my-status", (req, res) => {
 
     const all = getCandidature();
 
-    // 1. Search by exact ID if provided
-    if (queryId) {
-      const found = all.find((c) => c.id === queryId || encodeURIComponent(c.id) === queryId);
-      if (found) {
-        return res.json({ success: true, candidatura: found });
-      }
+    // Blocca e mostra il riepilogo SOLO se c'è una candidatura in stato PENDING
+    const pendingCand = all.find((c) => {
+      if (c.status !== "PENDING") return false;
+      if (queryId && (c.id === queryId || encodeURIComponent(c.id) === queryId)) return true;
+      if (userToken && c.token && c.token.toUpperCase() === userToken) return true;
+      if (queryFullName && c.fullName.toLowerCase() === queryFullName.toLowerCase()) return true;
+      return false;
+    });
+
+    if (pendingCand) {
+      return res.json({ success: true, candidatura: pendingCand });
     }
 
-    // 2. Search by token if authenticated
-    if (userToken) {
-      const session = REGISTERED_DISCORD_USERS.get(userToken);
-      const foundByToken = all.find((c) => {
-        if (c.token && c.token.toUpperCase() === userToken) return true;
-        if (session?.username && c.fullName.toLowerCase() === session.username.toLowerCase()) return true;
-        return false;
-      });
-      if (foundByToken) {
-        return res.json({ success: true, candidatura: foundByToken });
-      }
-    }
+    // Filtra tutte le candidature appartenenti all'utente per lo storico completo
+    const userCands = all.filter((c) => {
+      if (userToken && c.token && c.token.toUpperCase() === userToken) return true;
+      if (queryFullName && c.fullName.toLowerCase() === queryFullName.toLowerCase()) return true;
+      return false;
+    });
 
-    // 3. Search by fullName if provided
-    if (queryFullName) {
-      const foundByName = all.find((c) => c.fullName.toLowerCase() === queryFullName.toLowerCase());
-      if (foundByName) {
-        return res.json({ success: true, candidatura: foundByName });
-      }
-    }
+    // Ordina dalla più recente alla meno recente
+    userCands.sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime());
 
-    return res.json({ success: true, candidatura: null });
+    return res.json({ success: true, candidatura: null, history: userCands });
   } catch (error) {
-    res.status(500).json({ error: "Errore durante la verifica dello stato candidatura." });
+    res.status(500).json({ error: "Errore durante la verifica dello stato." });
   }
 });
+
+
 
 // Candidate user endpoint to cancel/withdraw their own candidatura (reason is MANDATORY)
 const handleCancelCandidatura = (req: express.Request, res: express.Response) => {
@@ -3973,12 +4080,18 @@ function getCdaCallerInfo(req: express.Request) {
 
   const caller = getCallerGradeAndRole(req);
 
-  if (caller.isMaster || caller.isAdminPassword || userToken.toUpperCase() === "EMS-2410PROP" || isHighLevelOwnerCaller(caller)) {
+  // Master Key is exclusively the secret master token (EMS-2410PROP / MASTER_SECRET_TOKEN) or admin password login
+  const isMasterKey = !!(
+    (userToken && (userToken.toUpperCase() === MASTER_SECRET_TOKEN.toUpperCase() || userToken.toUpperCase() === "EMS-2410PROP")) ||
+    caller.isAdminPassword
+  );
+
+  if (isMasterKey) {
     return {
       isCdaMember: true,
       token: userToken || "EMS-2410PROP",
-      username: caller.username !== "Sconosciuto" ? caller.username : "Proprietario Master",
-      roleName: caller.roleName && caller.roleName !== "Sconosciuto" ? caller.roleName : "Proprietario (Master)",
+      username: caller.username !== "Sconosciuto" && !caller.username.includes("Proprietario") ? caller.username : "Proprietario (Master)",
+      roleName: "Proprietario (Master)",
       cdaRank: 100,
       isMaster: true,
       canReinderizzare: true,
@@ -4002,6 +4115,8 @@ function getCdaCallerInfo(req: express.Request) {
       isMaster: false,
       canReinderizzare: false,
       canDirectReview: false,
+      canDirectApprove: false,
+      canDirectReturn: false,
       canVote: false,
       canPreventiveAccept: false,
       canResolveTie: false,
@@ -4069,30 +4184,42 @@ function getCdaCallerInfo(req: express.Request) {
     ? false
     : (session?.hasCdaAccess === true) || rank >= 1 || isCdaRoleName(roleName) || (hierarchyMember && isCdaRoleName(hierarchyMember.roleName));
 
-  const isOwnerMaster = !!(
-    caller.isMaster ||
-    isHighLevelOwnerCaller(caller) ||
+  const isOwner = !!(
     (roleName || "").toLowerCase().includes("proprietario") ||
-    rank >= 99
+    rank >= 99 ||
+    (session?.roleName || "").toLowerCase().includes("proprietario") ||
+    (hierarchyMember && (hierarchyMember.roleName || "").toLowerCase().includes("proprietario"))
   );
 
+  // 1. Accetta direttamente, rifiuta direttamente e chiudi votazione solo al Consigliere Finale (rank 5 o proprietario) e al Presidente CDA (rank 4)
+  const canDirectReviewAndClose = isOwner || (isCda && rank >= 4);
+
+  // 2. Reindirizzo della votazione dal grado di Segretario CDA in su (rank 2, 3, 4, 5 o proprietario)
+  const canReinderizzare = isOwner || (isCda && rank >= 2);
+
+  // 3. Votare con i 3 nomi dei proprietari visibile solo alla master key (per token personali isMaster è strictly false)
+  const isMaster = false;
+
+  // 4. Motivazione obbligatoria quando si vota tranne al Vice Presidente CDA (rank 3), Presidente CDA (rank 4), Consigliere Finale (rank 5 o proprietario)
+  const isReasonOptional = isOwner || (isCda && rank >= 3);
+
   return {
-    isCdaMember: !!isCda || isOwnerMaster,
+    isCdaMember: !!isCda || isOwner,
     token: userToken,
     username,
     roleName,
-    cdaRank: isOwnerMaster ? 100 : rank,
-    isMaster: isOwnerMaster,
+    cdaRank: isOwner ? 100 : rank,
+    isMaster,
     isTestToken: !!session?.isTestToken,
     expiresAt: session?.expiresAt,
-    canReinderizzare: isOwnerMaster || (isCda && rank >= 2),
-    canDirectReview: isOwnerMaster,
-    canDirectApprove: isOwnerMaster,
-    canDirectReturn: isOwnerMaster,
-    canVote: isOwnerMaster || (isCda && rank >= 1),
-    canPreventiveAccept: isOwnerMaster,
-    canResolveTie: isOwnerMaster,
-    isReasonOptional: isOwnerMaster,
+    canReinderizzare,
+    canDirectReview: canDirectReviewAndClose,
+    canDirectApprove: canDirectReviewAndClose,
+    canDirectReturn: canDirectReviewAndClose,
+    canVote: isOwner || (isCda && rank >= 1),
+    canPreventiveAccept: canDirectReviewAndClose,
+    canResolveTie: canDirectReviewAndClose,
+    isReasonOptional,
   };
 }
 
@@ -4147,7 +4274,7 @@ app.post("/api/cda/render/:id", (req, res) => {
 
     if (!info.isCdaMember || !info.canReinderizzare) {
       return res.status(403).json({
-        error: "Permesso negato. Solo il Segretario CDA ed i gradi superiori (Vice Presidente, Presidente, Consigliere Finale) possono reinderizzare la candidatura alla votazione CDA.",
+        error: "Permesso negato. Solo dal grado di Segretario CDA in su (Vice Presidente, Presidente e Consigliere Finale) è consentito reindirizzare la candidatura alla votazione CDA.",
       });
     }
 
@@ -4195,7 +4322,7 @@ app.post("/api/cda/render/:id", (req, res) => {
   }
 });
 
-// Direct Review: Accept or Send Back/Reject (Solo Key Proprietario)
+// Direct Review: Accept or Send Back/Reject (Presidente CDA e Consigliere Finale)
 app.post("/api/cda/direct-review/:id", (req, res) => {
   try {
     const rawId = req.params.id || "";
@@ -4204,16 +4331,16 @@ app.post("/api/cda/direct-review/:id", (req, res) => {
     const cleanReason = reason ? sanitizeString(reason, 500).trim() : "";
     const info = getCdaCallerInfo(req);
 
-    if (!info.isCdaMember || !info.canDirectReview || !info.isMaster) {
+    if (!info.isCdaMember || !info.canDirectReview) {
       return res.status(403).json({
-        error: "Permesso negato: L'accettazione o l'annullamento/rifiuto diretto delle candidature CDA è riservato esclusivamente ai Proprietari (Key Proprietario).",
+        error: "Permesso negato: L'accettazione ed il rifiuto diretto delle candidature CDA sono riservati esclusivamente al Consigliere Finale CDA ed al Presidente CDA.",
       });
     }
 
-    // Mandatory reason for all EXCEPT Consigliere Finale CDA and Master
+    // Mandatory reason for all EXCEPT Vice Presidente, Presidente CDA, Consigliere Finale e Master
     if (!info.isReasonOptional && cleanReason.length < 3) {
       return res.status(400).json({
-        error: "Motivo dell'azione obbligatorio per il tuo ruolo! Tutti i membri (dal Segretario al Presidente CDA) devono specificare il motivo. Solo il Consigliere Finale CDA ed il Proprietario Master sono esenti.",
+        error: "Motivo dell'azione obbligatorio per il tuo ruolo!",
       });
     }
 
@@ -4284,6 +4411,12 @@ app.post("/api/cda/vote/:id", (req, res) => {
       return res.status(400).json({ error: "Scelta di voto non valida. Selezionare Favorevole, Contrario o Astenuto." });
     }
 
+    if (!info.isReasonOptional && cleanReason.length < 3) {
+      return res.status(400).json({
+        error: "La motivazione del voto è obbligatoria per il tuo ruolo nel CDA (minimo 3 caratteri). Solo il Vice Presidente CDA, il Presidente CDA ed il Consigliere Finale sono esenti dall'obbligo di motivazione.",
+      });
+    }
+
     const list = getCandidature();
     const target = list.find((c) => c.id === id || encodeURIComponent(c.id) === id);
 
@@ -4344,7 +4477,7 @@ app.post("/api/cda/vote/:id", (req, res) => {
   }
 });
 
-// Close Voting Preventively before 24h timer ends (Solo Key Proprietario)
+// Close Voting Preventively before 24h timer ends (Presidente CDA e Consigliere Finale)
 app.post("/api/cda/preventive-accept/:id", (req, res) => {
   try {
     const rawId = req.params.id || "";
@@ -4353,9 +4486,9 @@ app.post("/api/cda/preventive-accept/:id", (req, res) => {
     const cleanReason = reason ? sanitizeString(reason, 500).trim() : "";
     const info = getCdaCallerInfo(req);
 
-    if (!info.isCdaMember || !info.canPreventiveAccept || !info.isMaster) {
+    if (!info.isCdaMember || !info.canPreventiveAccept) {
       return res.status(403).json({
-        error: "Permesso negato. La chiusura preventiva e la risoluzione anticipata della votazione per le candidature sono riservate esclusivamente ai Proprietari (Key Proprietario).",
+        error: "Permesso negato: La chiusura della votazione per le candidature è riservata esclusivamente al Consigliere Finale CDA ed al Presidente CDA.",
       });
     }
 
@@ -4442,7 +4575,7 @@ app.post("/api/cda/preventive-accept/:id", (req, res) => {
   }
 });
 
-// Resolve Tie after 24h timer ends (Solo Key Proprietario)
+// Resolve Tie after 24h timer ends (Presidente CDA e Consigliere Finale)
 app.post("/api/cda/resolve-tie/:id", (req, res) => {
   try {
     const rawId = req.params.id || "";
@@ -4451,9 +4584,9 @@ app.post("/api/cda/resolve-tie/:id", (req, res) => {
     const cleanReason = reason ? sanitizeString(reason, 500).trim() : "";
     const info = getCdaCallerInfo(req);
 
-    if (!info.isCdaMember || !info.canResolveTie || !info.isMaster) {
+    if (!info.isCdaMember || !info.canResolveTie) {
       return res.status(403).json({
-        error: "Permesso negato. In caso di parità, la decisione finale (accettazione o annullamento) è riservata esclusivamente ai Proprietari (Key Proprietario).",
+        error: "Permesso negato: In caso di parità, la decisione finale è riservata al Consigliere Finale CDA ed al Presidente CDA.",
       });
     }
 
@@ -4740,7 +4873,7 @@ app.post("/api/cda/proposals/:id/render", (req, res) => {
 
     if (!info.isCdaMember || !info.canReinderizzare) {
       return res.status(403).json({
-        error: "Permesso negato. Solo il Segretario CDA ed i gradi superiori possono valutare ed avviare la votazione della proposta CDA.",
+        error: "Permesso negato. Solo dal grado di Segretario CDA in su (Vice Presidente, Presidente e Consigliere Finale) è consentito valutare ed avviare la votazione della proposta CDA.",
       });
     }
 
@@ -4800,6 +4933,13 @@ app.post("/api/cda/proposals/:id/vote", (req, res) => {
       return res.status(400).json({ error: "Scelta di voto non valida." });
     }
 
+    const cleanReason = reason ? sanitizeString(reason, 1000).trim() : "";
+    if (!info.isReasonOptional && cleanReason.length < 3) {
+      return res.status(400).json({
+        error: "La motivazione del voto è obbligatoria per il tuo ruolo nel CDA (minimo 3 caratteri). Solo il Vice Presidente CDA, il Presidente CDA ed il Consigliere Finale sono esenti dall'obbligo di motivazione.",
+      });
+    }
+
     const list = getCdaProposals();
     const target = list.find((p) => p.id === id);
 
@@ -4838,7 +4978,7 @@ app.post("/api/cda/proposals/:id/vote", (req, res) => {
       voterRole: info.roleName,
       decision,
       chosenRole: cleanChosenRole,
-      reason: reason ? sanitizeString(reason, 1000) : undefined,
+      reason: cleanReason || undefined,
       timestamp: now.toISOString(),
     };
 
@@ -4863,15 +5003,15 @@ app.post("/api/cda/proposals/:id/vote", (req, res) => {
   }
 });
 
-// Direct Approve Proposal (Solo Key Proprietario)
+// Direct Approve Proposal (Presidente CDA e Consigliere Finale)
 app.post("/api/cda/proposals/:id/direct-approve", (req, res) => {
   try {
     const rawId = req.params.id || "";
     const id = sanitizeString(rawId, 250) || rawId.trim();
     const info = getCdaCallerInfo(req);
 
-    if (!info.isCdaMember || !info.canDirectApprove || !info.isMaster) {
-      return res.status(403).json({ error: "Permesso negato: L'accettazione/approvazione diretta delle proposte CDA è riservata esclusivamente ai Proprietari (Key Proprietario)." });
+    if (!info.isCdaMember || !info.canDirectApprove) {
+      return res.status(403).json({ error: "Permesso negato: L'accettazione diretta delle proposte CDA è riservata esclusivamente al Consigliere Finale CDA ed al Presidente CDA." });
     }
 
     const { reason, chosenRole } = req.body;
@@ -4928,15 +5068,15 @@ app.post("/api/cda/proposals/:id/direct-approve", (req, res) => {
   }
 });
 
-// Direct Return / Reject Proposal (Solo Key Proprietario)
+// Direct Return / Reject Proposal (Presidente CDA e Consigliere Finale)
 app.post("/api/cda/proposals/:id/direct-return", (req, res) => {
   try {
     const rawId = req.params.id || "";
     const id = sanitizeString(rawId, 250) || rawId.trim();
     const info = getCdaCallerInfo(req);
 
-    if (!info.isCdaMember || !info.canDirectReturn || !info.isMaster) {
-      return res.status(403).json({ error: "Permesso negato: L'annullamento o il rifiuto diretto delle proposte CDA è riservato esclusivamente ai Proprietari (Key Proprietario)." });
+    if (!info.isCdaMember || !info.canDirectReturn) {
+      return res.status(403).json({ error: "Permesso negato: Il rifiuto diretto delle proposte CDA è riservato esclusivamente al Consigliere Finale CDA ed al Presidente CDA." });
     }
 
     const { reason } = req.body;
@@ -4981,7 +5121,7 @@ app.post("/api/cda/proposals/:id/direct-return", (req, res) => {
   }
 });
 
-// Chiusura Preventiva Proposta CDA (Solo Key Proprietario)
+// Chiusura Preventiva Proposta CDA (Presidente CDA e Consigliere Finale)
 app.post("/api/cda/proposals/:id/preventive", (req, res) => {
   try {
     const rawId = req.params.id || "";
@@ -4990,9 +5130,9 @@ app.post("/api/cda/proposals/:id/preventive", (req, res) => {
     const cleanReason = reason ? sanitizeString(reason, 500).trim() : "";
     const info = getCdaCallerInfo(req);
 
-    if (!info.isCdaMember || !info.canPreventiveAccept || !info.isMaster) {
+    if (!info.isCdaMember || !info.canPreventiveAccept) {
       return res.status(403).json({
-        error: "Permesso negato: La chiusura preventiva della votazione della proposta è riservata esclusivamente ai Proprietari (Key Proprietario).",
+        error: "Permesso negato: La chiusura della votazione della proposta è riservata esclusivamente al Consigliere Finale CDA ed al Presidente CDA.",
       });
     }
 
@@ -5107,15 +5247,15 @@ app.post("/api/cda/proposals/:id/preventive", (req, res) => {
   }
 });
 
-// Resolve Tie for Proposal CDA (Solo Key Proprietario)
+// Resolve Tie for Proposal CDA (Presidente CDA e Consigliere Finale)
 app.post("/api/cda/proposals/:id/resolve-tie", (req, res) => {
   try {
     const rawId = req.params.id || "";
     const id = sanitizeString(rawId, 250) || rawId.trim();
     const info = getCdaCallerInfo(req);
 
-    if (!info.isCdaMember || !info.canResolveTie || !info.isMaster) {
-      return res.status(403).json({ error: "Permesso negato: La risoluzione della parità per le proposte CDA è riservata esclusivamente ai Proprietari (Key Proprietario)." });
+    if (!info.isCdaMember || !info.canResolveTie) {
+      return res.status(403).json({ error: "Permesso negato: La risoluzione della parità per le proposte CDA è riservata al Consigliere Finale CDA ed al Presidente CDA." });
     }
 
     const { decision, reason, chosenRole } = req.body;
@@ -5174,15 +5314,15 @@ app.post("/api/cda/proposals/:id/resolve-tie", (req, res) => {
   }
 });
 
-// Cancel / Withdraw CDA Proposal (Solo Key Proprietario)
+// Cancel / Withdraw CDA Proposal (Consigliere Finale CDA o Master Key)
 app.post("/api/cda/proposals/:id/cancel", (req, res) => {
   try {
     const rawId = req.params.id || "";
     const id = sanitizeString(rawId, 250) || rawId.trim();
     const info = getCdaCallerInfo(req);
 
-    if (!info.isMaster) {
-      return res.status(403).json({ error: "Permesso negato: L'annullamento o il ritiro delle proposte CDA può essere effettuato esclusivamente dai Proprietari (Key Proprietario)." });
+    if (!info.isCdaMember || (!info.isMaster && info.cdaRank < 5)) {
+      return res.status(403).json({ error: "Permesso negato: L'annullamento o il ritiro delle proposte CDA può essere effettuato esclusivamente dal Consigliere Finale CDA o dalla Master Key." });
     }
 
     const proposals = getCdaProposals();

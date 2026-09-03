@@ -574,6 +574,11 @@ export default function CdaPortal({ discordSession, onSessionUpdated }: CdaPorta
       return;
     }
 
+    if (!permissions?.isReasonOptional && (!actionReason || actionReason.trim().length < 3)) {
+      setErrorMsg("La motivazione del voto è obbligatoria per il tuo ruolo (minimo 3 caratteri). Solo Vice Presidente CDA, Presidente CDA e Consigliere Finale sono esenti.");
+      return;
+    }
+
     if (selectedProp.type === "REINTEGRO" && voteDecision === "FAVOREVOLE" && !reinstatementSelectedRole) {
       setErrorMsg("Seleziona il grado con il quale la persona deve essere reintegrata.");
       return;
@@ -870,6 +875,11 @@ export default function CdaPortal({ discordSession, onSessionUpdated }: CdaPorta
 
     if (permissions?.isMaster && !voterOwnerName) {
       setErrorMsg("Seleziona per quale Proprietario stai votando (Giovanni Manzo, Simone Rizzus o Antony Romano).");
+      return;
+    }
+
+    if (!permissions?.isReasonOptional && (!actionReason || actionReason.trim().length < 3)) {
+      setErrorMsg("La motivazione del voto è obbligatoria per il tuo ruolo (minimo 3 caratteri). Solo Vice Presidente CDA, Presidente CDA e Consigliere Finale sono esenti.");
       return;
     }
 
@@ -2075,7 +2085,7 @@ export default function CdaPortal({ discordSession, onSessionUpdated }: CdaPorta
             activeCdaData.votes,
             permissions?.token,
             permissions?.username,
-            voterOwnerName || undefined
+            permissions?.isMaster ? (voterOwnerName || undefined) : undefined
           );
 
           return (
@@ -2100,16 +2110,16 @@ export default function CdaPortal({ discordSession, onSessionUpdated }: CdaPorta
                   </span>
                   <h3 className="text-xl font-black text-white">
                     {modalAction === "RENDER" && "Reindirizza a Votazione CDA (Timer 24h)"}
-                    {modalAction === "DIRECT_APPROVE" && "Accetta Direttamente (Proprietario)"}
-                    {modalAction === "DIRECT_RETURN" && "Respingi / Rimanda Indietro (Proprietario)"}
+                    {modalAction === "DIRECT_APPROVE" && "Accetta Direttamente"}
+                    {modalAction === "DIRECT_RETURN" && "Respingi / Rimanda Indietro"}
                     {modalAction === "VOTE" && (
                       activeExistingVote
-                        ? (voterOwnerName ? `Vuoi cambiare il voto di ${voterOwnerName}?` : "Vuoi cambiare il tuo voto CDA?")
+                        ? (permissions?.isMaster && voterOwnerName ? `Vuoi cambiare il voto di ${voterOwnerName}?` : "Vuoi cambiare il tuo voto CDA?")
                         : "Esprimi il tuo Voto CDA"
                     )}
-                    {modalAction === "PREVENTIVE" && "Chiusura Preventiva Votazione (Proprietario)"}
-                    {modalAction === "RESOLVE_TIE" && "Risoluzione Parità Voti (Proprietario)"}
-                    {modalAction === "CANCEL" && "Annulla / Ritira Proposta CDA (Proprietario)"}
+                    {modalAction === "PREVENTIVE" && "Chiudi Votazione"}
+                    {modalAction === "RESOLVE_TIE" && "Risoluzione Parità Voti"}
+                    {modalAction === "CANCEL" && "Annulla / Ritira Proposta CDA"}
                   </h3>
                 </div>
                 <button
@@ -2251,7 +2261,7 @@ export default function CdaPortal({ discordSession, onSessionUpdated }: CdaPorta
               {modalAction === "RESOLVE_TIE" && (
                 <div className="space-y-3">
                   <label className="text-xs font-bold uppercase tracking-wider text-slate-300 block">
-                    Decisione finale di Risoluzione Parità (Riservata ai Proprietari):
+                    Decisione finale di Risoluzione Parità:
                   </label>
                   <div className="grid grid-cols-2 gap-3">
                     <button
@@ -2327,16 +2337,20 @@ export default function CdaPortal({ discordSession, onSessionUpdated }: CdaPorta
                 <div className="space-y-2">
                   <label htmlFor="modal-reason-textarea" className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center justify-between">
                     <span>
-                      {modalAction === "CANCEL" ? "Motivazione del Ritiro" : "Motivazione dell'Azione"}{" "}
+                      {modalAction === "VOTE" ? "Motivazione del Voto" : modalAction === "CANCEL" ? "Motivazione del Ritiro" : "Motivazione dell'Azione"}{" "}
                       {modalAction === "CANCEL" ? (
-                        !permissions?.isMaster && <span className="text-rose-400 font-extrabold">* (Obbligatoria)</span>
+                        !permissions?.isMaster ? <span className="text-rose-400 font-extrabold">* (Obbligatoria)</span> : <span className="text-slate-400 font-normal lowercase">(facoltativa)</span>
                       ) : (
-                        !permissions?.isReasonOptional && <span className="text-rose-400 font-extrabold">* (Obbligatoria)</span>
+                        !permissions?.isReasonOptional ? (
+                          <span className="text-rose-400 font-extrabold">* (Obbligatoria)</span>
+                        ) : (
+                          <span className="text-slate-400 font-normal lowercase">(facoltativa)</span>
+                        )
                       )}
                     </span>
-                    {permissions?.isMaster && (
-                      <span className="text-[10px] text-amber-400 font-normal">
-                        Opzionale per Key Master / Proprietario
+                    {permissions?.isReasonOptional && modalAction === "VOTE" && (
+                      <span className="text-[10px] text-emerald-400 font-normal">
+                        Facoltativa per il tuo ruolo (Vice Pres. / Pres. / Consigliere Finale)
                       </span>
                     )}
                   </label>
@@ -2350,6 +2364,10 @@ export default function CdaPortal({ discordSession, onSessionUpdated }: CdaPorta
                         ? permissions?.isMaster
                           ? "Motivo del ritiro (opzionale per Master Key)..."
                           : "Inserisci la motivazione obbligatoria per il ritiro della proposta..."
+                        : modalAction === "VOTE"
+                        ? permissions?.isReasonOptional
+                          ? "Scrivi qui un eventuale commento o motivazione del voto (facoltativo)..."
+                          : "Scrivi qui la motivazione obbligatoria del tuo voto..."
                         : "Scrivi qui il motivo della tua decisione..."
                     }
                     className="w-full bg-[#0a0a0f] border border-slate-700 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
