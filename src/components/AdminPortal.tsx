@@ -4593,7 +4593,7 @@ export default function AdminPortal({ onConfigChanged }: AdminPortalProps) {
                       type="text"
                       value={logsFilterText}
                       onChange={(e) => setLogsFilterText(e.target.value)}
-                      placeholder="Cerca per Utente, IP, Token, Azione..."
+                      placeholder="Cerca per Utente, Token, Azione..."
                       className="w-full bg-[#0A0A0B] border border-white/10 rounded-lg pl-9 pr-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-hidden focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 font-medium"
                     />
                     {logsFilterText && (
@@ -4651,7 +4651,9 @@ export default function AdminPortal({ onConfigChanged }: AdminPortalProps) {
                       onClick={() => setLogsCategoryFilter(btn.id)}
                       className={`px-3 py-1.5 rounded-lg text-2xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
                         logsCategoryFilter === btn.id
-                          ? "bg-purple-600 text-white shadow-sm border border-purple-400/40"
+                          ? btn.id === "VOTI"
+                            ? "bg-orange-500 text-white shadow-sm border border-orange-400/50"
+                            : "bg-purple-600 text-white shadow-sm border border-purple-400/40"
                           : "bg-white/5 text-slate-400 hover:text-slate-200 border border-white/5"
                       }`}
                     >
@@ -4688,20 +4690,19 @@ export default function AdminPortal({ onConfigChanged }: AdminPortalProps) {
                         <th className="p-3.5">Utente / Dipendente</th>
                         <th className="p-3.5">Grado</th>
                         <th className="p-3.5">Token</th>
-                        <th className="p-3.5">IP Client</th>
                         <th className="p-3.5">Dettagli Evento</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-white/5 text-slate-300">
                       {filteredAccessLogs.length === 0 ? (
                         <tr>
-                          <td colSpan={9} className="p-8 text-center text-slate-500">
+                          <td colSpan={8} className="p-8 text-center text-slate-500">
                             Nessun log degli accessi trovato per i filtri selezionati.
                           </td>
                         </tr>
                       ) : (
                         filteredAccessLogs.map((log) => (
-                          <tr key={log.id} className="hover:bg-white/[0.02] transition-colors">
+                          <tr key={log.id} className={`hover:bg-white/[0.02] transition-colors ${log.category === "VOTI" ? "hover:bg-orange-500/[0.03]" : ""}`}>
                             <td className="p-3.5 font-mono text-slate-400 whitespace-nowrap text-[11px]">
                               {new Date(log.timestamp).toLocaleString("it-IT", {
                                 day: "2-digit",
@@ -4729,7 +4730,7 @@ export default function AdminPortal({ onConfigChanged }: AdminPortalProps) {
                                 </span>
                               )}
                               {log.category === "VOTI" && (
-                                <span className="inline-block bg-blue-500/15 text-blue-300 border border-blue-500/30 px-2 py-0.5 rounded text-[10px] font-bold uppercase">
+                                <span className="inline-block bg-orange-500/20 text-orange-300 border border-orange-400/40 px-2 py-0.5 rounded text-[10px] font-bold uppercase shadow-sm shadow-orange-500/10">
                                   Voti
                                 </span>
                               )}
@@ -4778,9 +4779,6 @@ export default function AdminPortal({ onConfigChanged }: AdminPortalProps) {
                             </td>
                             <td className="p-3.5 font-mono text-[11px] text-slate-400 whitespace-nowrap">
                               {log.token}
-                            </td>
-                            <td className="p-3.5 font-mono text-[11px] text-indigo-300 bg-indigo-950/30 px-2 py-0.5 rounded border border-indigo-500/20 whitespace-nowrap">
-                              {log.ip}
                             </td>
                             <td className="p-3.5 text-slate-400 max-w-xs truncate" title={log.details || ""}>
                               {log.details}
