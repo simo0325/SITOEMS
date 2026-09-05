@@ -72,16 +72,34 @@ export default function RoleElectionPortal({
   const hasAccess = userSession ? canAccessRoleElection(userSession) : false;
   const isOwner = userSession ? isOwnerKey(userSession) : false;
 
-  // Fetch election data
-  const fetchData = async () => {
+  // Fetch election data with automatic retry on server boot/reload
+  const fetchData = async (retryCount = 0) => {
+    if (!userSession || !canAccessRoleElection(userSession)) {
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
     setErrorMsg(null);
     try {
       const headers: Record<string, string> = {};
-      const token = userSession?.token || localStorage.getItem("discordToken") || localStorage.getItem("adminToken");
+      const token = userSession.token || localStorage.getItem("discordToken") || localStorage.getItem("adminToken");
       if (token) headers["Authorization"] = `Bearer ${token}`;
 
       const res = await fetch("/api/role-election/data", { headers });
+      const contentType = res.headers.get("content-type") || "";
+
+      if (!contentType.includes("application/json")) {
+        // If server is starting up or proxy returned HTML temporarily
+        if (retryCount < 2) {
+          setTimeout(() => {
+            fetchData(retryCount + 1);
+          }, 1200);
+          return;
+        }
+        throw new Error("Il server sta riavviando i servizi. Riprova tra qualche istante.");
+      }
+
       const data = await res.json();
 
       if (data.success) {
@@ -98,11 +116,15 @@ export default function RoleElectionPortal({
       } else {
         setErrorMsg(data.error || "Impossibile recuperare i dati della votazione.");
       }
-    } catch (err) {
-      console.error("Error fetching role election data:", err);
-      setErrorMsg("Errore di connessione durante il recupero dei dati.");
+    } catch (err: any) {
+      if (retryCount >= 2) {
+        console.warn("Notice fetching role election data:", err?.message || err);
+        setErrorMsg(err?.message || "Errore di connessione durante il recupero dei dati.");
+      }
     } finally {
-      setLoading(false);
+      if (retryCount === 0 || retryCount >= 2) {
+        setLoading(false);
+      }
     }
   };
 
@@ -211,6 +233,11 @@ export default function RoleElectionPortal({
           motivation: motivation.trim(),
         }),
       });
+
+      const contentType = res.headers.get("content-type") || "";
+      if (!contentType.includes("application/json")) {
+        throw new Error("Risposta non valida dal server. Riprova tra qualche istante.");
+      }
 
       const data = await res.json();
       if (data.success) {

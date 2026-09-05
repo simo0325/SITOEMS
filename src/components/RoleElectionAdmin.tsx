@@ -119,14 +119,40 @@ export default function RoleElectionAdmin({ adminToken, isMaster }: RoleElection
     return headers;
   };
 
+  // Safe response parser for JSON
+  const safeParseResponse = async (res: Response) => {
+    const contentType = res.headers.get("content-type") || "";
+    if (!contentType.includes("application/json")) {
+      throw new Error(`Risposta del server non valida (${res.status}). Riprova tra qualche istante.`);
+    }
+    return res.json();
+  };
+
   // Load data from server
-  const loadData = async () => {
+  const loadData = async (retryCount = 0) => {
+    const activeToken = adminToken || localStorage.getItem("adminToken") || localStorage.getItem("discordToken") || "";
+    if (!activeToken) {
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
     setErrorMsg(null);
     try {
       const res = await fetch("/api/admin/role-election/data", {
         headers: getAuthHeaders(),
       });
+      const contentType = res.headers.get("content-type") || "";
+      if (!contentType.includes("application/json")) {
+        if (retryCount < 2) {
+          setTimeout(() => {
+            loadData(retryCount + 1);
+          }, 1200);
+          return;
+        }
+        throw new Error("Il server sta riavviando i servizi. Riprova tra qualche secondo.");
+      }
+
       const data = await res.json();
 
       if (data.success) {
@@ -150,11 +176,15 @@ export default function RoleElectionAdmin({ adminToken, isMaster }: RoleElection
       } else {
         setErrorMsg(data.error || "Impossibile caricare i dati della votazione ruoli.");
       }
-    } catch (err) {
-      console.error("Error loading role election admin data:", err);
-      setErrorMsg("Errore di rete durante la sincronizzazione dei dati.");
+    } catch (err: any) {
+      if (retryCount >= 2) {
+        console.warn("Notice loading role election admin data:", err?.message || err);
+        setErrorMsg(err?.message || "Errore di rete durante la sincronizzazione dei dati.");
+      }
     } finally {
-      setLoading(false);
+      if (retryCount === 0 || retryCount >= 2) {
+        setLoading(false);
+      }
     }
   };
 
@@ -186,7 +216,7 @@ export default function RoleElectionAdmin({ adminToken, isMaster }: RoleElection
         body: JSON.stringify(payload),
       });
 
-      const data = await res.json();
+      const data = await safeParseResponse(res);
       if (data.success) {
         setConfig(data.config);
         setCfgIsOpen(data.config.isOpen);
@@ -230,7 +260,7 @@ export default function RoleElectionAdmin({ adminToken, isMaster }: RoleElection
         body: JSON.stringify({ roles: updatedRoles }),
       });
 
-      const data = await res.json();
+      const data = await safeParseResponse(res);
       if (data.success && data.config) {
         setConfig(data.config);
         setNewRoleInput("");
@@ -239,8 +269,8 @@ export default function RoleElectionAdmin({ adminToken, isMaster }: RoleElection
       } else {
         setErrorMsg(data.error || "Errore durante l'aggiunta del ruolo.");
       }
-    } catch (e) {
-      setErrorMsg("Errore durante l'aggiunta del ruolo.");
+    } catch (e: any) {
+      setErrorMsg(e?.message || "Errore durante l'aggiunta del ruolo.");
     }
   };
 
@@ -260,7 +290,7 @@ export default function RoleElectionAdmin({ adminToken, isMaster }: RoleElection
         body: JSON.stringify({ roles: updatedRoles }),
       });
 
-      const data = await res.json();
+      const data = await safeParseResponse(res);
       if (data.success && data.config) {
         setConfig(data.config);
         setSuccessMsg(`Ruolo '${deletingRole}' rimosso con successo.`);
@@ -269,8 +299,8 @@ export default function RoleElectionAdmin({ adminToken, isMaster }: RoleElection
       } else {
         setErrorMsg(data.error || "Errore durante la rimozione del ruolo.");
       }
-    } catch (e) {
-      setErrorMsg("Errore durante la rimozione del ruolo.");
+    } catch (e: any) {
+      setErrorMsg(e?.message || "Errore durante la rimozione del ruolo.");
     } finally {
       setIsDeletingRole(false);
     }
@@ -304,7 +334,7 @@ export default function RoleElectionAdmin({ adminToken, isMaster }: RoleElection
         }),
       });
 
-      const data = await res.json();
+      const data = await safeParseResponse(res);
       if (data.success) {
         setCandidates(data.candidates);
         setNewCandName("");
@@ -315,9 +345,9 @@ export default function RoleElectionAdmin({ adminToken, isMaster }: RoleElection
       } else {
         setErrorMsg(data.error || "Errore durante l'aggiunta del candidato.");
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error adding candidate:", err);
-      setErrorMsg("Errore di connessione al server.");
+      setErrorMsg(err?.message || "Errore di connessione al server.");
     } finally {
       setIsAddingCand(false);
     }
@@ -338,7 +368,7 @@ export default function RoleElectionAdmin({ adminToken, isMaster }: RoleElection
         }),
       });
 
-      const data = await res.json();
+      const data = await safeParseResponse(res);
       if (data.success) {
         setCandidates(data.candidates);
         setEditingCandidate(null);
@@ -347,8 +377,8 @@ export default function RoleElectionAdmin({ adminToken, isMaster }: RoleElection
       } else {
         setErrorMsg(data.error || "Errore durante la modifica del candidato.");
       }
-    } catch (e) {
-      setErrorMsg("Errore durante il salvataggio delle modifiche.");
+    } catch (e: any) {
+      setErrorMsg(e?.message || "Errore durante il salvataggio delle modifiche.");
     } finally {
       setIsSavingEditCand(false);
     }
@@ -366,7 +396,7 @@ export default function RoleElectionAdmin({ adminToken, isMaster }: RoleElection
         headers: getAuthHeaders(),
       });
 
-      const data = await res.json();
+      const data = await safeParseResponse(res);
       if (data.success) {
         setCandidates(data.candidates);
         setSuccessMsg(`Candidato ${deletingCandidate.name} rimosso con successo.`);
@@ -375,9 +405,9 @@ export default function RoleElectionAdmin({ adminToken, isMaster }: RoleElection
       } else {
         setErrorMsg(data.error || "Impossibile eliminare il candidato.");
       }
-    } catch (e) {
+    } catch (e: any) {
       console.error("Error deleting candidate:", e);
-      setErrorMsg("Errore durante l'eliminazione del candidato.");
+      setErrorMsg(e?.message || "Errore durante l'eliminazione del candidato.");
     } finally {
       setIsDeletingCandidate(false);
     }
@@ -393,7 +423,7 @@ export default function RoleElectionAdmin({ adminToken, isMaster }: RoleElection
         headers: getAuthHeaders(),
       });
 
-      const data = await res.json();
+      const data = await safeParseResponse(res);
       if (data.success) {
         setShowClearModal(false);
         setSuccessMsg(data.message || "Tutte le votazioni sono state azzerate con successo!");
@@ -401,8 +431,8 @@ export default function RoleElectionAdmin({ adminToken, isMaster }: RoleElection
       } else {
         setErrorMsg(data.error || "Errore durante l'azzeramento dei voti.");
       }
-    } catch (err) {
-      setErrorMsg("Errore durante l'azzeramento.");
+    } catch (err: any) {
+      setErrorMsg(err?.message || "Errore durante l'azzeramento.");
     } finally {
       setIsClearingVotes(false);
     }
@@ -422,7 +452,7 @@ export default function RoleElectionAdmin({ adminToken, isMaster }: RoleElection
         headers,
       });
 
-      const data = await res.json();
+      const data = await safeParseResponse(res);
       if (data.success) {
         setSuccessMsg(`Scheda di ${voterName} eliminata.`);
         loadData();
