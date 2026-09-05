@@ -13,7 +13,7 @@ export interface NotificationItem {
 interface NotificationMenuProps {
   discordToken?: string | null;
   adminToken?: string | null;
-  onNavigate?: (mode: "voter" | "admin" | "hierarchy" | "candidatura" | "cda") => void;
+  onNavigate?: (mode: "voter" | "admin" | "hierarchy" | "candidatura" | "cda" | "excel_gerarchia" | "role_election") => void;
 }
 
 export default function NotificationMenu({ discordToken, adminToken, onNavigate }: NotificationMenuProps) {

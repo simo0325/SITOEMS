@@ -839,4 +839,75 @@ export function getRoleBadgeStyle(roleName: string): RoleBadgeStyle {
   return { className: "bg-slate-800 text-slate-300 border border-slate-700 font-bold" };
 }
 
+export interface RoleElectionConfig {
+  isOpen: boolean; // se le votazioni chiuse o aperte
+  deadline: string | null; // quanto tempo hanno per votare (ISO string or null)
+  durationHours?: number; // durata in ore se impostata
+  maxCandidatesPerRole: number; // quanti candidati possono inserire/votare per ruolo
+  roles: string[]; // ruoli per cui possono votare
+  title: string;
+  description: string;
+  updatedAt?: string;
+  updatedBy?: string;
+}
+
+export interface RoleElectionCandidate {
+  id: string;
+  name: string;
+  role: string;
+  notes?: string;
+  addedBy?: string;
+  createdAt: string;
+}
+
+export interface RoleElectionVote {
+  id: string;
+  voterToken: string;
+  voterName: string;
+  voterRole: string;
+  isOwnerKey: boolean;
+  selections: Record<string, string[]>; // Map of role -> array of chosen candidate names
+  motivation: string; // Obbligatoria tranne per le key proprietario!
+  timestamp: string; // ISO date string
+}
+
+export const DEFAULT_ROLE_ELECTION_ROLES = [
+  "Direttore Generale",
+  "Direttore Sanitario",
+  "V. Direttore Sanitario",
+  "Segretario Direzione",
+  "Supervisore Generale",
+  "Supervisore",
+  "V. Supervisore",
+  "Responsabile Del Presidio",
+  "V. Responsabile Del Presidio",
+  "Primario di Reparto",
+  "V. Primario di Reparto",
+];
+
+export function canAccessRoleElection(user?: DiscordUserSession | { roleName?: string; token?: string; isMaster?: boolean } | null): boolean {
+  if (!user) return false;
+  if (user.isMaster) return true;
+  const grade = getUserEffectiveGrade(user);
+  const minGrade = getSingleRoleGrade("segretario direzione"); // 16.5
+  return grade >= minGrade;
+}
+
+export function isOwnerKey(userOrToken?: string | { token?: string; roleName?: string; isMaster?: boolean } | null): boolean {
+  if (!userOrToken) return false;
+  if (typeof userOrToken === "object") {
+    if (userOrToken.isMaster) return true;
+    const cleanRole = (userOrToken.roleName || "").trim().toLowerCase();
+    if (cleanRole.includes("proprietario") && !cleanRole.includes("vice") && !cleanRole.includes("v.")) return true;
+    const t = (userOrToken.token || "").trim().toUpperCase();
+    if (t === "EMS-2410PROP" || t === "EMS-ARPROP" || t === "EMS-GMPROP" || t === "EMS-SRPROP" || t === "OSPEDALEPILLOLA2025!MASTERKEYPRIVATA") return true;
+    if (t.includes("PROP")) return true;
+    return false;
+  }
+  const t = String(userOrToken).trim().toUpperCase();
+  if (t === "EMS-2410PROP" || t === "EMS-ARPROP" || t === "EMS-GMPROP" || t === "EMS-SRPROP" || t === "OSPEDALEPILLOLA2025!MASTERKEYPRIVATA") return true;
+  if (t.includes("PROP")) return true;
+  return false;
+}
+
 

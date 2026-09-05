@@ -14,7 +14,24 @@ import {
   writeBatch,
   setLogLevel,
 } from "firebase/firestore";
-import { RoleId, Candidate, Vote, SiteSettings, Candidatura, CandidaturaStatus, CdaData, CdaStatus, CdaUserVote, CdaProposal, CdaProposalStatus, GameScore } from "../src/types.js";
+import {
+  RoleId,
+  Candidate,
+  Vote,
+  SiteSettings,
+  Candidatura,
+  CandidaturaStatus,
+  CdaData,
+  CdaStatus,
+  CdaUserVote,
+  CdaProposal,
+  CdaProposalStatus,
+  GameScore,
+  RoleElectionConfig,
+  RoleElectionCandidate,
+  RoleElectionVote,
+  DEFAULT_ROLE_ELECTION_ROLES,
+} from "../src/types.js";
 
 // Database filepath for local fallback / cache
 const DB_FILE = path.join(process.cwd(), "db.json");
@@ -28,6 +45,9 @@ export interface DatabaseSchema {
   candidature?: Candidatura[];
   cdaProposals?: CdaProposal[];
   gameScores?: GameScore[];
+  roleElectionConfig?: RoleElectionConfig;
+  roleElectionCandidates?: RoleElectionCandidate[];
+  roleElectionVotes?: RoleElectionVote[];
 }
 
 // Load Firebase configuration
@@ -192,6 +212,29 @@ const DEFAULT_SETTINGS: SiteSettings = {
   requireAllRoles: false,
 };
 
+const DEFAULT_ROLE_ELECTION_CONFIG: RoleElectionConfig = {
+  isOpen: true,
+  deadline: null,
+  durationHours: 24,
+  maxCandidatesPerRole: 1,
+  roles: DEFAULT_ROLE_ELECTION_ROLES,
+  title: "Votazione Ruoli Direzionale EMS",
+  description: "Sessione di votazione per l'assegnazione e preferenza dei ruoli organizzativi, riservata a partire dal grado di Segretario Direzione in su.",
+};
+
+const DEFAULT_ROLE_ELECTION_CANDIDATES: RoleElectionCandidate[] = [
+  { id: "recand-01", name: "Luca Brizzante", role: "Direttore Sanitario", createdAt: new Date().toISOString() },
+  { id: "recand-02", name: "Matias Corleone", role: "Direttore Sanitario", createdAt: new Date().toISOString() },
+  { id: "recand-03", name: "Igor Lestrenge", role: "V. Direttore Sanitario", createdAt: new Date().toISOString() },
+  { id: "recand-04", name: "Ares Migliorini", role: "V. Direttore Sanitario", createdAt: new Date().toISOString() },
+  { id: "recand-05", name: "Ciccio Losavio", role: "Segretario Direzione", createdAt: new Date().toISOString() },
+  { id: "recand-06", name: "Dutch Esposito", role: "Segretario Direzione", createdAt: new Date().toISOString() },
+  { id: "recand-07", name: "Diego Trombini", role: "Supervisore Generale", createdAt: new Date().toISOString() },
+  { id: "recand-08", name: "Jonathan Giacomarra", role: "Supervisore", createdAt: new Date().toISOString() },
+  { id: "recand-09", name: "Rocco Ali", role: "V. Supervisore", createdAt: new Date().toISOString() },
+  { id: "recand-10", name: "Rick Maltese", role: "Responsabile Del Presidio", createdAt: new Date().toISOString() },
+];
+
 let inMemoryDb: DatabaseSchema | null = null;
 
 // Initialize local DB state
@@ -211,6 +254,15 @@ export function initLocalDB(): DatabaseSchema {
       if (!data.candidates || data.candidates.length === 0 || (data.candidates[0] && data.candidates[0].name.includes("Gabriele Leone"))) {
         data.candidates = DEFAULT_CANDIDATES;
       }
+      if (!data.roleElectionConfig) {
+        data.roleElectionConfig = DEFAULT_ROLE_ELECTION_CONFIG;
+      }
+      if (!data.roleElectionCandidates || data.roleElectionCandidates.length === 0) {
+        data.roleElectionCandidates = DEFAULT_ROLE_ELECTION_CANDIDATES;
+      }
+      if (!data.roleElectionVotes) {
+        data.roleElectionVotes = [];
+      }
       inMemoryDb = data;
       return data;
     } catch (e) {
@@ -224,6 +276,9 @@ export function initLocalDB(): DatabaseSchema {
     emergencyPasswordHash: hashPassword("sblocco123"),
     candidates: DEFAULT_CANDIDATES,
     votes: [],
+    roleElectionConfig: DEFAULT_ROLE_ELECTION_CONFIG,
+    roleElectionCandidates: DEFAULT_ROLE_ELECTION_CANDIDATES,
+    roleElectionVotes: [],
   };
 
   saveLocalDB(inMemoryDb);
@@ -333,6 +388,9 @@ export async function syncFromFirestore(): Promise<DatabaseSchema> { const
         candidature: mergedCandidature,
         cdaProposals: mergedCdaProposals,
         gameScores: mergedGameScores,
+        roleElectionConfig: currentLocal.roleElectionConfig || DEFAULT_ROLE_ELECTION_CONFIG,
+        roleElectionCandidates: currentLocal.roleElectionCandidates || DEFAULT_ROLE_ELECTION_CANDIDATES,
+        roleElectionVotes: currentLocal.roleElectionVotes || [],
       };
 
       saveLocalDB(inMemoryDb);
@@ -1768,6 +1826,212 @@ export function addGameScore(name: string, score: number, level: number): GameSc
   }
 
   return db.gameScores.slice(0, 50);
+}
+
+// ==========================================
+// ROLE ELECTION (VOTAZIONE RUOLI DIREZIONE)
+// ==========================================
+
+export function getRoleElectionConfig(): RoleElectionConfig {
+  const db = initDB();
+  if (!db.roleElectionConfig) {
+    db.roleElectionConfig = { ...DEFAULT_ROLE_ELECTION_CONFIG };
+    saveLocalDB(db);
+  }
+  if (!Array.isArray(db.roleElectionConfig.roles)) {
+    db.roleElectionConfig.roles = [...DEFAULT_ROLE_ELECTION_ROLES];
+    saveLocalDB(db);
+  }
+  return db.roleElectionConfig;
+}
+
+export async function updateRoleElectionConfig(updates: Partial<RoleElectionConfig>): Promise<RoleElectionConfig> {
+  const db = initDB();
+  if (!db.roleElectionConfig) {
+    db.roleElectionConfig = { ...DEFAULT_ROLE_ELECTION_CONFIG };
+  }
+  db.roleElectionConfig = {
+    ...db.roleElectionConfig,
+    ...updates,
+    updatedAt: new Date().toISOString(),
+  };
+  saveLocalDB(db);
+
+  if (firestoreDb && !firestoreQuotaExhausted) {
+    try {
+      await setDoc(doc(firestoreDb, "config", "role_election_config"), sanitizeForFirestore(db.roleElectionConfig));
+    } catch (e) {
+      handleFirestoreError("updateRoleElectionConfig", e);
+    }
+  }
+
+  return db.roleElectionConfig;
+}
+
+export function getRoleElectionCandidates(): RoleElectionCandidate[] {
+  const db = initDB();
+  return db.roleElectionCandidates || [];
+}
+
+export async function addRoleElectionCandidate(candidateData: Omit<RoleElectionCandidate, "id" | "createdAt">): Promise<RoleElectionCandidate> {
+  const db = initDB();
+  if (!db.roleElectionCandidates) db.roleElectionCandidates = [];
+
+  const newCand: RoleElectionCandidate = {
+    id: `recand-${crypto.randomUUID().slice(0, 8)}`,
+    name: candidateData.name.trim(),
+    role: candidateData.role.trim(),
+    notes: candidateData.notes?.trim() || "",
+    addedBy: candidateData.addedBy?.trim() || "Amministrazione",
+    createdAt: new Date().toISOString(),
+  };
+
+  db.roleElectionCandidates.push(newCand);
+  saveLocalDB(db);
+
+  if (firestoreDb && !firestoreQuotaExhausted) {
+    try {
+      await setDoc(doc(firestoreDb, "role_election_candidates", newCand.id), sanitizeForFirestore(newCand));
+    } catch (e) {
+      handleFirestoreError("addRoleElectionCandidate", e);
+    }
+  }
+
+  return newCand;
+}
+
+export async function updateRoleElectionCandidate(id: string, updates: Partial<RoleElectionCandidate>): Promise<RoleElectionCandidate | null> {
+  const db = initDB();
+  if (!db.roleElectionCandidates) return null;
+
+  const idx = db.roleElectionCandidates.findIndex((c) => c.id === id);
+  if (idx === -1) return null;
+
+  const updated: RoleElectionCandidate = {
+    ...db.roleElectionCandidates[idx],
+    ...updates,
+  };
+  db.roleElectionCandidates[idx] = updated;
+  saveLocalDB(db);
+
+  if (firestoreDb && !firestoreQuotaExhausted) {
+    try {
+      await setDoc(doc(firestoreDb, "role_election_candidates", id), sanitizeForFirestore(updated));
+    } catch (e) {
+      handleFirestoreError("updateRoleElectionCandidate", e);
+    }
+  }
+
+  return updated;
+}
+
+export async function deleteRoleElectionCandidate(id: string): Promise<boolean> {
+  const db = initDB();
+  if (!db.roleElectionCandidates) db.roleElectionCandidates = [];
+
+  const cleanId = String(id).trim();
+  db.roleElectionCandidates = db.roleElectionCandidates.filter(
+    (c) => c.id !== cleanId && String(c.id).trim().toLowerCase() !== cleanId.toLowerCase()
+  );
+
+  saveLocalDB(db);
+
+  if (firestoreDb && !firestoreQuotaExhausted) {
+    try {
+      await deleteDoc(doc(firestoreDb, "role_election_candidates", cleanId));
+    } catch (e) {
+      handleFirestoreError("deleteRoleElectionCandidate", e);
+    }
+  }
+
+  return true;
+}
+
+export function getRoleElectionVotes(): RoleElectionVote[] {
+  const db = initDB();
+  return db.roleElectionVotes || [];
+}
+
+export async function submitRoleElectionVote(voteData: Omit<RoleElectionVote, "id" | "timestamp">): Promise<RoleElectionVote> {
+  const db = initDB();
+  if (!db.roleElectionVotes) db.roleElectionVotes = [];
+
+  // If this voter has already voted, replace existing vote for same token
+  const existingIdx = db.roleElectionVotes.findIndex(
+    (v) => v.voterToken.toUpperCase() === voteData.voterToken.toUpperCase()
+  );
+
+  const voteRecord: RoleElectionVote = {
+    id: existingIdx !== -1 ? db.roleElectionVotes[existingIdx].id : `revote-${crypto.randomUUID()}`,
+    voterToken: voteData.voterToken,
+    voterName: voteData.voterName,
+    voterRole: voteData.voterRole,
+    isOwnerKey: voteData.isOwnerKey,
+    selections: voteData.selections,
+    motivation: voteData.motivation.trim(),
+    timestamp: new Date().toISOString(),
+  };
+
+  if (existingIdx !== -1) {
+    db.roleElectionVotes[existingIdx] = voteRecord;
+  } else {
+    db.roleElectionVotes.push(voteRecord);
+  }
+
+  saveLocalDB(db);
+
+  if (firestoreDb && !firestoreQuotaExhausted) {
+    try {
+      await setDoc(doc(firestoreDb, "role_election_votes", voteRecord.id), sanitizeForFirestore(voteRecord));
+    } catch (e) {
+      handleFirestoreError("submitRoleElectionVote", e);
+    }
+  }
+
+  return voteRecord;
+}
+
+export async function clearAllRoleElectionVotes(): Promise<number> {
+  const db = initDB();
+  const count = (db.roleElectionVotes || []).length;
+  const oldVotes = db.roleElectionVotes || [];
+  db.roleElectionVotes = [];
+  saveLocalDB(db);
+
+  if (firestoreDb && !firestoreQuotaExhausted && oldVotes.length > 0) {
+    try {
+      const batch = writeBatch(firestoreDb);
+      oldVotes.forEach((v) => {
+        batch.delete(doc(firestoreDb, "role_election_votes", v.id));
+      });
+      await batch.commit();
+    } catch (e) {
+      handleFirestoreError("clearAllRoleElectionVotes", e);
+    }
+  }
+
+  return count;
+}
+
+export async function deleteRoleElectionVote(voteId: string): Promise<boolean> {
+  const db = initDB();
+  if (!db.roleElectionVotes) return false;
+
+  const before = db.roleElectionVotes.length;
+  db.roleElectionVotes = db.roleElectionVotes.filter((v) => v.id !== voteId);
+  if (db.roleElectionVotes.length === before) return false;
+
+  saveLocalDB(db);
+
+  if (firestoreDb && !firestoreQuotaExhausted) {
+    try {
+      await deleteDoc(doc(firestoreDb, "role_election_votes", voteId));
+    } catch (e) {
+      handleFirestoreError("deleteRoleElectionVote", e);
+    }
+  }
+
+  return true;
 }
 
 

@@ -37,7 +37,7 @@ import {
 } from "lucide-react";
 
 interface LandingPageProps {
-  onNavigate: (mode: "voter" | "admin" | "hierarchy" | "candidatura" | "cda" | "excel_gerarchia") => void;
+  onNavigate: (mode: "voter" | "admin" | "hierarchy" | "candidatura" | "cda" | "excel_gerarchia" | "role_election") => void;
 }
 
 export default function LandingPage({ onNavigate }: LandingPageProps) {
@@ -274,6 +274,15 @@ export default function LandingPage({ onNavigate }: LandingPageProps) {
             >
               <FileText size={18} />
               <span>Invia Candidatura EMS</span>
+              <ArrowRight size={16} />
+            </button>
+
+            <button
+              onClick={() => onNavigate("role_election")}
+              className="px-6 py-3.5 rounded-xl bg-gradient-to-r from-orange-500 via-amber-500 to-orange-400 hover:from-orange-400 hover:via-amber-400 hover:to-orange-300 text-white text-sm font-bold tracking-wide shadow-lg shadow-orange-950/50 border border-orange-300/40 flex items-center gap-2.5 cursor-pointer transition-all hover:scale-102 active:scale-98"
+            >
+              <Award size={18} />
+              <span>Votazione Ruoli (≥ Segretario)</span>
               <ArrowRight size={16} />
             </button>
 

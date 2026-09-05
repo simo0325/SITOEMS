@@ -61,6 +61,16 @@ import {
   addGameScore,
   deleteGameScore,
   deleteGameScores,
+  getRoleElectionConfig,
+  updateRoleElectionConfig,
+  getRoleElectionCandidates,
+  addRoleElectionCandidate,
+  updateRoleElectionCandidate,
+  deleteRoleElectionCandidate,
+  getRoleElectionVotes,
+  submitRoleElectionVote,
+  clearAllRoleElectionVotes,
+  deleteRoleElectionVote,
 } from "./server/db.js";
 import {
   ROLE_IDS_SORTED_ASC,
@@ -85,6 +95,12 @@ import {
   OFFICIAL_OWNERS_SEED,
   OFFICIAL_IMAGE_MEMBERS_SEED,
   ALLOWED_OFFICIAL_TOKEN_KEYS,
+  RoleElectionConfig,
+  RoleElectionCandidate,
+  RoleElectionVote,
+  DEFAULT_ROLE_ELECTION_ROLES,
+  canAccessRoleElection,
+  isOwnerKey,
 } from "./src/types.js";
 
 // Initialize DB on startup
@@ -1384,6 +1400,389 @@ app.post("/api/game/leaderboard/delete", (req, res) => {
   } catch (error) {
     console.error("Error deleting multiple game scores:", error);
     return res.status(500).json({ success: false, error: "Errore interno durante l'eliminazione dei punteggi." });
+  }
+});
+
+// ==========================================
+// ROLE ELECTION API ENDPOINTS (VOTAZIONE RUOLI DIREZIONE)
+// ==========================================
+
+// Get data for Role Election (Accessible to Segretario Direzione [Grade >= 16.5] and above)
+app.get("/api/role-election/data", (req, res) => {
+  try {
+    const caller = getCallerGradeAndRole(req);
+    const ownerAuth = isOwnerKeyAuthorized(req);
+    const isOwner = ownerAuth.authorized || caller.isMaster || (caller.roleName || "").toLowerCase().includes("proprietario");
+
+    // Grade check: Segretario Direzione (16.5) and above
+    const minGrade = 16.5;
+    if (caller.grade < minGrade && !caller.isAdminPassword && !isOwner) {
+      return res.status(403).json({
+        success: false,
+        error: "Accesso Riservato: questa sezione di votazione ruoli è accessibile esclusivamente a partire dal grado di Segretario Direzione in su.",
+      });
+    }
+
+    const authHeader = req.headers.authorization;
+    const token = authHeader && authHeader.startsWith("Bearer ") ? authHeader.substring(7).trim() : "";
+
+    const config = getRoleElectionConfig();
+    const candidates = getRoleElectionCandidates();
+    const votes = getRoleElectionVotes();
+
+    const userVote = votes.find(
+      (v) =>
+        (token && v.voterToken.toUpperCase() === token.toUpperCase()) ||
+        (caller.username && caller.username !== "Sconosciuto" && v.voterName.toLowerCase() === caller.username.toLowerCase())
+    );
+
+    res.json({
+      success: true,
+      config,
+      candidates,
+      caller: {
+        username: caller.username,
+        roleName: caller.roleName,
+        grade: caller.grade,
+        isOwnerKey: isOwner,
+      },
+      userVote: userVote
+        ? {
+            id: userVote.id,
+            selections: userVote.selections,
+            motivation: userVote.motivation,
+            timestamp: userVote.timestamp,
+            isOwnerKey: userVote.isOwnerKey,
+          }
+        : null,
+      totalVotes: votes.length,
+    });
+  } catch (error) {
+    console.error("Error in GET /api/role-election/data:", error);
+    res.status(500).json({ success: false, error: "Errore durante il recupero dei dati di votazione ruoli." });
+  }
+});
+
+// Submit a vote for role election
+app.post("/api/role-election/vote", (req, res) => {
+  try {
+    const caller = getCallerGradeAndRole(req);
+    const ownerAuth = isOwnerKeyAuthorized(req);
+    const isOwner = ownerAuth.authorized || caller.isMaster || (caller.roleName || "").toLowerCase().includes("proprietario");
+
+    const authHeader = req.headers.authorization;
+    const token = authHeader && authHeader.startsWith("Bearer ") ? authHeader.substring(7).trim() : "";
+
+    // Grade check: Segretario Direzione (16.5) and above
+    const minGrade = 16.5;
+    if (caller.grade < minGrade && !caller.isAdminPassword && !isOwner) {
+      return res.status(403).json({
+        success: false,
+        error: "Accesso Riservato: solo i membri dal grado di Segretario Direzione in su possono esprimere un voto.",
+      });
+    }
+
+    const config = getRoleElectionConfig();
+
+    // Check if voting is open
+    if (!config.isOpen) {
+      return res.status(400).json({
+        success: false,
+        error: "Le votazioni per i ruoli della Direzione sono attualmente chiuse.",
+      });
+    }
+
+    // Check deadline
+    if (config.deadline && new Date().getTime() > new Date(config.deadline).getTime()) {
+      return res.status(400).json({
+        success: false,
+        error: "Il tempo a disposizione per effettuare la votazione dei ruoli è scaduto.",
+      });
+    }
+
+    const { selections, motivation } = req.body || {};
+
+    // Mandatory motivation rule:
+    // "quando votano obbligali a mettere una motivazione al voto, tranne alle key proprietario"
+    if (!isOwner) {
+      if (!motivation || typeof motivation !== "string" || motivation.trim().length < 5) {
+        return res.status(400).json({
+          success: false,
+          error: "La motivazione al voto è obbligatoria per tutti gli elettori (minimo 5 caratteri).",
+        });
+      }
+    }
+
+    if (!selections || typeof selections !== "object") {
+      return res.status(400).json({
+        success: false,
+        error: "Nessuna preferenza selezionata.",
+      });
+    }
+
+    // Verify limit of candidates per role
+    const maxPerRole = Math.max(1, config.maxCandidatesPerRole || 1);
+    for (const [roleName, candList] of Object.entries(selections)) {
+      if (Array.isArray(candList) && candList.length > maxPerRole) {
+        return res.status(400).json({
+          success: false,
+          error: `Puoi selezionare al massimo ${maxPerRole} candidato/i per il ruolo '${roleName}'.`,
+        });
+      }
+    }
+
+    const cleanMotivation = motivation ? String(motivation).trim() : "";
+    const voterName = caller.username && caller.username !== "Sconosciuto" ? caller.username : (ownerAuth.ownerName || "Membro Direzione");
+    const voterRole = caller.roleName && caller.roleName !== "Sconosciuto" ? caller.roleName : (isOwner ? "Proprietario" : "Segretario Direzione");
+
+    submitRoleElectionVote({
+      voterToken: token || (isOwner ? "KEY-PROPRIETARIO" : "TOKEN-DIREZIONE"),
+      voterName,
+      voterRole,
+      isOwnerKey: isOwner,
+      selections,
+      motivation: cleanMotivation,
+    }).then((voteRecord) => {
+      addAccessLog(
+        req,
+        voterName,
+        voterRole,
+        token,
+        "VOTO_RUOLI_DIREZIONE",
+        "SUCCESS",
+        `Voto espresso per ruoli direzionali (${Object.keys(selections).length} cariche votate). Motivazione: ${isOwner && !cleanMotivation ? "N/A (Key Proprietario)" : "Presente"}`
+      );
+
+      res.json({
+        success: true,
+        message: "Il tuo voto è stato registrato con successo!",
+        vote: voteRecord,
+      });
+    }).catch((err) => {
+      console.error("Error saving role election vote:", err);
+      res.status(500).json({ success: false, error: "Errore durante il salvataggio del voto." });
+    });
+  } catch (error) {
+    console.error("Error in POST /api/role-election/vote:", error);
+    res.status(500).json({ success: false, error: "Errore del server durante l'invio del voto." });
+  }
+});
+
+// Admin: Get all Role Election details, config, candidates and votes
+app.get("/api/admin/role-election/data", requireAdmin, (req, res) => {
+  try {
+    const config = getRoleElectionConfig();
+    const candidates = getRoleElectionCandidates();
+    const votes = getRoleElectionVotes();
+
+    // Compute statistics
+    const roleStats: Record<string, Record<string, number>> = {};
+    config.roles.forEach((r) => {
+      roleStats[r] = {};
+    });
+
+    votes.forEach((v) => {
+      Object.entries(v.selections || {}).forEach(([roleName, selectedCandNames]) => {
+        if (!roleStats[roleName]) roleStats[roleName] = {};
+        if (Array.isArray(selectedCandNames)) {
+          selectedCandNames.forEach((name) => {
+            roleStats[roleName][name] = (roleStats[roleName][name] || 0) + 1;
+          });
+        }
+      });
+    });
+
+    const winners: Record<string, { name: string; count: number }[]> = {};
+    Object.keys(roleStats).forEach((roleName) => {
+      winners[roleName] = Object.entries(roleStats[roleName])
+        .map(([name, count]) => ({ name, count }))
+        .sort((a, b) => b.count - a.count);
+    });
+
+    res.json({
+      success: true,
+      config,
+      candidates,
+      votes,
+      stats: {
+        totalVotes: votes.length,
+        roleStats,
+        winners,
+      },
+    });
+  } catch (error) {
+    console.error("Error in GET /api/admin/role-election/data:", error);
+    res.status(500).json({ success: false, error: "Errore durante il recupero dei dati amministrativi." });
+  }
+});
+
+// Admin: Update Role Election Settings (isOpen, deadline, maxCandidatesPerRole, roles, title, description)
+app.post("/api/admin/role-election/config", requireAdmin, async (req, res) => {
+  try {
+    const caller = getCallerGradeAndRole(req);
+    const { isOpen, deadline, durationHours, maxCandidatesPerRole, roles, title, description } = req.body || {};
+
+    const updates: Partial<RoleElectionConfig> = {};
+    if (typeof isOpen === "boolean") updates.isOpen = isOpen;
+    if (deadline !== undefined) updates.deadline = deadline ? String(deadline) : null;
+    if (typeof durationHours === "number") updates.durationHours = durationHours;
+    if (typeof maxCandidatesPerRole === "number" && maxCandidatesPerRole >= 1) updates.maxCandidatesPerRole = maxCandidatesPerRole;
+    if (Array.isArray(roles)) updates.roles = roles.map((r: any) => String(r).trim()).filter(Boolean);
+    if (title && typeof title === "string") updates.title = title.trim();
+    if (description && typeof description === "string") updates.description = description.trim();
+    updates.updatedBy = caller.username || "Amministrazione";
+
+    const newConfig = await updateRoleElectionConfig(updates);
+
+    addAccessLog(
+      req,
+      caller.username || "Amministrazione",
+      caller.roleName || "Admin",
+      "",
+      "CONFIGURAZIONE_VOTAZIONE_RUOLI",
+      "SUCCESS",
+      `Modificate impostazioni votazione ruoli: Stato=${newConfig.isOpen ? "Aperte" : "Chiuse"}, MaxPreferenze=${newConfig.maxCandidatesPerRole}, Scadenza=${newConfig.deadline || "Nessuna"}`
+    );
+
+    res.json({ success: true, config: newConfig });
+  } catch (error) {
+    console.error("Error in POST /api/admin/role-election/config:", error);
+    res.status(500).json({ success: false, error: "Errore durante l'aggiornamento della configurazione." });
+  }
+});
+
+// Admin: Add candidate for Role Election
+app.post("/api/admin/role-election/candidate", requireAdmin, async (req, res) => {
+  try {
+    const caller = getCallerGradeAndRole(req);
+    const { name, role, notes } = req.body || {};
+    if (!name || typeof name !== "string" || !name.trim()) {
+      return res.status(400).json({ success: false, error: "Nome del candidato obbligatorio." });
+    }
+    if (!role || typeof role !== "string" || !role.trim()) {
+      return res.status(400).json({ success: false, error: "Ruolo di candidatura obbligatorio." });
+    }
+
+    const candidate = await addRoleElectionCandidate({
+      name: name.trim(),
+      role: role.trim(),
+      notes: notes ? String(notes).trim() : "",
+      addedBy: caller.username || "Amministrazione",
+    });
+
+    addAccessLog(
+      req,
+      caller.username || "Amministrazione",
+      caller.roleName || "Admin",
+      "",
+      "AGGIUNTO_CANDIDATO_RUOLO",
+      "SUCCESS",
+      `Aggiunto candidato ${candidate.name} per la carica '${candidate.role}'`
+    );
+
+    res.json({ success: true, candidate, candidates: getRoleElectionCandidates() });
+  } catch (error) {
+    console.error("Error adding role candidate:", error);
+    res.status(500).json({ success: false, error: "Errore durante l'aggiunta del candidato." });
+  }
+});
+
+// Admin: Update candidate for Role Election
+app.put("/api/admin/role-election/candidate/:id", requireAdmin, async (req, res) => {
+  try {
+    const caller = getCallerGradeAndRole(req);
+    const id = req.params.id;
+    const { name, role, notes } = req.body || {};
+
+    const updates: Partial<RoleElectionCandidate> = {};
+    if (name && typeof name === "string") updates.name = name.trim();
+    if (role && typeof role === "string") updates.role = role.trim();
+    if (notes !== undefined) updates.notes = String(notes).trim();
+
+    const updated = await updateRoleElectionCandidate(id, updates);
+    if (!updated) {
+      return res.status(404).json({ success: false, error: "Candidato non trovato." });
+    }
+
+    res.json({ success: true, candidate: updated, candidates: getRoleElectionCandidates() });
+  } catch (error) {
+    console.error("Error updating role candidate:", error);
+    res.status(500).json({ success: false, error: "Errore durante la modifica del candidato." });
+  }
+});
+
+// Admin: Delete candidate for Role Election
+app.delete("/api/admin/role-election/candidate/:id", requireAdmin, async (req, res) => {
+  try {
+    const caller = getCallerGradeAndRole(req);
+    const id = req.params.id;
+    const deleted = await deleteRoleElectionCandidate(id);
+
+    const actorName = (caller.username && caller.username !== "Sconosciuto") ? caller.username : (caller.reviewerName || caller.roleName || "Admin");
+
+    addAccessLog(
+      req,
+      actorName,
+      caller.roleName || "Admin",
+      "",
+      "ELIMINATO_CANDIDATO_RUOLO",
+      "SUCCESS",
+      `Eliminato candidato ID '${id}' dalla votazione ruoli da ${actorName}.`
+    );
+
+    res.json({ success: true, deleted, candidates: getRoleElectionCandidates() });
+  } catch (error) {
+    console.error("Error deleting role candidate:", error);
+    res.status(500).json({ success: false, error: "Errore durante l'eliminazione del candidato." });
+  }
+});
+
+// Admin: Clear all Role Election votes ("ripulire tutte le votazioni una volta concluso")
+app.post("/api/admin/role-election/clear-votes", requireAdmin, async (req, res) => {
+  try {
+    const caller = getCallerGradeAndRole(req);
+    const count = await clearAllRoleElectionVotes();
+
+    const actorName = (caller.username && caller.username !== "Sconosciuto") ? caller.username : (caller.reviewerName || caller.roleName || "Amministrazione");
+
+    addAccessLog(
+      req,
+      actorName,
+      caller.roleName || "Admin",
+      "",
+      "RESET_VOTI_RUOLI",
+      "SUCCESS",
+      `Ripulite tutte le votazioni per i ruoli della Direzione (Totale ${count} schede cancellate) da ${actorName}.`
+    );
+
+    res.json({
+      success: true,
+      count,
+      message: `Tutte le votazioni (${count} schede) sono state ripulite con successo per iniziare una nuova tornata.`,
+    });
+  } catch (error) {
+    console.error("Error clearing role votes:", error);
+    res.status(500).json({ success: false, error: "Errore durante la pulizia dei voti." });
+  }
+});
+
+// Admin: Delete individual Role Election vote
+app.delete("/api/admin/role-election/votes/:id", async (req, res) => {
+  try {
+    const caller = getCallerGradeAndRole(req);
+    const ownerAuth = isOwnerKeyAuthorized(req);
+
+    if (!caller.isAdminPassword && !caller.isMaster && !ownerAuth.authorized && caller.grade < 18) {
+      return res.status(403).json({ success: false, error: "Permesso negato per eliminare singoli voti." });
+    }
+
+    const id = req.params.id;
+    const deleted = await deleteRoleElectionVote(id);
+
+    res.json({ success: true, deleted });
+  } catch (error) {
+    console.error("Error deleting individual role vote:", error);
+    res.status(500).json({ success: false, error: "Errore durante l'eliminazione del voto." });
   }
 });
 

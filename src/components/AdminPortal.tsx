@@ -65,6 +65,7 @@ import {
 } from "../types.js";
 import RoleBadge from "./RoleBadge.js";
 import EmsHierarchy from "./EmsHierarchy.js";
+import RoleElectionAdmin from "./RoleElectionAdmin.js";
 
 interface AdminPortalProps {
   onConfigChanged: () => void;
@@ -77,7 +78,7 @@ interface RevokedTokenEntry {
   revokedAt: string;
 }
 
-type TabType = "candidates" | "votes" | "analytics" | "tokens" | "revoked_tokens" | "logs" | "hierarchy" | "candidature" | "cda_proposals" | "settings";
+type TabType = "candidates" | "votes" | "analytics" | "tokens" | "revoked_tokens" | "logs" | "hierarchy" | "candidature" | "cda_proposals" | "role_election" | "settings";
 
 export default function AdminPortal({ onConfigChanged }: AdminPortalProps) {
   const [token, setToken] = useState<string | null>(() => localStorage.getItem("adminToken"));
@@ -2048,6 +2049,16 @@ export default function AdminPortal({ onConfigChanged }: AdminPortalProps) {
               {pendingProposalsCount} attive
             </span>
           )}
+        </button>
+        <button
+          onClick={() => setActiveTab("role_election")}
+          className={`flex items-center gap-2 px-4 py-3 font-semibold text-xs uppercase tracking-wider cursor-pointer border-b-2 transition-all ${
+            activeTab === "role_election"
+              ? "border-orange-500 text-orange-400 font-extrabold"
+              : "border-transparent text-slate-400 hover:text-slate-200"
+          }`}
+        >
+          <Award size={16} /> Votazione Ruoli Direzione
         </button>
         <button
           onClick={() => setActiveTab("settings")}
@@ -5556,6 +5567,13 @@ export default function AdminPortal({ onConfigChanged }: AdminPortalProps) {
                   ))}
                 </div>
               )}
+            </div>
+          )}
+
+          {/* TAB: ELEZIONI RUOLI DIREZIONE */}
+          {activeTab === "role_election" && (
+            <div className="animate-fadeIn">
+              <RoleElectionAdmin adminToken={token || undefined} isMaster={sessionInfo?.isMaster} />
             </div>
           )}
         </div>

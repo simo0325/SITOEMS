@@ -10,10 +10,11 @@ import ExcelGerarchiaPortal from "./components/ExcelGerarchiaPortal.js";
 import DiscordAuthGateway from "./components/DiscordAuthGateway.js";
 import NotificationMenu from "./components/NotificationMenu.js";
 import HospitalDinoGame from "./components/HospitalDinoGame.js";
+import RoleElectionPortal from "./components/RoleElectionPortal.js";
 import emsLogo from "./assets/images/ems_logo_1784649117886.jpg";
-import { DiscordUserSession, getUserEffectiveGrade, getSingleRoleGrade } from "./types.js";
+import { DiscordUserSession, getUserEffectiveGrade, getSingleRoleGrade, canAccessRoleElection } from "./types.js";
 
-type AppMode = "home" | "voter" | "admin" | "hierarchy" | "candidatura" | "cda" | "excel_gerarchia";
+type AppMode = "home" | "voter" | "admin" | "hierarchy" | "candidatura" | "cda" | "excel_gerarchia" | "role_election";
 
 function getInitialStateFromUrl(): { mode: AppMode; isGameActive: boolean } {
   if (typeof window === "undefined") return { mode: "home", isGameActive: false };
@@ -25,6 +26,9 @@ function getInitialStateFromUrl(): { mode: AppMode; isGameActive: boolean } {
   }
   if (path.includes("excel-gerarchia") || path.includes("excelgerarchia") || path.includes("foglio-gerarchia")) {
     return { mode: "excel_gerarchia", isGameActive: false };
+  }
+  if (path.includes("ruoli") || path.includes("role-election") || path.includes("elezioni-ruoli")) {
+    return { mode: "role_election", isGameActive: false };
   }
   if (path.includes("cda")) {
     return { mode: "cda", isGameActive: false };
@@ -50,6 +54,8 @@ function getUrlForMode(mode: AppMode, isGameActive: boolean): string {
   switch (mode) {
     case "excel_gerarchia":
       return "/ExcelGerarchia";
+    case "role_election":
+      return "/ElezioniRuoli";
     case "cda":
       return "/CDA";
     case "hierarchy":
@@ -161,6 +167,7 @@ export default function App() {
   const userEffectiveGrade = discordSession ? getUserEffectiveGrade(discordSession) : 0;
   const minAdminGrade = getSingleRoleGrade("vice direttore sanitario");
   const canAccessAdmin = userEffectiveGrade >= minAdminGrade;
+  const canAccessElection = discordSession ? canAccessRoleElection(discordSession) : false;
 
   useEffect(() => {
     if (mode === "admin" && !canAccessAdmin) {
@@ -245,6 +252,7 @@ export default function App() {
       case "candidatura": return "Candidatura";
       case "cda": return "Consiglio CDA";
       case "excel_gerarchia": return "Excel Gerarchia";
+      case "role_election": return "Votazione Ruoli";
       case "voter": return "Portale Elettore";
       case "admin": return "Area Admin";
     }
@@ -468,6 +476,25 @@ export default function App() {
                     <span>Portale Elettore</span>
                   </button>
 
+                  {canAccessElection && (
+                    <button
+                      onClick={() => { handleNavigate("role_election"); setIsNavOpen(false); }}
+                      className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all text-left cursor-pointer ${
+                        mode === "role_election"
+                          ? "bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md shadow-orange-950/50"
+                          : "text-slate-300 hover:bg-white/10 hover:text-white"
+                      }`}
+                    >
+                      <Award size={16} className={mode === "role_election" ? "text-white" : "text-orange-400"} />
+                      <div className="flex items-center justify-between w-full">
+                        <span>Votazione Ruoli</span>
+                        <span className="text-[9px] px-1.5 py-0.5 rounded bg-orange-500/20 text-orange-300 font-bold border border-orange-500/30">
+                          ≥ Segretario
+                        </span>
+                      </div>
+                    </button>
+                  )}
+
                   {canAccessAdmin && (
                     <button
                       onClick={() => { handleNavigate("admin"); setIsNavOpen(false); }}
@@ -540,6 +567,23 @@ export default function App() {
         {mode === "voter" && (
           discordSession ? (
             <VoterPortal configVersion={configVersion} discordSession={discordSession} />
+          ) : (
+            <DiscordAuthGateway
+              targetPortalName="voter"
+              onVerified={(session) => setDiscordSession(session)}
+              onCancel={() => handleNavigate("home")}
+            />
+          )
+        )}
+
+        {mode === "role_election" && (
+          discordSession ? (
+            <div className="py-6 px-4">
+              <RoleElectionPortal
+                userSession={discordSession}
+                onOpenDiscordModal={() => handleNavigate("voter")}
+              />
+            </div>
           ) : (
             <DiscordAuthGateway
               targetPortalName="voter"
