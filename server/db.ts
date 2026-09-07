@@ -61,12 +61,53 @@ if (fs.existsSync(configPath)) {
   }
 }
 
+// Fallback to process.env.FIREBASE_CONFIG (supports VPS deployments)
+if (!firebaseConfig && process.env.FIREBASE_CONFIG) {
+  try {
+    firebaseConfig = JSON.parse(process.env.FIREBASE_CONFIG);
+  } catch (e) {
+    console.error("Failed to parse FIREBASE_CONFIG environment variable", e);
+  }
+}
+
 let firestoreDb: any = null;
-let firestoreQuotaExhausted = true;
+let firestoreQuotaExhausted = false;
 let quotaExhaustedResetTimer: NodeJS.Timeout | null = null;
 
+if (firebaseConfig && (firebaseConfig.apiKey || firebaseConfig.projectId)) {
+  try {
+    const firebaseApp = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
+    const dbId = firebaseConfig.firestoreDatabaseId && firebaseConfig.firestoreDatabaseId !== "(default)"
+      ? firebaseConfig.firestoreDatabaseId
+      : undefined;
+    firestoreDb = dbId
+      ? initializeFirestore(firebaseApp, {}, dbId)
+      : getFirestore(firebaseApp);
+    firestoreQuotaExhausted = false;
+    console.log(`[Firestore] Initialized successfully with database ID: ${dbId || "(default)"}`);
+  } catch (initErr) {
+    console.error("[Firestore] Initialization error:", initErr);
+    firestoreQuotaExhausted = true;
+  }
+} else {
+  console.warn("[Firestore] No valid firebase-applet-config.json found. Operating in local disk database mode.");
+  firestoreQuotaExhausted = true;
+}
+
 export function isFirestoreQuotaExhausted(): boolean {
-  return firestoreQuotaExhausted;
+  return firestoreQuotaExhausted || !firestoreDb;
+}
+
+export function isFirestoreConnected(): boolean {
+  return firestoreDb !== null && !firestoreQuotaExhausted;
+}
+
+export function getFirestoreDb(): any {
+  return firestoreDb;
+}
+
+export function getLoadedFirebaseConfig(): any {
+  return firebaseConfig;
 }
 
 export function sanitizeForFirestore<T>(obj: T): T {
@@ -297,14 +338,26 @@ export function saveLocalDB(data: DatabaseSchema): void {
 }
 
 // Sync full dataset from Cloud Firestore or seed Firestore if empty
-export async function syncFromFirestore(): Promise<DatabaseSchema> { const 
-  currentLocal = initLocalDB(); if (!firestoreDb || 
-  firestoreQuotaExhausted) return currentLocal;
+export async function syncFromFirestore(): Promise<DatabaseSchema> {
+  const currentLocal = initLocalDB();
+  if (!firestoreDb || firestoreQuotaExhausted) return currentLocal;
   try {
     const settingsDocRef = doc(firestoreDb, "config", "settings");
     const adminDocRef = doc(firestoreDb, "config", "admin");
+    const roleConfigDocRef = doc(firestoreDb, "config", "role_election_config");
 
-    const [settingsSnap, adminSnap, candidatesSnap, votesSnap, candidatureSnap, cdaProposalsSnap, gameScoresSnap] = await Promise.all([
+    const [
+      settingsSnap,
+      adminSnap,
+      candidatesSnap,
+      votesSnap,
+      candidatureSnap,
+      cdaProposalsSnap,
+      gameScoresSnap,
+      roleConfigSnap,
+      roleCandidatesSnap,
+      roleVotesSnap,
+    ] = await Promise.all([
       getDoc(settingsDocRef),
       getDoc(adminDocRef),
       getDocs(collection(firestoreDb, "candidates")),
@@ -312,9 +365,17 @@ export async function syncFromFirestore(): Promise<DatabaseSchema> { const
       getDocs(collection(firestoreDb, "candidature")),
       getDocs(collection(firestoreDb, "cda_proposals")),
       getDocs(collection(firestoreDb, "game_scores")),
+      getDoc(roleConfigDocRef),
+      getDocs(collection(firestoreDb, "role_election_candidates")),
+      getDocs(collection(firestoreDb, "role_election_votes")),
     ]);
 
-    const hasData = settingsSnap.exists() || adminSnap.exists() || candidatesSnap.size > 0;
+    const hasData =
+      settingsSnap.exists() ||
+      adminSnap.exists() ||
+      candidatesSnap.size > 0 ||
+      candidatureSnap.size > 0 ||
+      roleCandidatesSnap.size > 0;
 
     if (hasData) {
       const settings = settingsSnap.exists() ? (settingsSnap.data() as SiteSettings) : currentLocal.settings;
@@ -350,34 +411,149 @@ export async function syncFromFirestore(): Promise<DatabaseSchema> { const
         remoteGameScores.push({ ...(d.data() as GameScore), id: d.id });
       });
 
-      // Preserve local candidates if remote returned empty set or dummy list
-      let mergedCandidates: Candidate[] = remoteCandidates;
-      if (mergedCandidates.length === 0 || (mergedCandidates[0] && mergedCandidates[0].name.includes("Gabriele Leone"))) {
-        mergedCandidates = (currentLocal.candidates && currentLocal.candidates.length > 0 && !currentLocal.candidates[0].name.includes("Gabriele Leone"))
-          ? currentLocal.candidates
-          : DEFAULT_CANDIDATES;
-        
-        //Push initial real candidates to Cloud Firestore
-        mergedCandidates.forEach((cand) => {
-          if (firestoreDb) {
-            setDoc(doc(firestoreDb, "candidates", cand.id), sanitizeForFirestore(cand)).catch((e) =>
-              handleFirestoreError("seedCandidates", e)
-            );
-          }
-        });
+      const remoteRoleCandidates: RoleElectionCandidate[] = [];
+      roleCandidatesSnap.forEach((d) => {
+        remoteRoleCandidates.push({ ...(d.data() as RoleElectionCandidate), id: d.id });
+      });
+
+      const remoteRoleVotes: RoleElectionVote[] = [];
+      roleVotesSnap.forEach((d) => {
+        remoteRoleVotes.push({ ...(d.data() as RoleElectionVote), id: d.id });
+      });
+
+      // Bi-directional candidates merge (never lose local or remote candidates)
+      const candMap = new Map<string, Candidate>();
+      (currentLocal.candidates || []).forEach((c) => {
+        if (c && c.id) candMap.set(c.id, c);
+      });
+      remoteCandidates.forEach((c) => {
+        if (c && c.id) candMap.set(c.id, c);
+      });
+      let mergedCandidates = Array.from(candMap.values());
+      if (mergedCandidates.length === 0) {
+        mergedCandidates = DEFAULT_CANDIDATES;
       }
+      const writePromises: Promise<any>[] = [];
 
-      const mergedVotes = remoteVotes.length > 0 ? remoteVotes : (currentLocal.votes || []);
+      // Push any candidate not in remote to Firestore
+      const remoteCandIds = new Set(remoteCandidates.map((c) => c.id));
+      mergedCandidates.forEach((cand) => {
+        if (!remoteCandIds.has(cand.id) && firestoreDb) {
+          writePromises.push(
+            setDoc(doc(firestoreDb, "candidates", cand.id), sanitizeForFirestore(cand)).catch((e) =>
+              handleFirestoreError("pushCandidate", e)
+            )
+          );
+        }
+      });
+
+      // Bi-directional votes merge
+      const voteMap = new Map<string, Vote>();
+      (currentLocal.votes || []).forEach((v) => { if (v && v.id) voteMap.set(v.id, v); });
+      remoteVotes.forEach((v) => { if (v && v.id) voteMap.set(v.id, v); });
+      const mergedVotes = Array.from(voteMap.values());
       mergedVotes.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+      const remoteVoteIds = new Set(remoteVotes.map((v) => v.id));
+      mergedVotes.forEach((v) => {
+        if (!remoteVoteIds.has(v.id) && firestoreDb) {
+          writePromises.push(
+            setDoc(doc(firestoreDb, "votes", v.id), sanitizeForFirestore(v)).catch((e) =>
+              handleFirestoreError("pushVote", e)
+            )
+          );
+        }
+      });
 
-      const mergedCandidature = remoteCandidature.length > 0 ? remoteCandidature : (currentLocal.candidature || []);
+      // Bi-directional candidature merge
+      const canditureMap = new Map<string, Candidatura>();
+      (currentLocal.candidature || []).forEach((c) => { if (c && c.id) canditureMap.set(c.id, c); });
+      remoteCandidature.forEach((c) => { if (c && c.id) canditureMap.set(c.id, c); });
+      const mergedCandidature = Array.from(canditureMap.values());
       mergedCandidature.sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime());
+      const remoteCandidatureIds = new Set(remoteCandidature.map((c) => c.id));
+      mergedCandidature.forEach((c) => {
+        if (!remoteCandidatureIds.has(c.id) && firestoreDb) {
+          writePromises.push(
+            setDoc(doc(firestoreDb, "candidature", c.id), sanitizeForFirestore(c)).catch((e) =>
+              handleFirestoreError("pushCandidatura", e)
+            )
+          );
+        }
+      });
 
-      const mergedCdaProposals = remoteCdaProposals.length > 0 ? remoteCdaProposals : (currentLocal.cdaProposals || []);
+      // Bi-directional proposals merge
+      const propMap = new Map<string, CdaProposal>();
+      (currentLocal.cdaProposals || []).forEach((p) => { if (p && p.id) propMap.set(p.id, p); });
+      remoteCdaProposals.forEach((p) => { if (p && p.id) propMap.set(p.id, p); });
+      const mergedCdaProposals = Array.from(propMap.values());
       mergedCdaProposals.sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime());
 
-      const mergedGameScores = remoteGameScores.length > 0 ? remoteGameScores : (currentLocal.gameScores || []);
+      // Bi-directional game scores merge
+      const scoreMap = new Map<string, GameScore>();
+      (currentLocal.gameScores || []).forEach((s) => { if (s && s.id) scoreMap.set(s.id, s); });
+      remoteGameScores.forEach((s) => { if (s && s.id) scoreMap.set(s.id, s); });
+      const mergedGameScores = Array.from(scoreMap.values());
       mergedGameScores.sort((a, b) => b.score - a.score);
+
+      // Role Election Config
+      let mergedRoleConfig: RoleElectionConfig = currentLocal.roleElectionConfig || DEFAULT_ROLE_ELECTION_CONFIG;
+      if (roleConfigSnap.exists()) {
+        mergedRoleConfig = roleConfigSnap.data() as RoleElectionConfig;
+      } else if (firestoreDb) {
+        writePromises.push(
+          setDoc(roleConfigDocRef, sanitizeForFirestore(mergedRoleConfig)).catch((e) =>
+            handleFirestoreError("pushRoleConfig", e)
+          )
+        );
+      }
+
+      // Bi-directional Role Election Candidates merge
+      const roleCandMap = new Map<string, RoleElectionCandidate>();
+      (currentLocal.roleElectionCandidates || []).forEach((rc) => {
+        if (rc && rc.id) roleCandMap.set(rc.id, rc);
+      });
+      remoteRoleCandidates.forEach((rc) => {
+        if (rc && rc.id) roleCandMap.set(rc.id, rc);
+      });
+      let mergedRoleCandidates = Array.from(roleCandMap.values());
+      if (mergedRoleCandidates.length === 0) {
+        mergedRoleCandidates = DEFAULT_ROLE_ELECTION_CANDIDATES;
+      }
+      const remoteRoleCandIds = new Set(remoteRoleCandidates.map((c) => c.id));
+      mergedRoleCandidates.forEach((rc) => {
+        if (!remoteRoleCandIds.has(rc.id) && firestoreDb) {
+          writePromises.push(
+            setDoc(doc(firestoreDb, "role_election_candidates", rc.id), sanitizeForFirestore(rc)).catch((e) =>
+              handleFirestoreError("pushRoleCandidate", e)
+            )
+          );
+        }
+      });
+
+      // Bi-directional Role Election Votes merge
+      const roleVoteMap = new Map<string, RoleElectionVote>();
+      (currentLocal.roleElectionVotes || []).forEach((rv) => {
+        if (rv && rv.id) roleVoteMap.set(rv.id, rv);
+      });
+      remoteRoleVotes.forEach((rv) => {
+        if (rv && rv.id) roleVoteMap.set(rv.id, rv);
+      });
+      const mergedRoleVotes = Array.from(roleVoteMap.values());
+      mergedRoleVotes.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+      const remoteRoleVoteIds = new Set(remoteRoleVotes.map((v) => v.id));
+      mergedRoleVotes.forEach((rv) => {
+        if (!remoteRoleVoteIds.has(rv.id) && firestoreDb) {
+          writePromises.push(
+            setDoc(doc(firestoreDb, "role_election_votes", rv.id), sanitizeForFirestore(rv)).catch((e) =>
+              handleFirestoreError("pushRoleVote", e)
+            )
+          );
+        }
+      });
+
+      if (writePromises.length > 0) {
+        await Promise.allSettled(writePromises);
+      }
 
       inMemoryDb = {
         settings,
@@ -388,16 +564,16 @@ export async function syncFromFirestore(): Promise<DatabaseSchema> { const
         candidature: mergedCandidature,
         cdaProposals: mergedCdaProposals,
         gameScores: mergedGameScores,
-        roleElectionConfig: currentLocal.roleElectionConfig || DEFAULT_ROLE_ELECTION_CONFIG,
-        roleElectionCandidates: currentLocal.roleElectionCandidates || DEFAULT_ROLE_ELECTION_CANDIDATES,
-        roleElectionVotes: currentLocal.roleElectionVotes || [],
+        roleElectionConfig: mergedRoleConfig,
+        roleElectionCandidates: mergedRoleCandidates,
+        roleElectionVotes: mergedRoleVotes,
       };
 
       saveLocalDB(inMemoryDb);
-      console.log(`Cloud Firestore synced: ${inMemoryDb.candidates.length} candidates, ${inMemoryDb.votes.length} votes, ${inMemoryDb.candidature.length} candidature, ${inMemoryDb.cdaProposals.length} proposals.`);
+      console.log(`[Firestore] Sync complete: ${inMemoryDb.candidates.length} candidates, ${inMemoryDb.votes.length} votes, ${inMemoryDb.candidature?.length || 0} candidature, ${inMemoryDb.roleElectionCandidates?.length || 0} role candidates, ${inMemoryDb.roleElectionVotes?.length || 0} role votes.`);
       return inMemoryDb;
     } else {
-      console.log("Firestore empty. Migrating initial dataset to Cloud Firestore...");
+      console.log("[Firestore] Empty remote database detected. Migrating local dataset to Cloud Firestore...");
       await seedFirestore(currentLocal);
       return currentLocal;
     }
@@ -415,6 +591,9 @@ async function seedFirestore(data: DatabaseSchema) {
       passwordHash: data.adminPasswordHash,
       emergencyPasswordHash: data.emergencyPasswordHash || hashPassword("sblocco123"),
     }));
+    if (data.roleElectionConfig) {
+      await setDoc(doc(firestoreDb, "config", "role_election_config"), sanitizeForFirestore(data.roleElectionConfig));
+    }
 
     const batch = writeBatch(firestoreDb);
     data.candidates.forEach((cand) => {
@@ -431,8 +610,20 @@ async function seedFirestore(data: DatabaseSchema) {
       });
     }
 
+    if (data.roleElectionCandidates) {
+      data.roleElectionCandidates.forEach((rc) => {
+        batch.set(doc(firestoreDb, "role_election_candidates", rc.id), sanitizeForFirestore(rc));
+      });
+    }
+
+    if (data.roleElectionVotes) {
+      data.roleElectionVotes.forEach((rv) => {
+        batch.set(doc(firestoreDb, "role_election_votes", rv.id), sanitizeForFirestore(rv));
+      });
+    }
+
     await batch.commit();
-    console.log("Cloud Firestore seeded successfully.");
+    console.log("[Firestore] Cloud Firestore seeded successfully with full dataset.");
   } catch (err) {
     handleFirestoreError("seedFirestore", err);
   }
@@ -2032,6 +2223,16 @@ export async function deleteRoleElectionVote(voteId: string): Promise<boolean> {
   }
 
   return true;
+}
+
+export function getFullDatabaseCopy(): DatabaseSchema {
+  return JSON.parse(JSON.stringify(initDB()));
+}
+
+export function restoreFullDatabase(newDb: DatabaseSchema): DatabaseSchema {
+  inMemoryDb = newDb;
+  saveLocalDB(inMemoryDb);
+  return inMemoryDb;
 }
 
 

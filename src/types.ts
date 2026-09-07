@@ -14,6 +14,7 @@ export enum RoleId {
   V_DIRETTORE = "v_direttore",
   DIRETTORE = "direttore",
   DIRETTORE_GENERALE = "direttore_generale",
+  RESPONSABILE_GENERALE_EMS = "responsabile_generale_ems",
 }
 
 export interface Candidate {
@@ -146,6 +147,13 @@ export const ROLE_CONFIGS: Record<RoleId, RoleConfig> = {
     symbol: "gem",
     grade: 12,
   },
+  [RoleId.RESPONSABILE_GENERALE_EMS]: {
+    id: RoleId.RESPONSABILE_GENERALE_EMS,
+    name: "Responsabile Generale EMS",
+    color: "cyan-300",
+    symbol: "crown",
+    grade: 13,
+  },
 };
 
 // Sort role IDs by grade (ascending or descending)
@@ -175,6 +183,7 @@ export interface DiscordUserSession {
   isExpired?: boolean;
   candidateId?: string;
   hideFromHierarchy?: boolean;
+  isDev?: boolean;
 }
 
 const ROLE_GRADE_MAP: Record<string, number> = {
@@ -184,6 +193,8 @@ const ROLE_GRADE_MAP: Record<string, number> = {
   "v. proprietario": 99,
 
   // Dirigenza & Gerarchia EMS
+  "responsabile generale ems": 21,
+  "responsabile generale": 21,
   "direttore generale": 20,
   "v. direttore generale": 19,
   "vice direttore generale": 19,
@@ -288,6 +299,7 @@ export interface AccessLog {
 export const ALLOWED_DISCORD_ROLES = [
   "Proprietario",
   "Vice Proprietario",
+  "Responsabile Generale EMS",
   "Direttore Generale",
   "Direttore Sanitario",
   "V. Direttore Sanitario",
@@ -323,6 +335,7 @@ export interface HierarchyMember {
   categoryKey: HierarchyCategoryKey;
   badge?: string;
   discordTag?: string;
+  isDev?: boolean;
   updatedAt?: string;
 }
 
@@ -354,7 +367,7 @@ export const HIERARCHY_CATEGORIES: Record<HierarchyCategoryKey, HierarchyCategor
     key: "DIRIGENZA_GENERALE",
     title: "Dirigenza Generale",
     description: "Direzione strategica, gestione generale ed amministrativa",
-    rolesIncluded: ["Direttore Generale"],
+    rolesIncluded: ["Responsabile Generale EMS", "Direttore Generale"],
     color: "cyan-400",
     borderColor: "border-slate-800/90 hover:border-slate-700",
     bgColor: "bg-slate-900/50 backdrop-blur-md",
@@ -419,7 +432,11 @@ export function getCategoryForRole(roleName: string): HierarchyCategoryKey {
   if (r.includes("proprietario")) {
     return "PROPRIETARI";
   }
-  if (r.includes("direttore generale")) {
+  if (
+    r.includes("responsabile generale ems") ||
+    r.includes("responsabile generale") ||
+    r.includes("direttore generale")
+  ) {
     return "DIRIGENZA_GENERALE";
   }
   if (

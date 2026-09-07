@@ -6,8 +6,8 @@ coverage/
 *.log
 .env*
 !.env.example
-# Runtime JSON storage & log files
-access_logs.json
-db.json
-discord_registered_users.json
+# Runtime JSON storage & log files (Commented out to ensure VPS sync and clone preserve initial database)
+# access_logs.json
+# db.json
+# discord_registered_users.json
 

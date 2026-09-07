@@ -41,6 +41,12 @@ import {
   CheckCircle2,
   XCircle,
   FileSpreadsheet,
+  Cloud,
+  Database,
+  UploadCloud,
+  Server,
+  HardDrive,
+  Cog,
 } from "lucide-react";
 import {
   RoleId,
@@ -62,6 +68,7 @@ import {
   getUserEffectiveGrade,
   isCdaRoleName,
   getCdaRank,
+  isOwnerKey,
 } from "../types.js";
 import RoleBadge from "./RoleBadge.js";
 import EmsHierarchy from "./EmsHierarchy.js";
@@ -104,6 +111,7 @@ export default function AdminPortal({ onConfigChanged }: AdminPortalProps) {
   const [newEmpCdaRole, setNewEmpCdaRole] = useState<string>("DEFAULT");
   const [newEmpDiscordTag, setNewEmpDiscordTag] = useState<string>("");
   const [newEmpHideFromHierarchy, setNewEmpHideFromHierarchy] = useState<boolean>(false);
+  const [newEmpIsDev, setNewEmpIsDev] = useState<boolean>(false);
   const [isGeneratingToken, setIsGeneratingToken] = useState<boolean>(false);
   const [tokenActionError, setTokenActionError] = useState<string | null>(null);
   const [tokenSuccessMessage, setTokenSuccessMessage] = useState<string | null>(null);
@@ -116,6 +124,7 @@ export default function AdminPortal({ onConfigChanged }: AdminPortalProps) {
   const [testEmpCustomToken, setTestEmpCustomToken] = useState<string>("");
   const [testEmpDiscordTag, setTestEmpDiscordTag] = useState<string>("");
   const [testEmpHideFromHierarchy, setTestEmpHideFromHierarchy] = useState<boolean>(false);
+  const [testEmpIsDev, setTestEmpIsDev] = useState<boolean>(false);
   const [testDurationUnit, setTestDurationUnit] = useState<"unlimited" | "minutes" | "hours" | "days">("minutes");
   const [testDurationValue, setTestDurationValue] = useState<number | string>(30);
   const [isGeneratingTestToken, setIsGeneratingTestToken] = useState<boolean>(false);
@@ -130,6 +139,7 @@ export default function AdminPortal({ onConfigChanged }: AdminPortalProps) {
   const [editEmpCdaRole, setEditEmpCdaRole] = useState<string>("DEFAULT");
   const [editEmpDiscordTag, setEditEmpDiscordTag] = useState<string>("");
   const [editEmpHideFromHierarchy, setEditEmpHideFromHierarchy] = useState<boolean>(false);
+  const [editEmpIsDev, setEditEmpIsDev] = useState<boolean>(false);
   const [isUpdatingToken, setIsUpdatingToken] = useState<boolean>(false);
 
   // Confirm Token Revocation Modal State
@@ -175,6 +185,13 @@ export default function AdminPortal({ onConfigChanged }: AdminPortalProps) {
     return sessionInfo?.roleName || "Amministratore";
   };
 
+  // Cloud Firestore & System Backup State
+  const [systemStatus, setSystemStatus] = useState<any>(null);
+  const [isSyncingFirestore, setIsSyncingFirestore] = useState<boolean>(false);
+  const [syncStatusMessage, setSyncStatusMessage] = useState<string | null>(null);
+  const [isRestoringBackup, setIsRestoringBackup] = useState<boolean>(false);
+  const backupFileInputRef = useRef<HTMLInputElement>(null);
+
   const getAdminHeaders = (authToken?: string) => {
     const activeToken = authToken || token || localStorage.getItem("adminToken") || "";
     const empToken = localStorage.getItem("discordToken") || "";
@@ -192,26 +209,32 @@ export default function AdminPortal({ onConfigChanged }: AdminPortalProps) {
     return headers;
   };
 
+  const effectiveCallerToken = token || localStorage.getItem("adminToken") || "";
+  const isCallerOwnerKey = isOwnerKey(effectiveCallerToken);
   const cleanUserRole = (sessionInfo?.roleName || "").toLowerCase();
   const isMasterSession = Boolean(
     sessionInfo?.isMaster ||
     cleanUserRole.includes("proprietario") ||
-    (sessionInfo?.grade !== undefined && sessionInfo.grade >= 99)
+    (sessionInfo?.grade !== undefined && sessionInfo.grade >= 99) ||
+    isCallerOwnerKey
   );
   const isProprietarioUser = Boolean(
     isMasterSession ||
     cleanUserRole.includes("proprietario") ||
-    (sessionInfo?.grade !== undefined && sessionInfo.grade >= 99)
+    (sessionInfo?.grade !== undefined && sessionInfo.grade >= 99) ||
+    isCallerOwnerKey
   );
   const isHighOwner = Boolean(
     isMasterSession ||
     cleanUserRole.includes("proprietario") ||
-    (sessionInfo?.grade !== undefined && sessionInfo.grade >= 99)
+    (sessionInfo?.grade !== undefined && sessionInfo.grade >= 99) ||
+    isCallerOwnerKey
   );
 
   const isDirettoreGeneraleUser = Boolean(
     isProprietarioUser ||
     isMasterSession ||
+    cleanUserRole.includes("responsabile generale") ||
     cleanUserRole.includes("direttore generale") ||
     (sessionInfo?.grade !== undefined && sessionInfo.grade >= 20)
   );
@@ -1011,11 +1034,98 @@ export default function AdminPortal({ onConfigChanged }: AdminPortalProps) {
         fetchAccessLogs(authToken, isSilent),
         fetchCandidature(authToken, isSilent),
         fetchCdaProposals(authToken, isSilent),
+        fetchSystemStatus(authToken),
       ]).catch(() => {});
     } catch (err: any) {
       if (!isSilent) setDashboardError(err.message || "Errore di caricamento.");
     } finally {
       if (!isSilent) setIsLoadingData(false);
+    }
+  };
+
+  const fetchSystemStatus = async (authToken?: string) => {
+    const t = authToken || token;
+    if (!t) return;
+    try {
+      const res = await fetch("/api/admin/system/status", {
+        headers: getAdminHeaders(t),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setSystemStatus(data);
+      }
+    } catch (e) {
+      console.warn("Could not fetch system status:", e);
+    }
+  };
+
+  const handleManualCloudSync = async () => {
+    if (!token) return;
+    setIsSyncingFirestore(true);
+    setSyncStatusMessage(null);
+    try {
+      const res = await fetch("/api/admin/system/sync-firestore", {
+        method: "POST",
+        headers: getAdminHeaders(token),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Errore sincronizzazione");
+      setSyncStatusMessage(data.message || "Sincronizzazione completata con successo!");
+      await Promise.allSettled([
+        fetchDashboardData(token, true),
+        fetchSystemStatus(token),
+      ]);
+      onConfigChanged();
+      setTimeout(() => setSyncStatusMessage(null), 5000);
+    } catch (err: any) {
+      alert("Errore sincronizzazione: " + (err.message || ""));
+    } finally {
+      setIsSyncingFirestore(false);
+    }
+  };
+
+  const handleDownloadBackup = () => {
+    if (!token) return;
+    window.location.href = `/api/admin/system/backup?token=${encodeURIComponent(token)}`;
+  };
+
+  const handleRestoreBackupFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !token) return;
+
+    if (!confirm(`Sei sicuro di voler ripristinare il database dal file "${file.name}"? I dati verranno integrati e sincronizzati istantaneamente con Cloud Firestore.`)) {
+      if (backupFileInputRef.current) backupFileInputRef.current.value = "";
+      return;
+    }
+
+    setIsRestoringBackup(true);
+    try {
+      const text = await file.text();
+      const json = JSON.parse(text);
+
+      const res = await fetch("/api/admin/system/restore", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...getAdminHeaders(token),
+        },
+        body: JSON.stringify(json),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Errore ripristino backup");
+
+      alert("Backup ripristinato con successo! Tutti i dati sono stati integrati e sincronizzati con Cloud Firestore.");
+      await Promise.allSettled([
+        fetchDashboardData(token, false),
+        fetchSystemStatus(token),
+      ]);
+      onConfigChanged();
+    } catch (err: any) {
+      alert("Errore durante il ripristino: " + (err.message || "Formato file non valido"));
+    } finally {
+      setIsRestoringBackup(false);
+      if (backupFileInputRef.current) backupFileInputRef.current.value = "";
     }
   };
 
@@ -1055,6 +1165,7 @@ export default function AdminPortal({ onConfigChanged }: AdminPortalProps) {
           hasCdaAccess: hasCdaVal,
           discordTag: newEmpDiscordTag.trim() || undefined,
           hideFromHierarchy: newEmpHideFromHierarchy,
+          isDev: isProprietarioUser ? newEmpIsDev : undefined,
         }),
       });
 
@@ -1068,6 +1179,7 @@ export default function AdminPortal({ onConfigChanged }: AdminPortalProps) {
       setNewEmpCustomToken("");
       setNewEmpDiscordTag("");
       setNewEmpHideFromHierarchy(false);
+      setNewEmpIsDev(false);
       setNewEmpCdaRole("DEFAULT");
       fetchEmployeeTokens(activeToken);
     } catch (err: any) {
@@ -1113,6 +1225,7 @@ export default function AdminPortal({ onConfigChanged }: AdminPortalProps) {
           durationValue: testDurationUnit === "unlimited" ? undefined : Number(testDurationValue),
           discordTag: testEmpDiscordTag.trim() || undefined,
           hideFromHierarchy: testEmpHideFromHierarchy,
+          isDev: testEmpIsDev,
         }),
       });
 
@@ -1126,6 +1239,7 @@ export default function AdminPortal({ onConfigChanged }: AdminPortalProps) {
       setTestEmpCustomToken("");
       setTestEmpDiscordTag("");
       setTestEmpHideFromHierarchy(false);
+      setTestEmpIsDev(false);
       setTestEmpCdaRole("DEFAULT");
       fetchEmployeeTokens(activeToken);
     } catch (err: any) {
@@ -1143,6 +1257,7 @@ export default function AdminPortal({ onConfigChanged }: AdminPortalProps) {
     setEditEmpRole(empToken.roleName);
     setEditEmpDiscordTag(empToken.discordTag || "");
     setEditEmpHideFromHierarchy(empToken.hideFromHierarchy || false);
+    setEditEmpIsDev(Boolean(empToken.isDev));
     if (empToken.cdaRoleName) {
       setEditEmpCdaRole(empToken.cdaRoleName);
     } else {
@@ -1205,6 +1320,7 @@ export default function AdminPortal({ onConfigChanged }: AdminPortalProps) {
           hasCdaAccess: hasCdaVal,
           discordTag: editEmpDiscordTag.trim() || undefined,
           hideFromHierarchy: editEmpHideFromHierarchy,
+          isDev: editEmpIsDev,
         }),
       });
 
@@ -2806,6 +2922,7 @@ export default function AdminPortal({ onConfigChanged }: AdminPortalProps) {
                             [RoleId.V_DIRETTORE]: "#ef4444",
                             [RoleId.DIRETTORE]: "#b91c1c",
                             [RoleId.DIRETTORE_GENERALE]: "#06b6d4",
+                            [RoleId.RESPONSABILE_GENERALE_EMS]: "#7eeaff",
                           };
                           const roleColorHex = hexColorMap[roleId] || "#6366f1";
 
@@ -3221,6 +3338,7 @@ export default function AdminPortal({ onConfigChanged }: AdminPortalProps) {
                                       [RoleId.V_DIRETTORE]: "#ef4444",
                                       [RoleId.DIRETTORE]: "#b91c1c",
                                       [RoleId.DIRETTORE_GENERALE]: "#06b6d4",
+                                      [RoleId.RESPONSABILE_GENERALE_EMS]: "#7eeaff",
                                     };
                                     const roleColorHex = hexColorMap[roleId] || "#6366f1";
 
@@ -3352,6 +3470,7 @@ export default function AdminPortal({ onConfigChanged }: AdminPortalProps) {
                                       [RoleId.V_DIRETTORE]: "#ef4444",
                                       [RoleId.DIRETTORE]: "#b91c1c",
                                       [RoleId.DIRETTORE_GENERALE]: "#06b6d4",
+                                      [RoleId.RESPONSABILE_GENERALE_EMS]: "#7eeaff",
                                     };
                                     const roleColorHex = hexColorMap[roleId] || "#6366f1";
 
@@ -3611,20 +3730,37 @@ export default function AdminPortal({ onConfigChanged }: AdminPortalProps) {
                           )}
                         </div>
 
-                        {/* Toggle Nascondi da Gerarchia TEST */}
+                        {/* Toggle Nascondi da Gerarchia TEST & Tag Dev */}
                         <div className="pt-2 flex items-center justify-between flex-wrap gap-3">
-                          <label className="flex items-center gap-2 cursor-pointer text-xs text-slate-300 select-none">
-                            <input
-                              type="checkbox"
-                              checked={testEmpHideFromHierarchy}
-                              onChange={(e) => setTestEmpHideFromHierarchy(e.target.checked)}
-                              className="rounded border-white/20 text-purple-600 focus:ring-purple-500 h-4 w-4 bg-slate-900"
-                            />
-                            <span className="flex items-center gap-1.5">
-                              <EyeOff size={14} className="text-purple-400" />
-                              Nascondi questo token dalla Gerarchia EMS
-                            </span>
-                          </label>
+                          <div className="flex items-center gap-4 flex-wrap">
+                            <label className="flex items-center gap-2 cursor-pointer text-xs text-slate-300 select-none">
+                              <input
+                                type="checkbox"
+                                checked={testEmpHideFromHierarchy}
+                                onChange={(e) => setTestEmpHideFromHierarchy(e.target.checked)}
+                                className="rounded border-white/20 text-purple-600 focus:ring-purple-500 h-4 w-4 bg-slate-900"
+                              />
+                              <span className="flex items-center gap-1.5">
+                                <EyeOff size={14} className="text-purple-400" />
+                                Nascondi questo token dalla Gerarchia EMS
+                              </span>
+                            </label>
+
+                            {isProprietarioUser && (
+                              <label className="flex items-center gap-2 cursor-pointer text-xs text-blue-300 select-none bg-blue-950/40 px-2.5 py-1.5 rounded-lg border border-blue-500/30">
+                                <input
+                                  type="checkbox"
+                                  checked={testEmpIsDev}
+                                  onChange={(e) => setTestEmpIsDev(e.target.checked)}
+                                  className="rounded border-blue-500/50 text-blue-500 focus:ring-blue-500 h-4 w-4 bg-slate-900 accent-blue-600 cursor-pointer"
+                                />
+                                <span className="flex items-center gap-1.5 font-bold">
+                                  <Cog size={14} className="text-blue-400" />
+                                  Tag Dev (Sviluppatore)
+                                </span>
+                              </label>
+                            )}
+                          </div>
 
                           <button
                             type="submit"
@@ -3764,18 +3900,35 @@ export default function AdminPortal({ onConfigChanged }: AdminPortalProps) {
                   </div>
 
                   <div className="pt-2 flex items-center justify-between flex-wrap gap-3">
-                    <label className="flex items-center gap-2 cursor-pointer text-xs text-slate-300 select-none">
-                      <input
-                        type="checkbox"
-                        checked={newEmpHideFromHierarchy}
-                        onChange={(e) => setNewEmpHideFromHierarchy(e.target.checked)}
-                        className="rounded border-white/20 text-indigo-600 focus:ring-indigo-500 h-4 w-4 bg-slate-900"
-                      />
-                      <span className="flex items-center gap-1.5">
-                        <EyeOff size={14} className="text-slate-400" />
-                        Nascondi questo token dalla Gerarchia EMS
-                      </span>
-                    </label>
+                    <div className="flex items-center gap-4 flex-wrap">
+                      <label className="flex items-center gap-2 cursor-pointer text-xs text-slate-300 select-none">
+                        <input
+                          type="checkbox"
+                          checked={newEmpHideFromHierarchy}
+                          onChange={(e) => setNewEmpHideFromHierarchy(e.target.checked)}
+                          className="rounded border-white/20 text-indigo-600 focus:ring-indigo-500 h-4 w-4 bg-slate-900"
+                        />
+                        <span className="flex items-center gap-1.5">
+                          <EyeOff size={14} className="text-slate-400" />
+                          Nascondi questo token dalla Gerarchia EMS
+                        </span>
+                      </label>
+
+                      {isProprietarioUser && (
+                        <label className="flex items-center gap-2 cursor-pointer text-xs text-blue-300 select-none bg-blue-950/40 px-2.5 py-1.5 rounded-lg border border-blue-500/30">
+                          <input
+                            type="checkbox"
+                            checked={newEmpIsDev}
+                            onChange={(e) => setNewEmpIsDev(e.target.checked)}
+                            className="rounded border-blue-500/50 text-blue-500 focus:ring-blue-500 h-4 w-4 bg-slate-900 accent-blue-600 cursor-pointer"
+                          />
+                          <span className="flex items-center gap-1.5 font-bold">
+                            <Cog size={14} className="text-blue-400" />
+                            Tag Dev (Sviluppatore)
+                          </span>
+                        </label>
+                      )}
+                    </div>
 
                     <button
                       type="submit"
@@ -3861,6 +4014,11 @@ export default function AdminPortal({ onConfigChanged }: AdminPortalProps) {
                                   <div className="flex flex-col">
                                     <div className="flex items-center gap-1.5 whitespace-nowrap">
                                       <span>{empToken.username}</span>
+                                      {empToken.isDev && (
+                                        <span className="h-5 px-1.5 bg-blue-500/20 text-blue-300 border border-blue-500/40 rounded text-[10px] font-bold inline-flex items-center gap-1 whitespace-nowrap shrink-0">
+                                          <Cog size={10} className="text-blue-400 shrink-0" /> Dev
+                                        </span>
+                                      )}
                                       {empToken.isTestToken && (
                                         <span className="h-5 px-1.5 bg-purple-500/20 text-purple-300 border border-purple-500/40 rounded text-[10px] font-bold font-mono inline-flex items-center gap-1 whitespace-nowrap shrink-0">
                                           <Sparkles size={10} className="text-purple-400 shrink-0" /> TEST
@@ -4168,6 +4326,29 @@ export default function AdminPortal({ onConfigChanged }: AdminPortalProps) {
                             </div>
                           </label>
                         </div>
+
+                        {/* Tag Dev (Sviluppatore) - Solo Proprietari */}
+                        {(isProprietarioUser || isOwnerKey(editingTokenObj.token) || (editingTokenObj.roleName || "").toLowerCase().includes("proprietario")) && (
+                          <div className="pt-2">
+                            <label className="flex items-center gap-2.5 cursor-pointer text-xs text-blue-300 select-none bg-blue-950/30 p-3 rounded-lg border border-blue-500/30 hover:border-blue-500/50 transition-all">
+                              <input
+                                type="checkbox"
+                                checked={editEmpIsDev}
+                                onChange={(e) => setEditEmpIsDev(e.target.checked)}
+                                className="rounded border-blue-500/50 text-blue-500 focus:ring-blue-500 h-4 w-4 bg-slate-900 accent-blue-600 cursor-pointer"
+                              />
+                              <div className="flex flex-col">
+                                <span className="font-bold text-blue-200 flex items-center gap-1.5">
+                                  <Cog size={14} className="text-blue-400" />
+                                  Tag Dev (Sviluppatore) nella Gerarchia
+                                </span>
+                                <span className="text-[11px] text-blue-300/80">
+                                  Applica l'etichetta distintiva blu con ingranaggio nell'angolo superiore destro della tessera in Gerarchia.
+                                </span>
+                              </div>
+                            </label>
+                          </div>
+                        )}
 
                         <div className="pt-4 flex items-center justify-end gap-2 border-t border-white/5">
                           <button
@@ -4795,10 +4976,11 @@ export default function AdminPortal({ onConfigChanged }: AdminPortalProps) {
 
           {/* TAB 3: IMPOSTAZIONI SITO */}
           {activeTab === "settings" && (
-            <div className="max-w-2xl mx-auto bg-[#161618] rounded-xl border border-white/5 shadow-md overflow-hidden animate-fadeIn">
-              <div className="px-6 py-4 bg-white/5 border-b border-white/5 font-bold text-sm text-slate-300">
-                Impostazioni del Portale Votazioni
-              </div>
+            <div className="max-w-3xl mx-auto space-y-6 animate-fadeIn">
+              <div className="bg-[#161618] rounded-xl border border-white/5 shadow-md overflow-hidden">
+                <div className="px-6 py-4 bg-white/5 border-b border-white/5 font-bold text-sm text-slate-300">
+                  Impostazioni del Portale Votazioni
+                </div>
 
               <form onSubmit={handleSaveSettings} className="p-6 space-y-6">
                 {settingsSuccessMessage && (
@@ -4949,6 +5131,134 @@ export default function AdminPortal({ onConfigChanged }: AdminPortalProps) {
                 </div>
               </form>
             </div>
+
+            {/* Database & Cloud Firestore Sync Section */}
+            <div className="bg-[#161618] rounded-xl border border-white/5 shadow-md overflow-hidden mt-6">
+              <div className="px-6 py-4 border-b border-white/5 flex items-center justify-between flex-wrap gap-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
+                    <Cloud size={18} />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-white">Sincronizzazione Database & Cloud Firestore (VPS)</h3>
+                    <p className="text-2xs text-slate-400">Stato del database, sincronizzazione cloud e gestione backup di sicurezza</p>
+                  </div>
+                </div>
+
+                {/* Firestore connection badge */}
+                <div className="flex items-center gap-2">
+                  {systemStatus?.firestore?.connected ? (
+                    <div className="flex items-center gap-1.5 px-3 py-1 bg-emerald-500/10 border border-emerald-500/25 rounded-full text-emerald-400 text-xs font-bold">
+                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                      <span>Cloud Firestore Connesso</span>
+                      <span className="text-[10px] text-emerald-400/70 font-mono hidden sm:inline">
+                        ({systemStatus.firestore.databaseId || "(default)"})
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-1.5 px-3 py-1 bg-amber-500/10 border border-amber-500/25 rounded-full text-amber-400 text-xs font-bold">
+                      <span className="w-2 h-2 rounded-full bg-amber-400" />
+                      <span>Database Locale (db.json)</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="p-6 space-y-6">
+                {syncStatusMessage && (
+                  <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs rounded-lg p-3.5 flex items-center gap-2">
+                    <Check size={16} strokeWidth={2.5} className="text-emerald-400 shrink-0" />
+                    <span className="font-semibold">{syncStatusMessage}</span>
+                  </div>
+                )}
+
+                {/* Live Count Badges */}
+                {systemStatus?.counts && (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+                    <div className="bg-[#0A0A0B] border border-white/5 rounded-lg p-3">
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Candidati</span>
+                      <span className="text-lg font-black text-white">{systemStatus.counts.candidates}</span>
+                    </div>
+                    <div className="bg-[#0A0A0B] border border-white/5 rounded-lg p-3">
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Voti Elettorali</span>
+                      <span className="text-lg font-black text-white">{systemStatus.counts.votes}</span>
+                    </div>
+                    <div className="bg-[#0A0A0B] border border-white/5 rounded-lg p-3">
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Candidature</span>
+                      <span className="text-lg font-black text-white">{systemStatus.counts.candidature}</span>
+                    </div>
+                    <div className="bg-[#0A0A0B] border border-white/5 rounded-lg p-3">
+                      <span className="text-[10px] font-bold text-orange-400 uppercase tracking-wider block">Votazione Ruoli</span>
+                      <span className="text-sm font-black text-orange-300">
+                        {systemStatus.counts.roleElectionCandidates} cand. / {systemStatus.counts.roleElectionVotes} voti
+                      </span>
+                    </div>
+                    <div className="bg-[#0A0A0B] border border-white/5 rounded-lg p-3">
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Token Dipendenti</span>
+                      <span className="text-lg font-black text-white">{systemStatus.counts.registeredTokens}</span>
+                    </div>
+                    <div className="bg-[#0A0A0B] border border-white/5 rounded-lg p-3">
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Log Accessi</span>
+                      <span className="text-lg font-black text-white">{systemStatus.counts.accessLogs}</span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Action Buttons */}
+                <div className="flex flex-wrap items-center gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={handleManualCloudSync}
+                    disabled={isSyncingFirestore}
+                    className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs rounded-lg shadow-sm cursor-pointer transition-colors active:scale-95 flex items-center gap-2"
+                  >
+                    {isSyncingFirestore ? (
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
+                    ) : (
+                      <RefreshCw size={14} />
+                    )}
+                    <span>Sincronizza con Cloud Firestore Ora</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleDownloadBackup}
+                    className="px-4 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 font-semibold text-xs rounded-lg shadow-sm cursor-pointer transition-colors active:scale-95 flex items-center gap-2"
+                  >
+                    <Download size={14} className="text-indigo-400" />
+                    <span>Scarica Backup Database (.JSON)</span>
+                  </button>
+
+                  <label className="px-4 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 font-semibold text-xs rounded-lg shadow-sm cursor-pointer transition-colors active:scale-95 flex items-center gap-2">
+                    <UploadCloud size={14} className="text-emerald-400" />
+                    <span>{isRestoringBackup ? "Ripristino in corso..." : "Ripristina da File Backup (.JSON)"}</span>
+                    <input
+                      ref={backupFileInputRef}
+                      type="file"
+                      accept=".json"
+                      onChange={handleRestoreBackupFile}
+                      disabled={isRestoringBackup}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
+
+                {/* VPS Explanatory Note */}
+                <div className="bg-[#0A0A0B] border border-indigo-500/20 rounded-xl p-4 text-xs space-y-2">
+                  <div className="flex items-center gap-2 text-indigo-400 font-bold text-xs">
+                    <Server size={14} />
+                    <span>Guida al caricamento e sincronizzazione su VPS</span>
+                  </div>
+                  <p className="text-slate-300 leading-relaxed">
+                    <strong>Perché prima non si vedevano i dati sulla VPS?</strong> In precedenza il file <code className="text-indigo-300">db.json</code> era incluso nel <code className="text-indigo-300">.gitignore</code>, perciò quando caricavi o facevi il pull sulla VPS il database locale risultava vuoto. Ora il <code className="text-indigo-300">.gitignore</code> è stato corretto per includere il database!
+                  </p>
+                  <p className="text-slate-400 leading-relaxed">
+                    Inoltre, sia in locale che sulla tua VPS, l'applicazione si sincronizza automaticamente in tempo reale con <strong>Google Cloud Firestore</strong> (progetto <code className="text-slate-300 font-mono">ai-studio-sitodivotazioner-0cf88ef9-8cdd-45d3-a15b-8452148e6f1d</code>). Assicurati che sulla VPS sia presente il file <code className="text-slate-300 font-mono">firebase-applet-config.json</code> nella cartella principale (o imposta la variabile d'ambiente <code className="text-slate-300 font-mono">FIREBASE_CONFIG</code>).
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
           )}
 
           {/* TAB 7: GERARCHIA EMS */}

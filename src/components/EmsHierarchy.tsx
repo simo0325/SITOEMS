@@ -19,19 +19,23 @@ import {
   Sparkles,
   ChevronDown,
   UserCheck,
+  Cog,
 } from "lucide-react";
 import {
   HierarchyCategoryKey,
   HierarchyMember,
   HIERARCHY_CATEGORIES,
   HierarchyCategoryConfig,
+  isOwnerKey,
 } from "../types.js";
 
 interface RoleStyle {
   badgeBg: string;
   text: string;
   border: string;
+  cardHover: string;
   avatarBg: string;
+  avatarHover: string;
   avatarText: string;
   iconColor: string;
   symbol: "star" | "cross" | "crown" | "crown-vice" | "gem";
@@ -43,11 +47,13 @@ function getRoleStyle(roleName: string): RoleStyle {
   if (name.includes("proprietario")) {
     if (name.includes("vice") || name.includes("v.")) {
       return {
-        badgeBg: "bg-slate-900/90 text-white border-slate-200/80 font-black",
+        badgeBg: "bg-slate-900/90 text-white border-slate-200/80 font-black shadow-sm shadow-slate-200/20",
         text: "text-white font-black",
         border: "border-slate-200/70",
-        avatarBg: "bg-slate-900 border-slate-200/80",
-        avatarText: "text-white",
+        cardHover: "hover:border-white hover:shadow-xl hover:shadow-slate-200/25",
+        avatarBg: "bg-slate-900 border-slate-200/80 shadow-md shadow-slate-200/25",
+        avatarHover: "group-hover:border-white group-hover:shadow-lg group-hover:shadow-white/40",
+        avatarText: "text-white font-black",
         iconColor: "text-slate-100",
         symbol: "crown",
       };
@@ -56,9 +62,11 @@ function getRoleStyle(roleName: string): RoleStyle {
       badgeBg: "bg-slate-950/90 border-[#b89bf3]/50 font-extrabold shadow-sm shadow-indigo-950/30",
       text: "bg-gradient-to-r from-[#8fb3f5] via-[#b89bf3] to-[#f28fbe] bg-clip-text text-transparent font-black",
       border: "border-[#b89bf3]/60",
-      avatarBg: "bg-slate-950 border-[#b89bf3]/60",
+      cardHover: "hover:border-[#b89bf3] hover:shadow-xl hover:shadow-[#b89bf3]/25",
+      avatarBg: "bg-slate-900 border-[#b89bf3]/70 shadow-md shadow-[#b89bf3]/25",
+      avatarHover: "group-hover:border-[#b89bf3] group-hover:shadow-lg group-hover:shadow-[#b89bf3]/40",
       avatarText: "bg-gradient-to-r from-[#8fb3f5] via-[#b89bf3] to-[#f28fbe] bg-clip-text text-transparent font-black",
-      iconColor: "",
+      iconColor: "text-[#b89bf3]",
       symbol: "crown-vice",
     };
   }
@@ -68,20 +76,38 @@ function getRoleStyle(roleName: string): RoleStyle {
       badgeBg: "bg-gradient-to-r from-amber-500/30 via-yellow-400/40 to-amber-500/30 text-yellow-300 border-yellow-400/90 font-black shadow-md shadow-amber-950/60",
       text: "text-yellow-300 font-black",
       border: "border-yellow-400/80",
-      avatarBg: "bg-amber-950 border-yellow-400/80",
+      cardHover: "hover:border-yellow-400 hover:shadow-xl hover:shadow-yellow-400/25",
+      avatarBg: "bg-slate-900 border-yellow-400/80 shadow-md shadow-yellow-400/25",
+      avatarHover: "group-hover:border-yellow-300 group-hover:shadow-lg group-hover:shadow-yellow-400/45",
       avatarText: "text-yellow-300 font-black",
       iconColor: "text-yellow-300",
       symbol: "crown",
     };
   }
 
+  if (name.includes("responsabile generale ems") || name.includes("responsabile generale")) {
+    return {
+      badgeBg: "bg-gradient-to-r from-[#f8f8f8]/20 via-[#7eeaff]/25 to-[#f8f8f8]/20 text-[#7eeaff] border-[#7eeaff]/60 font-black shadow-sm shadow-[#7eeaff]/20",
+      text: "bg-gradient-to-r from-[#f8f8f8] to-[#7eeaff] bg-clip-text text-transparent font-black",
+      border: "border-[#7eeaff]/60",
+      cardHover: "hover:border-[#7eeaff] hover:shadow-xl hover:shadow-[#7eeaff]/25",
+      avatarBg: "bg-slate-900 border-[#7eeaff]/70 shadow-md shadow-[#7eeaff]/25",
+      avatarHover: "group-hover:border-[#7eeaff] group-hover:shadow-lg group-hover:shadow-[#7eeaff]/45",
+      avatarText: "bg-gradient-to-r from-[#f8f8f8] to-[#7eeaff] bg-clip-text text-transparent font-black",
+      iconColor: "text-[#7eeaff]",
+      symbol: "crown",
+    };
+  }
+
   if (name.includes("direttore generale")) {
     return {
-      badgeBg: "bg-cyan-500/20 text-cyan-300 border-cyan-500/40",
-      text: "text-cyan-300",
-      border: "border-cyan-500/40",
-      avatarBg: "bg-cyan-950/80 border-cyan-500/60",
-      avatarText: "text-cyan-300",
+      badgeBg: "bg-cyan-500/20 text-cyan-300 border-cyan-500/50 font-black shadow-sm shadow-cyan-950/40",
+      text: "text-cyan-300 font-black",
+      border: "border-cyan-500/50",
+      cardHover: "hover:border-cyan-400 hover:shadow-xl hover:shadow-cyan-400/25",
+      avatarBg: "bg-slate-900 border-cyan-400/70 shadow-md shadow-cyan-400/25",
+      avatarHover: "group-hover:border-cyan-300 group-hover:shadow-lg group-hover:shadow-cyan-400/45",
+      avatarText: "text-cyan-300 font-black",
       iconColor: "text-cyan-400",
       symbol: "gem",
     };
@@ -90,21 +116,25 @@ function getRoleStyle(roleName: string): RoleStyle {
   if (name.includes("direttore sanitario")) {
     if (name.includes("vice") || name.includes("v.")) {
       return {
-        badgeBg: "bg-red-500/20 text-red-300 border-red-500/40",
-        text: "text-red-300",
-        border: "border-red-500/40",
-        avatarBg: "bg-red-950/80 border-red-500/60",
-        avatarText: "text-red-300",
-        iconColor: "text-red-400",
+        badgeBg: "bg-rose-500/20 text-rose-300 border-rose-500/50 font-black shadow-sm shadow-rose-950/40",
+        text: "text-rose-300 font-black",
+        border: "border-rose-500/50",
+        cardHover: "hover:border-rose-400 hover:shadow-xl hover:shadow-rose-400/25",
+        avatarBg: "bg-slate-900 border-rose-400/70 shadow-md shadow-rose-500/25",
+        avatarHover: "group-hover:border-rose-300 group-hover:shadow-lg group-hover:shadow-rose-400/45",
+        avatarText: "text-rose-300 font-black",
+        iconColor: "text-rose-400",
         symbol: "crown",
       };
     }
     return {
-      badgeBg: "bg-red-700/25 text-red-200 border-red-600/50 font-extrabold",
-      text: "text-red-200",
-      border: "border-red-600/50",
-      avatarBg: "bg-red-900/90 border-red-500/70",
-      avatarText: "text-red-200",
+      badgeBg: "bg-red-700/25 text-red-200 border-red-500/60 font-black shadow-sm shadow-red-950/40",
+      text: "text-red-200 font-black",
+      border: "border-red-500/60",
+      cardHover: "hover:border-red-500 hover:shadow-xl hover:shadow-red-500/25",
+      avatarBg: "bg-slate-900 border-red-500/70 shadow-md shadow-red-500/25",
+      avatarHover: "group-hover:border-red-400 group-hover:shadow-lg group-hover:shadow-red-500/45",
+      avatarText: "text-red-200 font-black",
       iconColor: "text-red-300",
       symbol: "crown",
     };
@@ -112,11 +142,13 @@ function getRoleStyle(roleName: string): RoleStyle {
 
   if (name.includes("segretario")) {
     return {
-      badgeBg: "bg-violet-700/20 text-violet-300 border-violet-600/40",
-      text: "text-violet-300",
-      border: "border-violet-600/40",
-      avatarBg: "bg-violet-950/80 border-violet-600/60",
-      avatarText: "text-violet-300",
+      badgeBg: "bg-violet-700/20 text-violet-300 border-violet-500/50 font-black shadow-sm shadow-violet-950/40",
+      text: "text-violet-300 font-black",
+      border: "border-violet-500/50",
+      cardHover: "hover:border-violet-400 hover:shadow-xl hover:shadow-violet-400/25",
+      avatarBg: "bg-slate-900 border-violet-400/70 shadow-md shadow-violet-500/25",
+      avatarHover: "group-hover:border-violet-300 group-hover:shadow-lg group-hover:shadow-violet-400/45",
+      avatarText: "text-violet-300 font-black",
       iconColor: "text-violet-400",
       symbol: "cross",
     };
@@ -124,11 +156,13 @@ function getRoleStyle(roleName: string): RoleStyle {
 
   if (name.includes("supervisore generale")) {
     return {
-      badgeBg: "bg-purple-600/20 text-purple-300 border-purple-500/40",
-      text: "text-purple-300",
-      border: "border-purple-500/40",
-      avatarBg: "bg-purple-950/80 border-purple-500/60",
-      avatarText: "text-purple-300",
+      badgeBg: "bg-purple-600/20 text-purple-300 border-purple-500/50 font-black shadow-sm shadow-purple-950/40",
+      text: "text-purple-300 font-black",
+      border: "border-purple-500/50",
+      cardHover: "hover:border-purple-400 hover:shadow-xl hover:shadow-purple-400/25",
+      avatarBg: "bg-slate-900 border-purple-400/70 shadow-md shadow-purple-500/25",
+      avatarHover: "group-hover:border-purple-300 group-hover:shadow-lg group-hover:shadow-purple-400/45",
+      avatarText: "text-purple-300 font-black",
       iconColor: "text-purple-400",
       symbol: "cross",
     };
@@ -137,32 +171,38 @@ function getRoleStyle(roleName: string): RoleStyle {
   if (name.includes("supervisore")) {
     if (name.includes("assistente") || name.includes("aiuto")) {
       return {
-        badgeBg: "bg-pink-400/20 text-pink-300 border-pink-400/40",
-        text: "text-pink-300",
-        border: "border-pink-400/40",
-        avatarBg: "bg-pink-950/80 border-pink-400/50",
-        avatarText: "text-pink-300",
+        badgeBg: "bg-pink-400/20 text-pink-300 border-pink-400/50 font-black shadow-sm shadow-pink-950/40",
+        text: "text-pink-300 font-black",
+        border: "border-pink-400/50",
+        cardHover: "hover:border-pink-400 hover:shadow-xl hover:shadow-pink-400/25",
+        avatarBg: "bg-slate-900 border-pink-400/70 shadow-md shadow-pink-400/25",
+        avatarHover: "group-hover:border-pink-300 group-hover:shadow-lg group-hover:shadow-pink-400/45",
+        avatarText: "text-pink-300 font-black",
         iconColor: "text-pink-400",
         symbol: "star",
       };
     }
     if (name.includes("vice") || name.includes("v.")) {
       return {
-        badgeBg: "bg-pink-600/20 text-pink-300 border-pink-500/40",
-        text: "text-pink-300",
-        border: "border-pink-500/40",
-        avatarBg: "bg-pink-950/80 border-pink-500/60",
-        avatarText: "text-pink-300",
+        badgeBg: "bg-pink-600/20 text-pink-300 border-pink-500/50 font-black shadow-sm shadow-pink-950/40",
+        text: "text-pink-300 font-black",
+        border: "border-pink-500/50",
+        cardHover: "hover:border-pink-400 hover:shadow-xl hover:shadow-pink-500/25",
+        avatarBg: "bg-slate-900 border-pink-500/70 shadow-md shadow-pink-500/25",
+        avatarHover: "group-hover:border-pink-300 group-hover:shadow-lg group-hover:shadow-pink-500/45",
+        avatarText: "text-pink-300 font-black",
         iconColor: "text-pink-400",
         symbol: "star",
       };
     }
     return {
-      badgeBg: "bg-rose-600/20 text-rose-300 border-rose-500/40",
-      text: "text-rose-300",
-      border: "border-rose-500/40",
-      avatarBg: "bg-rose-950/80 border-rose-500/60",
-      avatarText: "text-rose-300",
+      badgeBg: "bg-rose-600/20 text-rose-300 border-rose-500/50 font-black shadow-sm shadow-rose-950/40",
+      text: "text-rose-300 font-black",
+      border: "border-rose-500/50",
+      cardHover: "hover:border-rose-400 hover:shadow-xl hover:shadow-rose-500/25",
+      avatarBg: "bg-slate-900 border-rose-500/70 shadow-md shadow-rose-500/25",
+      avatarHover: "group-hover:border-rose-300 group-hover:shadow-lg group-hover:shadow-rose-500/45",
+      avatarText: "text-rose-300 font-black",
       iconColor: "text-rose-400",
       symbol: "star",
     };
@@ -171,21 +211,25 @@ function getRoleStyle(roleName: string): RoleStyle {
   if (name.includes("responsabile del presidio") || name.includes("responsabile presidio")) {
     if (name.includes("vice") || name.includes("v.")) {
       return {
-        badgeBg: "bg-orange-400/20 text-orange-300 border-orange-400/40",
-        text: "text-orange-300",
-        border: "border-orange-400/40",
-        avatarBg: "bg-orange-950/80 border-orange-400/50",
-        avatarText: "text-orange-300",
+        badgeBg: "bg-orange-400/20 text-orange-300 border-orange-400/50 font-black shadow-sm shadow-orange-950/40",
+        text: "text-orange-300 font-black",
+        border: "border-orange-400/50",
+        cardHover: "hover:border-orange-400 hover:shadow-xl hover:shadow-orange-400/25",
+        avatarBg: "bg-slate-900 border-orange-400/70 shadow-md shadow-orange-400/25",
+        avatarHover: "group-hover:border-orange-300 group-hover:shadow-lg group-hover:shadow-orange-400/45",
+        avatarText: "text-orange-300 font-black",
         iconColor: "text-orange-400",
         symbol: "star",
       };
     }
     return {
-      badgeBg: "bg-orange-600/20 text-orange-300 border-orange-500/40",
-      text: "text-orange-300",
-      border: "border-orange-500/40",
-      avatarBg: "bg-orange-950/80 border-orange-500/60",
-      avatarText: "text-orange-300",
+      badgeBg: "bg-orange-600/20 text-orange-300 border-orange-500/50 font-black shadow-sm shadow-orange-950/40",
+      text: "text-orange-300 font-black",
+      border: "border-orange-500/50",
+      cardHover: "hover:border-orange-400 hover:shadow-xl hover:shadow-orange-500/25",
+      avatarBg: "bg-slate-900 border-orange-500/70 shadow-md shadow-orange-500/25",
+      avatarHover: "group-hover:border-orange-300 group-hover:shadow-lg group-hover:shadow-orange-500/45",
+      avatarText: "text-orange-300 font-black",
       iconColor: "text-orange-400",
       symbol: "star",
     };
@@ -194,21 +238,25 @@ function getRoleStyle(roleName: string): RoleStyle {
   if (name.includes("primario")) {
     if (name.includes("vice") || name.includes("v.")) {
       return {
-        badgeBg: "bg-amber-400/20 text-amber-300 border-amber-400/40",
-        text: "text-amber-300",
-        border: "border-amber-400/40",
-        avatarBg: "bg-amber-950/80 border-amber-400/50",
-        avatarText: "text-amber-300",
+        badgeBg: "bg-amber-400/20 text-amber-300 border-amber-400/50 font-black shadow-sm shadow-amber-950/40",
+        text: "text-amber-300 font-black",
+        border: "border-amber-400/50",
+        cardHover: "hover:border-amber-400 hover:shadow-xl hover:shadow-amber-400/25",
+        avatarBg: "bg-slate-900 border-amber-400/70 shadow-md shadow-amber-400/25",
+        avatarHover: "group-hover:border-amber-300 group-hover:shadow-lg group-hover:shadow-amber-400/45",
+        avatarText: "text-amber-300 font-black",
         iconColor: "text-amber-400",
         symbol: "star",
       };
     }
     return {
-      badgeBg: "bg-amber-700/20 text-amber-200 border-amber-600/40",
-      text: "text-amber-200",
-      border: "border-amber-600/40",
-      avatarBg: "bg-amber-950/80 border-amber-600/60",
-      avatarText: "text-amber-200",
+      badgeBg: "bg-amber-700/20 text-amber-200 border-amber-500/50 font-black shadow-sm shadow-amber-950/40",
+      text: "text-amber-200 font-black",
+      border: "border-amber-500/50",
+      cardHover: "hover:border-amber-400 hover:shadow-xl hover:shadow-amber-500/25",
+      avatarBg: "bg-slate-900 border-amber-500/70 shadow-md shadow-amber-500/25",
+      avatarHover: "group-hover:border-amber-300 group-hover:shadow-lg group-hover:shadow-amber-500/45",
+      avatarText: "text-amber-200 font-black",
       iconColor: "text-amber-400",
       symbol: "star",
     };
@@ -218,8 +266,10 @@ function getRoleStyle(roleName: string): RoleStyle {
     return {
       badgeBg: "bg-gradient-to-r from-[#a7a7a8]/20 via-[#d09a9a]/20 to-[#f78c8c]/25 text-[#f78c8c] border-[#f78c8c]/50 font-bold shadow-xs shadow-[#f78c8c]/20",
       text: "bg-gradient-to-r from-[#a7a7a8] to-[#f78c8c] bg-clip-text text-transparent font-bold",
-      border: "border-[#f78c8c]/40 hover:border-[#f78c8c]/70",
-      avatarBg: "bg-slate-900 border-[#f78c8c]/50",
+      border: "border-[#f78c8c]/50",
+      cardHover: "hover:border-[#f78c8c] hover:shadow-xl hover:shadow-[#f78c8c]/25",
+      avatarBg: "bg-slate-900 border-[#f78c8c]/70 shadow-md shadow-[#f78c8c]/25",
+      avatarHover: "group-hover:border-[#f78c8c] group-hover:shadow-lg group-hover:shadow-[#f78c8c]/45",
       avatarText: "bg-gradient-to-r from-[#a7a7a8] to-[#f78c8c] bg-clip-text text-transparent font-black",
       iconColor: "text-[#f78c8c]",
       symbol: "star",
@@ -227,11 +277,13 @@ function getRoleStyle(roleName: string): RoleStyle {
   }
 
   return {
-    badgeBg: "bg-slate-800 text-slate-200 border-slate-700",
-    text: "text-slate-200",
+    badgeBg: "bg-slate-800 text-slate-200 border-slate-700 font-bold",
+    text: "text-slate-200 font-bold",
     border: "border-slate-700",
-    avatarBg: "bg-slate-900 border-slate-700",
-    avatarText: "text-slate-300",
+    cardHover: "hover:border-slate-500 hover:shadow-xl hover:shadow-slate-500/25",
+    avatarBg: "bg-slate-900 border-slate-600/70 shadow-md shadow-slate-700/25",
+    avatarHover: "group-hover:border-slate-400 group-hover:shadow-lg group-hover:shadow-slate-500/45",
+    avatarText: "text-slate-300 font-bold",
     iconColor: "text-slate-400",
     symbol: "star",
   };
@@ -278,6 +330,7 @@ export default function EmsHierarchy({ isAdmin = false, adminToken }: EmsHierarc
   const [formCategory, setFormCategory] = useState<HierarchyCategoryKey>("FUNZIONARI");
   const [formBadge, setFormBadge] = useState("");
   const [formDiscordTag, setFormDiscordTag] = useState("");
+  const [formIsDev, setFormIsDev] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [syncing, setSyncing] = useState(false);
@@ -321,6 +374,7 @@ export default function EmsHierarchy({ isAdmin = false, adminToken }: EmsHierarc
     setFormCategory("FUNZIONARI");
     setFormBadge("");
     setFormDiscordTag("");
+    setFormIsDev(false);
     setFormError(null);
     setShowModal(true);
   };
@@ -332,6 +386,7 @@ export default function EmsHierarchy({ isAdmin = false, adminToken }: EmsHierarc
     setFormCategory(m.categoryKey);
     setFormBadge(m.badge || "");
     setFormDiscordTag(m.discordTag || "");
+    setFormIsDev(Boolean(m.isDev));
     setFormError(null);
     setShowModal(true);
   };
@@ -368,6 +423,7 @@ export default function EmsHierarchy({ isAdmin = false, adminToken }: EmsHierarc
           categoryKey: formCategory,
           badge: formBadge.trim(),
           discordTag: formDiscordTag.trim(),
+          isDev: formIsDev,
         }),
       });
 
@@ -745,12 +801,23 @@ export default function EmsHierarchy({ isAdmin = false, adminToken }: EmsHierarc
                               return (
                                 <div
                                   key={m.id}
-                                  className={`group relative bg-slate-950 border border-slate-800/90 hover:${memberRoleStyle.border} rounded-2xl p-4 flex items-center justify-between gap-4 transition-all hover:shadow-xl hover:-translate-y-0.5`}
+                                  className={`group relative bg-slate-950 border border-slate-800/90 ${memberRoleStyle.cardHover} rounded-2xl p-4 flex items-center justify-between gap-4 transition-all hover:-translate-y-0.5`}
                                 >
+                                  {/* Dev Tag - posizionato nella parte superiore a destra del dipendente */}
+                                  {m.isDev && (
+                                    <div
+                                      className="absolute top-2.5 right-2.5 z-10 flex items-center gap-1 px-2 py-0.5 rounded-md bg-blue-950/90 border border-blue-500/50 text-blue-400 font-bold text-[10px] tracking-wider uppercase shadow-xs shadow-blue-950/60 pointer-events-none"
+                                      title="Badge Dev"
+                                    >
+                                      <Cog className="w-3 h-3 text-blue-400 animate-[spin_8s_linear_infinite]" />
+                                      <span>Dev</span>
+                                    </div>
+                                  )}
+
                                   {/* Member Details */}
                                   <div className="flex items-center gap-3.5 min-w-0">
                                     {/* Avatar Circle con Accento Ruolo */}
-                                    <div className={`w-11 h-11 rounded-2xl flex items-center justify-center font-black text-sm shrink-0 ${memberRoleStyle.avatarBg} ${memberRoleStyle.avatarText} border shadow-md group-hover:scale-105 transition-transform`}>
+                                    <div className={`w-11 h-11 rounded-2xl flex items-center justify-center font-black text-sm shrink-0 ${memberRoleStyle.avatarBg} ${memberRoleStyle.avatarText} ${memberRoleStyle.avatarHover} border group-hover:scale-105 transition-all`}>
                                       {m.name
                                         .split(" ")
                                         .map((w) => w[0])
@@ -889,7 +956,7 @@ export default function EmsHierarchy({ isAdmin = false, adminToken }: EmsHierarc
                   className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-red-500 cursor-pointer"
                 >
                   <option value="PROPRIETARI">PROPRIETARI (Proprietario, Vice Proprietario)</option>
-                  <option value="DIRIGENZA_GENERALE">DIRIGENZA GENERALE (Direttore Generale)</option>
+                  <option value="DIRIGENZA_GENERALE">DIRIGENZA GENERALE (Responsabile Generale EMS, Direttore Generale)</option>
                   <option value="DIRIGENZA_SANITARIA">DIRIGENZA SANITARIA (Segretario, V. Direttore, Direttore Sanitario)</option>
                   <option value="SUPERVISIONE">SUPERVISIONE (Assistente, V. Supervisore, Supervisore, Sup. Generale)</option>
                   <option value="FUNZIONARI">FUNZIONARI (Vice Primario, Primario, V. Responsabile, Responsabile Presidio)</option>
@@ -951,6 +1018,27 @@ export default function EmsHierarchy({ isAdmin = false, adminToken }: EmsHierarc
                   ))}
                 </div>
               </div>
+
+              {/* Tag Dev (Sviluppatore) */}
+              {(isAdmin || isOwnerKey(adminToken || localStorage.getItem("adminToken")) || (formRole && formRole.toLowerCase().includes("proprietario")) || formIsDev) && (
+                <div className="p-3 bg-blue-950/40 border border-blue-500/30 rounded-xl flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Cog className="w-4 h-4 text-blue-400" />
+                    <div>
+                      <span className="text-xs font-bold text-blue-300 block">Tag Dev (Sviluppatore)</span>
+                      <span className="text-[11px] text-slate-400 block">
+                        Mostra il badge blu "Dev" con ingranaggio in alto a destra nella scheda
+                      </span>
+                    </div>
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={formIsDev}
+                    onChange={(e) => setFormIsDev(e.target.checked)}
+                    className="w-4 h-4 rounded border-blue-500/50 text-blue-500 focus:ring-blue-500 cursor-pointer accent-blue-600"
+                  />
+                </div>
+              )}
 
               <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-800">
                 <button

@@ -8,6 +8,10 @@ import {
   initDB,
   syncFromFirestore,
   isFirestoreQuotaExhausted,
+  isFirestoreConnected,
+  getLoadedFirebaseConfig,
+  getFullDatabaseCopy,
+  restoreFullDatabase,
   getSettings,
   updateSettings,
   verifyAdminPassword,
@@ -404,6 +408,7 @@ interface DiscordSession {
   activatedAt?: string;
   candidateId?: string;
   hideFromHierarchy?: boolean;
+  isDev?: boolean;
 }
 
 const DISCORD_USERS_FILE = path.join(process.cwd(), "discord_registered_users.json");
@@ -517,8 +522,18 @@ function saveRegisteredDiscordUsers(usersMap: Map<string, DiscordSession>) {
 
 // Memory map initialized from disk
 const REGISTERED_DISCORD_USERS = loadRegisteredDiscordUsers();
-// Pre-seed master secret token
-REGISTERED_DISCORD_USERS.set(MASTER_SECRET_TOKEN.toUpperCase(), MASTER_SESSION);
+// Pre-seed master secret token (preserving isDev if already configured)
+const existingMasterOnBoot = REGISTERED_DISCORD_USERS.get(MASTER_SECRET_TOKEN.toUpperCase());
+REGISTERED_DISCORD_USERS.set(MASTER_SECRET_TOKEN.toUpperCase(), {
+  ...MASTER_SESSION,
+  ...existingMasterOnBoot,
+  token: MASTER_SECRET_TOKEN,
+  roleName: "Proprietario",
+  gradeName: "Proprietario",
+  isAllowed: true,
+  isMaster: true,
+  isDev: existingMasterOnBoot?.isDev ? true : undefined,
+});
 const VERIFIED_BOT_CODES = new Map<string, { username: string; roleName: string; createdAt: number }>();
 
 // Helper function to automatically delete expired TEST tokens and invalidate sessions
@@ -657,6 +672,7 @@ const AUTHORIZED_ROLE_GRADES: Record<string, number> = {
   "Vice Presidente CDA": 96,
   "Segretario CDA": 95,
   "Membro CDA": 94,
+  "Responsabile Generale EMS": 13,
   "Direttore Generale": 12,
   "Direttore Sanitario": 11,
   "V. Direttore Sanitario": 10,
@@ -679,6 +695,8 @@ const ROLE_GRADE_MAP_SERVER: Record<string, number> = {
   "v. proprietario": 99,
 
   // Dirigenza & Gerarchia EMS
+  "responsabile generale ems": 21,
+  "responsabile generale": 21,
   "direttore generale": 20,
   "v. direttore generale": 19,
   "vice direttore generale": 19,
@@ -730,6 +748,8 @@ function getRoleGrade(roleName: string): number {
   if (clean.includes("master")) return 100;
   if (clean.includes("proprietario") && !clean.includes("vice") && !clean.includes("v.")) return 100;
   if (clean.includes("vice proprietario") || clean.includes("v. proprietario")) return 99;
+
+  if (clean.includes("responsabile generale")) return 21;
 
   if (clean.includes("direttore generale")) {
     if (clean.includes("v.") || clean.includes("vice")) return 19;
@@ -849,16 +869,12 @@ function ensureTokensForCandidates() {
   }
   ALLOWED_OFFICIAL_TOKEN_KEYS.add(masterKey);
 
-  // Ensure 3 Owners are present with official tokens (unless explicitly revoked or purged)
+  // Ensure 3 Owners are present with official tokens (owners can never be revoked or purged)
   OFFICIAL_OWNERS_SEED.forEach((owner) => {
     const tokenKey = owner.token.toUpperCase();
     ALLOWED_OFFICIAL_TOKEN_KEYS.add(tokenKey);
-    const isRevoked = REVOKED_TOKENS.has(tokenKey);
-    const isPurged = PURGED_TOKENS.has(tokenKey);
-    if (isRevoked || isPurged) {
-      REGISTERED_DISCORD_USERS.delete(tokenKey);
-      return;
-    }
+    REVOKED_TOKENS.delete(tokenKey);
+    PURGED_TOKENS.delete(tokenKey);
 
     const existing = REGISTERED_DISCORD_USERS.get(tokenKey);
     if (!existing) {
@@ -939,12 +955,13 @@ function isRoleAllowed(roleName: string): boolean {
 }
 
 // Check if caller is high-level owner (Master token, Admin password, Proprietario, or Vice Proprietario with grade >= 99)
-function isHighLevelOwnerCaller(caller: { isMaster?: boolean; roleName?: string; grade?: number; isAdminPassword?: boolean }): boolean {
+function isHighLevelOwnerCaller(caller: { isMaster?: boolean; roleName?: string; grade?: number; isAdminPassword?: boolean; username?: string }): boolean {
   if (!caller) return false;
   if (caller.isMaster || caller.isAdminPassword) return true;
   if (typeof caller.grade === "number" && caller.grade >= 10) return true;
   const clean = (caller.roleName || "").trim().toLowerCase();
-  if (clean.includes("proprietario") || clean.includes("admin") || clean.includes("direttore generale") || clean.includes("master")) return true;
+  if (clean.includes("proprietario") || clean.includes("admin") || clean.includes("responsabile generale") || clean.includes("direttore generale") || clean.includes("master")) return true;
+  if (caller.username && isOwnerKey(caller.username)) return true;
   return false;
 }
 
@@ -2112,12 +2129,13 @@ app.post("/api/admin/employee-tokens", requireAdmin, async (req, res) => {
       return res.status(403).json({ error: "Accesso riservato: Solo il personale con grado da V. Direttore in su può generare nuovi token dipendenti." });
     }
 
-    const { fullName, roleName, customToken, cdaRoleName, hasCdaAccess, discordTag, hideFromHierarchy } = req.body;
+    const { fullName, roleName, customToken, cdaRoleName, hasCdaAccess, discordTag, hideFromHierarchy, isDev } = req.body;
     const cleanName = sanitizeString(fullName, 100);
     const cleanRole = sanitizeString(roleName, 100);
     const cleanCdaRole = cdaRoleName ? sanitizeString(cdaRoleName, 100) : undefined;
     const cleanDiscordTag = discordTag ? sanitizeString(discordTag, 64) : undefined;
     const cleanHideHierarchy = Boolean(hideFromHierarchy);
+    const cleanIsDev = isProprietarioCaller(caller) && Boolean(isDev);
 
     if (!cleanName || cleanName.length < 2) {
       return res.status(400).json({ error: "Nome e Cognome dipendente obbligatorio (minimo 2 caratteri)." });
@@ -2175,6 +2193,7 @@ app.post("/api/admin/employee-tokens", requireAdmin, async (req, res) => {
       hasCdaAccess: typeof hasCdaAccess === "boolean" ? hasCdaAccess : (cleanCdaRole ? true : undefined),
       discordTag: cleanDiscordTag,
       hideFromHierarchy: cleanHideHierarchy,
+      isDev: cleanIsDev ? true : undefined,
     };
 
     // Un-revoke user/token if previously revoked
@@ -2240,12 +2259,13 @@ app.post("/api/admin/test-tokens", requireAdmin, async (req, res) => {
       });
     }
 
-    const { fullName, roleName, cdaRoleName, customToken, durationValue, durationUnit, hasCdaAccess, discordTag, hideFromHierarchy } = req.body;
+    const { fullName, roleName, cdaRoleName, customToken, durationValue, durationUnit, hasCdaAccess, discordTag, hideFromHierarchy, isDev } = req.body;
     const cleanName = sanitizeString(fullName, 100);
     const cleanRole = sanitizeString(roleName, 100);
     const cleanCdaRole = cdaRoleName ? sanitizeString(cdaRoleName, 100) : undefined;
     const cleanDiscordTag = discordTag ? sanitizeString(discordTag, 64) : undefined;
     const cleanHideHierarchy = Boolean(hideFromHierarchy);
+    const cleanIsDev = Boolean(isDev);
 
     if (!cleanName || cleanName.length < 2) {
       return res.status(400).json({ error: "Nome dipendente per il Token TEST obbligatorio (minimo 2 caratteri)." });
@@ -2293,6 +2313,7 @@ app.post("/api/admin/test-tokens", requireAdmin, async (req, res) => {
       durationMs: addMs > 0 ? addMs : undefined,
       discordTag: cleanDiscordTag,
       hideFromHierarchy: cleanHideHierarchy,
+      isDev: cleanIsDev ? true : undefined,
     };
 
     // Un-revoke user/token if previously revoked
@@ -2364,7 +2385,7 @@ app.put("/api/admin/employee-tokens/:token", requireAdmin, async (req, res) => {
       return res.status(404).json({ error: "Token non trovato." });
     }
 
-    const { fullName, roleName, cdaRoleName, hasCdaAccess, newToken, discordTag, hideFromHierarchy } = req.body;
+    const { fullName, roleName, cdaRoleName, hasCdaAccess, newToken, discordTag, hideFromHierarchy, isDev } = req.body;
     const cleanName = fullName ? sanitizeString(fullName, 100) : existingUser.username;
     const cleanRole = roleName ? sanitizeString(roleName, 100) : existingUser.roleName;
     const cleanCdaRole = cdaRoleName !== undefined 
@@ -2374,6 +2395,10 @@ app.put("/api/admin/employee-tokens/:token", requireAdmin, async (req, res) => {
       ? (discordTag && discordTag.trim() !== "" ? sanitizeString(discordTag, 64) : undefined) 
       : existingUser.discordTag;
     const cleanHideHierarchy = hideFromHierarchy !== undefined ? Boolean(hideFromHierarchy) : Boolean(existingUser.hideFromHierarchy);
+    const isOwnerTarget = isOwnerKey(tokenToUpdate) || (existingUser.roleName || "").trim().toLowerCase().includes("proprietario");
+    const cleanIsDev = isDev !== undefined
+      ? (isProprietarioCaller(caller) || isOwnerTarget || isOwnerKey(caller.username) ? Boolean(isDev) : Boolean(existingUser.isDev))
+      : Boolean(existingUser.isDev);
     const cleanNewToken = isMaster ? MASTER_SECRET_TOKEN.toUpperCase() : (newToken ? sanitizeString(newToken, 50).toUpperCase() : tokenToUpdate);
 
     // Validate new token if user changed it
@@ -2425,6 +2450,7 @@ app.put("/api/admin/employee-tokens/:token", requireAdmin, async (req, res) => {
       hasCdaAccess: cleanHasCda,
       discordTag: cleanDiscordTag,
       hideFromHierarchy: cleanHideHierarchy,
+      isDev: cleanIsDev ? true : undefined,
       token: cleanNewToken,
       isMaster: isMaster ? true : existingUser.isMaster,
     };
@@ -2434,6 +2460,9 @@ app.put("/api/admin/employee-tokens/:token", requireAdmin, async (req, res) => {
     }
     if (!cleanDiscordTag) {
       delete updatedSession.discordTag;
+    }
+    if (!cleanIsDev) {
+      delete updatedSession.isDev;
     }
 
     if (cleanNewToken !== tokenToUpdate) {
@@ -2454,7 +2483,7 @@ app.put("/api/admin/employee-tokens/:token", requireAdmin, async (req, res) => {
 
     ALLOWED_OFFICIAL_TOKEN_KEYS.add(cleanNewToken.toUpperCase());
     REGISTERED_DISCORD_USERS.set(cleanNewToken, updatedSession);
-    await saveTokenFirestore(updatedSession);
+    await saveTokenFirestore({ ...updatedSession, isDev: cleanIsDev ? true : false });
     saveRegisteredDiscordUsers(REGISTERED_DISCORD_USERS);
 
     // Refresh hierarchy cache
@@ -3069,6 +3098,7 @@ function buildAutoHierarchyMembers(): HierarchyMember[] {
       badge,
       discordTag: discTag,
       updatedAt: session.verifiedAt || new Date().toISOString(),
+      isDev: Boolean(session.isDev) ? true : undefined,
     };
     if (!memberEntry.badge) {
       delete (memberEntry as any).badge;
@@ -3124,7 +3154,8 @@ app.get("/api/hierarchy", (req, res) => {
 app.post("/api/admin/hierarchy", requireAdmin, (req, res) => {
   try {
     ensureHierarchyLoaded();
-    const { name, roleName, categoryKey, badge, discordTag } = req.body;
+    const caller = getCallerGradeAndRole(req);
+    const { name, roleName, categoryKey, badge, discordTag, isDev } = req.body;
     const cleanName = sanitizeString(name, 100);
     const cleanRole = sanitizeString(roleName, 100);
     const cleanBadge = (badge && badge.trim() !== "") ? sanitizeString(badge, 100) : undefined;
@@ -3141,6 +3172,10 @@ app.post("/api/admin/hierarchy", requireAdmin, (req, res) => {
       ? (categoryKey as HierarchyCategoryKey)
       : getCategoryForRole(cleanRole);
 
+    const cleanIsDev = isDev !== undefined
+      ? (isHighLevelOwnerCaller(caller) ? Boolean(isDev) : undefined)
+      : undefined;
+
     const newMember: HierarchyMember = {
       id: "HIER-" + Date.now() + "-" + crypto.randomBytes(2).toString("hex"),
       name: cleanName,
@@ -3149,9 +3184,11 @@ app.post("/api/admin/hierarchy", requireAdmin, (req, res) => {
       badge: cleanBadge,
       discordTag: cleanDiscordTag,
       updatedAt: new Date().toISOString(),
+      isDev: cleanIsDev ? true : undefined,
     };
     if (!cleanBadge) delete newMember.badge;
     if (!cleanDiscordTag) delete newMember.discordTag;
+    if (!newMember.isDev) delete newMember.isDev;
 
     HIERARCHY_MEMBERS.push(newMember);
     saveHierarchyMemberFirestore(newMember);
@@ -3178,11 +3215,12 @@ app.post("/api/admin/hierarchy", requireAdmin, (req, res) => {
 });
 
 // Admin endpoint to edit a member in hierarchy
-app.put("/api/admin/hierarchy/:id", requireAdmin, (req, res) => {
+app.put("/api/admin/hierarchy/:id", requireAdmin, async (req, res) => {
   try {
     ensureHierarchyLoaded();
+    const caller = getCallerGradeAndRole(req);
     const id = req.params.id;
-    const { name, roleName, categoryKey, badge, discordTag } = req.body;
+    const { name, roleName, categoryKey, badge, discordTag, isDev } = req.body;
     const index = HIERARCHY_MEMBERS.findIndex((m) => m.id === id);
 
     if (index === -1) {
@@ -3198,6 +3236,11 @@ app.put("/api/admin/hierarchy/:id", requireAdmin, (req, res) => {
       ? (categoryKey as HierarchyCategoryKey)
       : getCategoryForRole(cleanRole);
 
+    const isOwnerTarget = isOwnerKey(id.replace("HIER-TOKEN-", "")) || cleanRole.toLowerCase().includes("proprietario");
+    const cleanIsDev = isDev !== undefined
+      ? (isHighLevelOwnerCaller(caller) || isOwnerTarget ? Boolean(isDev) : Boolean(HIERARCHY_MEMBERS[index].isDev))
+      : Boolean(HIERARCHY_MEMBERS[index].isDev);
+
     const updatedObj: HierarchyMember = {
       ...HIERARCHY_MEMBERS[index],
       name: cleanName,
@@ -3206,18 +3249,47 @@ app.put("/api/admin/hierarchy/:id", requireAdmin, (req, res) => {
       badge: cleanBadge,
       discordTag: cleanDiscordTag,
       updatedAt: new Date().toISOString(),
+      isDev: cleanIsDev ? true : undefined,
     };
 
     if (!cleanBadge) delete updatedObj.badge;
     if (!cleanDiscordTag) delete updatedObj.discordTag;
+    if (!updatedObj.isDev) delete updatedObj.isDev;
 
     HIERARCHY_MEMBERS[index] = updatedObj;
 
     saveHierarchyMemberFirestore(updatedObj);
 
+    // If this member corresponds to a registered employee token (HIER-TOKEN-XYZ), sync to token session & firestore
+    if (id.startsWith("HIER-TOKEN-")) {
+      const tokenKey = id.replace("HIER-TOKEN-", "").toUpperCase();
+      const existingSession = REGISTERED_DISCORD_USERS.get(tokenKey);
+      if (existingSession) {
+        existingSession.username = cleanName;
+        existingSession.roleName = cleanRole;
+        existingSession.gradeName = cleanRole;
+        existingSession.discordTag = cleanDiscordTag;
+        if (cleanIsDev) {
+          existingSession.isDev = true;
+        } else {
+          delete existingSession.isDev;
+        }
+        if (cleanBadge) {
+          existingSession.cdaRoleName = cleanBadge;
+          existingSession.hasCdaAccess = true;
+        }
+        REGISTERED_DISCORD_USERS.set(tokenKey, existingSession);
+        await saveTokenFirestore({ ...existingSession, isDev: cleanIsDev ? true : false });
+        saveRegisteredDiscordUsers(REGISTERED_DISCORD_USERS);
+      }
+    }
+
+    // Refresh hierarchy cache
+    buildAutoHierarchyMembers();
+
     res.json({
       success: true,
-      member: HIERARCHY_MEMBERS[index],
+      member: updatedObj,
       message: `Membro ${cleanName} aggiornato con successo.`,
     });
   } catch (error) {
@@ -4216,7 +4288,13 @@ app.get("/api/admin/excel-gerarchia/export", (req, res) => {
       headers: { authorization: `Bearer ${token}` },
     } as any);
 
-    if (!caller.isMaster && !caller.isAdminPassword && caller.grade < 20 && !(caller.roleName || "").toLowerCase().includes("direttore generale")) {
+    if (
+      !caller.isMaster &&
+      !caller.isAdminPassword &&
+      caller.grade < 20 &&
+      !(caller.roleName || "").toLowerCase().includes("direttore generale") &&
+      !(caller.roleName || "").toLowerCase().includes("responsabile generale")
+    ) {
       return res.status(403).send("Accesso non autorizzato.");
     }
 
@@ -6465,6 +6543,7 @@ const ROLE_COLORS_HEX: Record<RoleId, string> = {
   [RoleId.V_DIRETTORE]: "#ef4444",
   [RoleId.DIRETTORE]: "#b91c1c",
   [RoleId.DIRETTORE_GENERALE]: "#06b6d4",
+  [RoleId.RESPONSABILE_GENERALE_EMS]: "#7eeaff",
 };
 
 // Export database of votes to an HTML Report with HTML escaping against XSS
@@ -6692,6 +6771,182 @@ app.get("/api/admin/export/html", (req, res) => {
     res.send(fullHtml);
   } catch (error) {
     res.status(500).send("Errore del server durante l'esportazione del report.");
+  }
+});
+
+// --- FIRESTORE SYSTEM STATUS, SYNC, BACKUP & RESTORE API ENDPOINTS ---
+
+// 1. System status and health
+app.get("/api/admin/system/status", requireAdmin, (req, res) => {
+  try {
+    const config = getLoadedFirebaseConfig();
+    const isConnected = isFirestoreConnected();
+    const isQuotaExhausted = isFirestoreQuotaExhausted();
+    const db = getFullDatabaseCopy();
+
+    res.json({
+      success: true,
+      firestore: {
+        connected: isConnected,
+        quotaExhausted: isQuotaExhausted,
+        projectId: config?.projectId || null,
+        databaseId: config?.firestoreDatabaseId || "(default)",
+        mode: isConnected ? "cloud_firestore" : "local_disk_only",
+      },
+      counts: {
+        candidates: db.candidates?.length || 0,
+        votes: db.votes?.length || 0,
+        candidature: db.candidature?.length || 0,
+        cdaProposals: db.cdaProposals?.length || 0,
+        gameScores: db.gameScores?.length || 0,
+        roleElectionCandidates: db.roleElectionCandidates?.length || 0,
+        roleElectionVotes: db.roleElectionVotes?.length || 0,
+        registeredTokens: REGISTERED_DISCORD_USERS.size,
+        accessLogs: ACCESS_LOGS.length,
+        revokedTokens: REVOKED_TOKENS.size,
+        purgedTokens: PURGED_TOKENS.size,
+      },
+      lastGlobalSyncTimestamp,
+      serverTime: new Date().toISOString(),
+    });
+  } catch (err: any) {
+    console.error("Error fetching system status:", err);
+    res.status(500).json({ error: "Errore nel recupero dello stato del sistema." });
+  }
+});
+
+// 2. Force manual sync with Cloud Firestore
+app.post("/api/admin/system/sync-firestore", requireAdmin, async (req, res) => {
+  try {
+    console.log("[Admin] Manual Cloud Firestore sync requested by administrator.");
+    await syncAllDataWithFirestore(true);
+    const db = getFullDatabaseCopy();
+    const isConnected = isFirestoreConnected();
+
+    res.json({
+      success: true,
+      message: isConnected
+        ? "Sincronizzazione bidirezionale con Cloud Firestore completata con successo!"
+        : "Sincronizzazione completata in modalità disco locale (Cloud Firestore non configurato o offline).",
+      counts: {
+        candidates: db.candidates?.length || 0,
+        votes: db.votes?.length || 0,
+        candidature: db.candidature?.length || 0,
+        roleElectionCandidates: db.roleElectionCandidates?.length || 0,
+        roleElectionVotes: db.roleElectionVotes?.length || 0,
+        registeredTokens: REGISTERED_DISCORD_USERS.size,
+        accessLogs: ACCESS_LOGS.length,
+      },
+      lastGlobalSyncTimestamp,
+    });
+  } catch (err: any) {
+    console.error("[Admin] Error during manual sync:", err);
+    res.status(500).json({ error: "Errore durante la sincronizzazione con Cloud Firestore: " + (err?.message || "Errore sconosciuto") });
+  }
+});
+
+// 3. Download Full System Backup (.JSON)
+app.get("/api/admin/system/backup", (req, res) => {
+  try {
+    const token = req.query.token as string;
+    const session = token ? ACTIVE_SESSIONS.get(token) : undefined;
+    if (!session || Date.now() - session.lastSeen > SESSION_TTL_MS) {
+      return res.status(401).send("Non autorizzato. Effettua nuovamente l'accesso come amministratore.");
+    }
+
+    const backupData = {
+      exportVersion: "2.0",
+      exportedAt: new Date().toISOString(),
+      database: getFullDatabaseCopy(),
+      registeredTokens: Array.from(REGISTERED_DISCORD_USERS.entries()),
+      accessLogs: ACCESS_LOGS,
+      revokedTokens: Array.from(REVOKED_TOKENS.entries()),
+      purgedTokens: Array.from(PURGED_TOKENS),
+      firebaseConfig: getLoadedFirebaseConfig(),
+    };
+
+    const filename = `ems_database_backup_${new Date().toISOString().slice(0, 10)}.json`;
+    res.setHeader("Content-Type", "application/json; charset=utf-8");
+    res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+    res.send(JSON.stringify(backupData, null, 2));
+  } catch (err: any) {
+    console.error("Error exporting backup:", err);
+    res.status(500).send("Errore durante l'esportazione del backup: " + (err?.message || ""));
+  }
+});
+
+// 4. Restore Full System Backup from JSON
+app.post("/api/admin/system/restore", requireAdmin, async (req, res) => {
+  try {
+    const backup = req.body;
+    if (!backup || (!backup.database && !backup.candidates)) {
+      return res.status(400).json({ error: "File di backup non valido o privo di dati di database." });
+    }
+
+    const newDb = backup.database || backup;
+    if (!Array.isArray(newDb.candidates)) {
+      return res.status(400).json({ error: "Formato backup errato: candidates mancanti." });
+    }
+
+    // Restore database
+    restoreFullDatabase(newDb);
+
+    // Restore registered tokens if present
+    if (Array.isArray(backup.registeredTokens)) {
+      backup.registeredTokens.forEach(([key, user]: [string, any]) => {
+        if (key && user) {
+          REGISTERED_DISCORD_USERS.set(key.toUpperCase(), user);
+        }
+      });
+      saveRegisteredDiscordUsers(REGISTERED_DISCORD_USERS);
+    }
+
+    // Restore access logs if present
+    if (Array.isArray(backup.accessLogs)) {
+      const logsMap = new Map<string, AccessLog>();
+      ACCESS_LOGS.forEach((l) => { if (l && l.id) logsMap.set(l.id, l); });
+      backup.accessLogs.forEach((l: AccessLog) => { if (l && l.id) logsMap.set(l.id, l); });
+      ACCESS_LOGS = Array.from(logsMap.values());
+      ACCESS_LOGS.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+      saveAccessLogs(ACCESS_LOGS);
+    }
+
+    // Restore revoked tokens if present
+    if (Array.isArray(backup.revokedTokens)) {
+      backup.revokedTokens.forEach(([key, val]: [string, any]) => {
+        if (key && val) REVOKED_TOKENS.set(key.toUpperCase(), val);
+      });
+      saveRevokedTokens(REVOKED_TOKENS);
+    }
+
+    // Restore purged tokens if present
+    if (Array.isArray(backup.purgedTokens)) {
+      backup.purgedTokens.forEach((t: string) => {
+        if (t) PURGED_TOKENS.add(t.toUpperCase());
+      });
+      savePurgedTokens(PURGED_TOKENS);
+    }
+
+    // Synchronize everything with Cloud Firestore immediately
+    await syncAllDataWithFirestore(true);
+
+    const refreshedDb = getFullDatabaseCopy();
+    res.json({
+      success: true,
+      message: "Backup ripristinato con successo e sincronizzato con Cloud Firestore!",
+      counts: {
+        candidates: refreshedDb.candidates?.length || 0,
+        votes: refreshedDb.votes?.length || 0,
+        candidature: refreshedDb.candidature?.length || 0,
+        roleElectionCandidates: refreshedDb.roleElectionCandidates?.length || 0,
+        roleElectionVotes: refreshedDb.roleElectionVotes?.length || 0,
+        registeredTokens: REGISTERED_DISCORD_USERS.size,
+        accessLogs: ACCESS_LOGS.length,
+      },
+    });
+  } catch (err: any) {
+    console.error("Error restoring backup:", err);
+    res.status(500).json({ error: "Errore durante il ripristino del backup: " + (err?.message || "") });
   }
 });
 
@@ -7164,16 +7419,23 @@ export async function syncAllDataWithFirestore(force = false) {
       cloudTokensAndLogs.tokens.forEach((t) => {
         if (t && t.token) {
           const uKey = t.token.toUpperCase();
-          const tUserLower = (t.username || "").trim().toLowerCase();
-          const tCandId = t.candidateId;
-          const isRevoked = revokedTokensSet.has(uKey) ||
-            (tUserLower && revokedUsernames.has(tUserLower)) ||
-            (tCandId && revokedCandIds.has(tCandId));
+          const isOwner = isOwnerKey(uKey) || isOwnerKey(t.token) || isOwnerKey(t.username || "") || (t.roleName || "").toLowerCase().includes("proprietario");
+          const isRevoked = !isOwner && (revokedTokensSet.has(uKey) || (t.candidateId && revokedCandIds.has(t.candidateId)));
 
           if (!isRevoked) {
             cloudTokenKeys.add(uKey);
             ALLOWED_OFFICIAL_TOKEN_KEYS.add(uKey);
-            REGISTERED_DISCORD_USERS.set(uKey, t);
+            const existingLocal = REGISTERED_DISCORD_USERS.get(uKey);
+            // Cloud Firestore is authoritative. If t.isDev is strictly true, it is Dev; otherwise it is false/undefined.
+            // Never revive isDev from local cache if cloud does not have it.
+            const resolvedIsDev = t.isDev === true ? true : undefined;
+            const mergedSession: DiscordSession = {
+              ...existingLocal,
+              ...t,
+              isDev: resolvedIsDev,
+            };
+            if (!mergedSession.isDev) delete mergedSession.isDev;
+            REGISTERED_DISCORD_USERS.set(uKey, mergedSession);
           } else {
             // Actively purge invalid/revoked/duplicate doc from Firestore employee_tokens
             deleteTokenFirestore(t.token, t.username, t.candidateId);
@@ -7188,16 +7450,17 @@ export async function syncAllDataWithFirestore(force = false) {
     // Bi-directional token sync: ensure all active tokens are persisted to Cloud Firestore
     for (const [tKey, localUser] of REGISTERED_DISCORD_USERS.entries()) {
       if (tKey !== MASTER_SECRET_TOKEN.toUpperCase()) {
-        const uUserLower = (localUser.username || "").trim().toLowerCase();
-        const uCandId = localUser.candidateId;
-        const isRevoked = revokedTokensSet.has(tKey) ||
+        const isOwner = isOwnerKey(tKey) || isOwnerKey(localUser.token || "") || isOwnerKey(localUser.username || "") || (localUser.roleName || "").toLowerCase().includes("proprietario");
+        const isRevoked = !isOwner && (
+          revokedTokensSet.has(tKey) ||
           (localUser.token && revokedTokensSet.has(localUser.token.toUpperCase())) ||
-          (uUserLower && revokedUsernames.has(uUserLower)) ||
-          (uCandId && revokedCandIds.has(uCandId));
+          (localUser.candidateId && revokedCandIds.has(localUser.candidateId))
+        );
 
         if (!isRevoked) {
           ALLOWED_OFFICIAL_TOKEN_KEYS.add(tKey.toUpperCase());
-          if (!cloudTokenKeys.has(tKey)) {
+          const cloudDoc = cloudTokensAndLogs.tokens.find((ct: any) => ct && ct.token && ct.token.toUpperCase() === tKey);
+          if (!cloudDoc || Boolean(cloudDoc.isDev) !== Boolean(localUser.isDev) || cloudDoc.username !== localUser.username || cloudDoc.roleName !== localUser.roleName) {
             await saveTokenFirestore(localUser);
           }
         } else {
@@ -7207,22 +7470,27 @@ export async function syncAllDataWithFirestore(force = false) {
       }
     }
 
-    // Remove any lingering revoked tokens from memory
+    // Remove any lingering revoked tokens from memory (never touch owner keys)
     for (const rKey of revokedTokensSet) {
-      REGISTERED_DISCORD_USERS.delete(rKey);
-    }
-    for (const [uKey, uVal] of Array.from(REGISTERED_DISCORD_USERS.entries())) {
-      if (
-        (uVal.username && revokedUsernames.has(uVal.username.trim().toLowerCase())) ||
-        (uVal.candidateId && revokedCandIds.has(uVal.candidateId))
-      ) {
-        REGISTERED_DISCORD_USERS.delete(uKey);
-        deleteTokenFirestore(uVal.token || uKey, uVal.username, uVal.candidateId);
+      if (!isOwnerKey(rKey)) {
+        REGISTERED_DISCORD_USERS.delete(rKey);
       }
     }
 
-    // Always guarantee Master Secret Token session
-    REGISTERED_DISCORD_USERS.set(MASTER_SECRET_TOKEN.toUpperCase(), MASTER_SESSION);
+    // Always guarantee Master Secret Token session (preserving isDev if configured)
+    const existingMaster = REGISTERED_DISCORD_USERS.get(MASTER_SECRET_TOKEN.toUpperCase());
+    const masterSessionToSave: DiscordSession = {
+      ...MASTER_SESSION,
+      ...existingMaster,
+      token: MASTER_SECRET_TOKEN,
+      roleName: "Proprietario",
+      gradeName: "Proprietario",
+      isAllowed: true,
+      isMaster: true,
+      isDev: existingMaster?.isDev ? true : undefined,
+    };
+    if (!masterSessionToSave.isDev) delete masterSessionToSave.isDev;
+    REGISTERED_DISCORD_USERS.set(MASTER_SECRET_TOKEN.toUpperCase(), masterSessionToSave);
     saveRegisteredDiscordUsers(REGISTERED_DISCORD_USERS);
 
     if (cloudTokensAndLogs.logs && cloudTokensAndLogs.logs.length > 0) {
