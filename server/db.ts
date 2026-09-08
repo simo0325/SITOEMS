@@ -70,8 +70,45 @@ if (!firebaseConfig && process.env.FIREBASE_CONFIG) {
   }
 }
 
+try {
+  setLogLevel("silent");
+} catch (e) {
+  // ignore
+}
+
+const QUOTA_STATE_FILE = path.join(process.cwd(), ".firestore_quota_exhausted.json");
+
+function loadQuotaExhaustedState(): boolean {
+  try {
+    if (fs.existsSync(QUOTA_STATE_FILE)) {
+      const data = JSON.parse(fs.readFileSync(QUOTA_STATE_FILE, "utf-8"));
+      // Firestore daily free tier resets daily (check if less than 12 hours old)
+      if (data && data.exhaustedAt && Date.now() - data.exhaustedAt < 12 * 60 * 60 * 1000) {
+        return true;
+      }
+    }
+  } catch (e) {
+    // ignore
+  }
+  return false;
+}
+
+function saveQuotaExhaustedState(exhausted: boolean) {
+  try {
+    if (exhausted) {
+      fs.writeFileSync(QUOTA_STATE_FILE, JSON.stringify({ exhaustedAt: Date.now() }), "utf-8");
+    } else {
+      if (fs.existsSync(QUOTA_STATE_FILE)) {
+        fs.unlinkSync(QUOTA_STATE_FILE);
+      }
+    }
+  } catch (e) {
+    // ignore
+  }
+}
+
 let firestoreDb: any = null;
-let firestoreQuotaExhausted = false;
+let firestoreQuotaExhausted = loadQuotaExhaustedState();
 let quotaExhaustedResetTimer: NodeJS.Timeout | null = null;
 
 const isFirestoreExplicitlyDisabled =
@@ -88,11 +125,15 @@ if (!isFirestoreExplicitlyDisabled && firebaseConfig && (firebaseConfig.apiKey |
     firestoreDb = dbId
       ? initializeFirestore(firebaseApp, {}, dbId)
       : getFirestore(firebaseApp);
-    firestoreQuotaExhausted = false;
-    console.log(`[Firestore] Initialized successfully with database ID: ${dbId || "(default)"}`);
+    if (!firestoreQuotaExhausted) {
+      console.log(`[Firestore] Initialized successfully with database ID: ${dbId || "(default)"}`);
+    } else {
+      console.warn(`[Firestore] Daily write quota is marked exhausted from previous check. Falling back to local disk persistence.`);
+    }
   } catch (initErr) {
     console.error("[Firestore] Initialization error:", initErr);
     firestoreQuotaExhausted = true;
+    saveQuotaExhaustedState(true);
   }
 } else {
   if (isFirestoreExplicitlyDisabled) {
@@ -153,14 +194,10 @@ export function handleFirestoreError(context: string, err: any) {
   if (isQuotaExhausted) {
     if (!firestoreQuotaExhausted) {
       firestoreQuotaExhausted = true;
+      saveQuotaExhaustedState(true);
       console.warn(`Firestore [${context}]: Quota limit exceeded (Daily free tier). Seamlessly falling back to local disk persistence.`);
-      if (!quotaExhaustedResetTimer) {
-        quotaExhaustedResetTimer = setTimeout(() => {
-          firestoreQuotaExhausted = false;
-          quotaExhaustedResetTimer = null;
-        }, 15 * 60 * 1000); // Retry after 15 minutes
-      }
     }
+    return;
   } else if (isPermissionDenied) {
     console.warn(`Firestore [${context}]: Permissions denied. Falling back to local disk persistence.`);
   } else if (isOffline) {

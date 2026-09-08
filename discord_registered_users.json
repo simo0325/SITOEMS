@@ -14,7 +14,10 @@
     "roleName": "Proprietario",
     "gradeName": "Proprietario",
     "isAllowed": true,
-    "verifiedAt": "2026-09-07T18:30:36.908Z"
+    "verifiedAt": "2026-09-07T18:30:36.908Z",
+    "discordTag": "@smokafps",
+    "cdaRoleName": "Consigliere Finale CDA",
+    "hasCdaAccess": true
   },
   {
     "token": "EMS-SRPROP",
@@ -22,7 +25,230 @@
     "roleName": "Proprietario",
     "gradeName": "Proprietario",
     "isAllowed": true,
-    "verifiedAt": "2026-09-07T18:30:42.453Z"
+    "verifiedAt": "2026-09-07T18:30:42.453Z",
+    "discordTag": "@sinolmao",
+    "cdaRoleName": "Consigliere Finale CDA",
+    "hasCdaAccess": true
+  },
+  {
+    "token": "EMS-TSD286",
+    "username": "Theo Smith",
+    "roleName": "Direttore Generale",
+    "gradeName": "Direttore Generale",
+    "isAllowed": true,
+    "verifiedAt": "2026-09-08T10:37:45.472Z",
+    "discordTag": "@b3nzy_",
+    "cdaRoleName": "Presidente CDA",
+    "hasCdaAccess": true
+  },
+  {
+    "token": "EMS-FC6767",
+    "username": "Filippo Ciro",
+    "roleName": "Direttore Sanitario",
+    "gradeName": "Direttore Sanitario",
+    "isAllowed": true,
+    "verifiedAt": "2026-09-08T10:37:45.472Z",
+    "discordTag": "@stellar9345",
+    "cdaRoleName": "Membro CDA",
+    "hasCdaAccess": true
+  },
+  {
+    "token": "EMS-LBC6A6",
+    "username": "Luca Brizzante",
+    "roleName": "Direttore Sanitario",
+    "gradeName": "Direttore Sanitario",
+    "isAllowed": true,
+    "verifiedAt": "2026-09-08T10:37:45.472Z",
+    "discordTag": "@ildivinoita",
+    "cdaRoleName": "Segretario CDA",
+    "hasCdaAccess": true
+  },
+  {
+    "token": "EMS-AM59DB",
+    "username": "Ares Migliorini",
+    "roleName": "V. Direttore Sanitario",
+    "gradeName": "V. Direttore Sanitario",
+    "isAllowed": true,
+    "verifiedAt": "2026-09-08T10:37:45.472Z",
+    "discordTag": "@aresvxy",
+    "cdaRoleName": "Membro CDA",
+    "hasCdaAccess": true
+  },
+  {
+    "token": "EMS-DEC97C",
+    "username": "Dutch Esposito",
+    "roleName": "V. Direttore Sanitario",
+    "gradeName": "V. Direttore Sanitario",
+    "isAllowed": true,
+    "verifiedAt": "2026-09-08T10:37:45.472Z",
+    "discordTag": "@espanico10",
+    "cdaRoleName": "Vice Presidente CDA",
+    "hasCdaAccess": true
+  },
+  {
+    "token": "EMS-ILB5D2",
+    "username": "Igor Lestrenge",
+    "roleName": "V. Direttore Sanitario",
+    "gradeName": "V. Direttore Sanitario",
+    "isAllowed": true,
+    "verifiedAt": "2026-09-08T10:37:45.472Z",
+    "discordTag": "@tr3m0r_92",
+    "cdaRoleName": "Membro CDA",
+    "hasCdaAccess": true
+  },
+  {
+    "token": "EMS-CLA9CC",
+    "username": "Ciccio Losavio",
+    "roleName": "Segretario Direzione",
+    "gradeName": "Segretario Direzione",
+    "isAllowed": true,
+    "verifiedAt": "2026-09-08T10:37:45.472Z",
+    "discordTag": "@cicciotheboss",
+    "cdaRoleName": "Membro CDA",
+    "hasCdaAccess": true
+  },
+  {
+    "token": "EMS-JG211B",
+    "username": "Jonathan Giacomarra",
+    "roleName": "Segretario Direzione",
+    "gradeName": "Segretario Direzione",
+    "isAllowed": true,
+    "verifiedAt": "2026-09-08T10:37:45.472Z",
+    "discordTag": "@peppe7662",
+    "cdaRoleName": "Membro CDA",
+    "hasCdaAccess": true
+  },
+  {
+    "token": "EMS-GP67SC",
+    "username": "Giuseppe Politics",
+    "roleName": "Supervisore Generale",
+    "gradeName": "Supervisore Generale",
+    "isAllowed": true,
+    "verifiedAt": "2026-09-08T10:37:45.472Z",
+    "discordTag": "@peppe_politico",
+    "cdaRoleName": "Membro CDA",
+    "hasCdaAccess": true
+  },
+  {
+    "token": "EMS-DT0311",
+    "username": "Diego Trombini",
+    "roleName": "Supervisore",
+    "gradeName": "Supervisore",
+    "isAllowed": true,
+    "verifiedAt": "2026-09-08T10:37:45.472Z",
+    "discordTag": "@ilprodiego",
+    "cdaRoleName": "Membro CDA",
+    "hasCdaAccess": true
+  },
+  {
+    "token": "EMS-RAA405",
+    "username": "Rocco Ali",
+    "roleName": "Supervisore",
+    "gradeName": "Supervisore",
+    "isAllowed": true,
+    "verifiedAt": "2026-09-08T10:37:45.472Z",
+    "discordTag": "@gius_00",
+    "cdaRoleName": "Membro CDA",
+    "hasCdaAccess": true
+  },
+  {
+    "token": "EMS-RB1237",
+    "username": "Raffaele Bravi",
+    "roleName": "V. Supervisore",
+    "gradeName": "V. Supervisore",
+    "isAllowed": true,
+    "verifiedAt": "2026-09-08T10:37:45.472Z",
+    "discordTag": "@loster2040_"
+  },
+  {
+    "token": "EMS-ADSY34",
+    "username": "Alex De Santis",
+    "roleName": "Assistente Supervisore",
+    "gradeName": "Assistente Supervisore",
+    "isAllowed": true,
+    "verifiedAt": "2026-09-08T10:37:45.472Z",
+    "discordTag": "@ss_alex"
+  },
+  {
+    "token": "EMS-AP34FW",
+    "username": "Antonio Palermo",
+    "roleName": "V. Responsabile Del Presidio",
+    "gradeName": "V. Responsabile Del Presidio",
+    "isAllowed": true,
+    "verifiedAt": "2026-09-08T10:37:45.472Z",
+    "discordTag": "@antonio83_"
+  },
+  {
+    "token": "EMS-KP28RC",
+    "username": "Kevin Panetto",
+    "roleName": "V. Responsabile Del Presidio",
+    "gradeName": "V. Responsabile Del Presidio",
+    "isAllowed": true,
+    "verifiedAt": "2026-09-08T10:37:45.472Z",
+    "discordTag": "@fcim1988995_69767"
+  },
+  {
+    "token": "EMS-ML373T",
+    "username": "Mirko Leone",
+    "roleName": "V. Responsabile Del Presidio",
+    "gradeName": "V. Responsabile Del Presidio",
+    "isAllowed": true,
+    "verifiedAt": "2026-09-08T10:37:45.472Z",
+    "discordTag": "@mirkomirror"
+  },
+  {
+    "token": "EMS-NLDF73",
+    "username": "Nick Larsson",
+    "roleName": "V. Responsabile Del Presidio",
+    "gradeName": "V. Responsabile Del Presidio",
+    "isAllowed": true,
+    "verifiedAt": "2026-09-08T10:37:45.472Z",
+    "discordTag": "@norsk_scl"
+  },
+  {
+    "token": "EMS-RM6E9E",
+    "username": "Rick Maltese",
+    "roleName": "V. Responsabile Del Presidio",
+    "gradeName": "V. Responsabile Del Presidio",
+    "isAllowed": true,
+    "verifiedAt": "2026-09-08T10:37:45.472Z",
+    "discordTag": "@synce7747"
+  },
+  {
+    "token": "EMS-MAFFU23",
+    "username": "Massimo Arresto",
+    "roleName": "V. Primario di Reparto",
+    "gradeName": "V. Primario di Reparto",
+    "isAllowed": true,
+    "verifiedAt": "2026-09-08T10:37:45.472Z",
+    "discordTag": "@elguapo7207"
+  },
+  {
+    "token": "EMS-MA264H",
+    "username": "Matteo Piscitelli",
+    "roleName": "V. Primario di Reparto",
+    "gradeName": "V. Primario di Reparto",
+    "isAllowed": true,
+    "verifiedAt": "2026-09-08T10:37:45.472Z",
+    "discordTag": "@12flxppy"
+  },
+  {
+    "token": "EMS-LG6923",
+    "username": "Londra",
+    "roleName": "Volontario",
+    "gradeName": "Volontario",
+    "isAllowed": true,
+    "verifiedAt": "2026-09-08T10:37:45.472Z",
+    "discordTag": "@darkettino"
+  },
+  {
+    "token": "EMS-MCA496",
+    "username": "Matias Corleone",
+    "roleName": "Volontario",
+    "gradeName": "Volontario",
+    "isAllowed": true,
+    "verifiedAt": "2026-09-08T10:37:45.472Z",
+    "discordTag": "@_matiascorleone_"
   },
   {
     "token": "EMS-ARB9E8",
@@ -30,6 +256,10 @@
     "roleName": "Proprietario",
     "gradeName": "Proprietario",
     "isAllowed": true,
-    "verifiedAt": "2026-09-08T09:40:10.556Z"
+    "discordTag": "@anto.romano",
+    "cdaRoleName": "Consigliere Finale CDA",
+    "hasCdaAccess": true,
+    "hideFromHierarchy": false,
+    "verifiedAt": "2026-09-08T10:42:09.929Z"
   }
 ]

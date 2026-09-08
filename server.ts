@@ -7971,7 +7971,11 @@ export async function syncAllDataWithFirestore(force = false) {
 
     // 5. Ensure official hierarchy members
     HIERARCHY_MEMBERS = buildAutoHierarchyMembers();
-    saveAllHierarchyMembersFirestore(HIERARCHY_MEMBERS);
+    if (!isFirestoreQuotaExhausted()) {
+      saveAllHierarchyMembersFirestore(HIERARCHY_MEMBERS).catch((e) =>
+        console.error("Error saving hierarchy members to Firestore:", e)
+      );
+    }
 
     lastGlobalSyncTimestamp = Date.now();
   } catch (err) {
@@ -8008,15 +8012,19 @@ async function startServer() {
     app.listen(PORT, "0.0.0.0", () => {
       console.log(`Server running on http://0.0.0.0:${PORT}`);
 
-      // Asynchronously synchronize with Cloud Firestore in the background
-      syncAllDataWithFirestore(true).catch((e) => {
-        console.error("Initial Firestore sync error:", e);
-      });
+      // Asynchronously synchronize with Cloud Firestore in the background (if not exhausted)
+      if (!isFirestoreQuotaExhausted()) {
+        syncAllDataWithFirestore(true).catch((e) => {
+          console.error("Initial Firestore sync error:", e);
+        });
+      }
 
-      // Setup periodic background sync every 30 seconds
+      // Setup periodic background sync every 2 minutes (only if Firestore quota is available)
       setInterval(() => {
-        syncAllDataWithFirestore().catch((e) => console.error("Background sync error:", e));
-      }, 30000);
+        if (!isFirestoreQuotaExhausted()) {
+          syncAllDataWithFirestore().catch((e) => console.error("Background sync error:", e));
+        }
+      }, 120000);
     });
   } catch (err) {
     console.error("Failed to start server:", err);
