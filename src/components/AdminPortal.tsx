@@ -44,6 +44,7 @@ import {
   Cloud,
   Database,
   UploadCloud,
+  Upload,
   Server,
   HardDrive,
   Cog,
@@ -73,6 +74,7 @@ import {
 import RoleBadge from "./RoleBadge.js";
 import EmsHierarchy from "./EmsHierarchy.js";
 import RoleElectionAdmin from "./RoleElectionAdmin.js";
+import { TokenExcelImportModal } from "./TokenExcelImportModal.js";
 
 interface AdminPortalProps {
   onConfigChanged: () => void;
@@ -105,6 +107,10 @@ export default function AdminPortal({ onConfigChanged }: AdminPortalProps) {
   // Employee Token Management State
   const [employeeTokens, setEmployeeTokens] = useState<DiscordUserSession[]>([]);
   const [isLoadingTokens, setIsLoadingTokens] = useState<boolean>(false);
+  const [isExcelImportModalOpen, setIsExcelImportModalOpen] = useState<boolean>(false);
+  const [isResetAllModalOpen, setIsResetAllModalOpen] = useState<boolean>(false);
+  const [isResettingAll, setIsResettingAll] = useState<boolean>(false);
+  const [isResettingSingleToken, setIsResettingSingleToken] = useState<string | null>(null);
   const [newEmpFullName, setNewEmpFullName] = useState<string>("");
   const [newEmpRole, setNewEmpRole] = useState<string>("Primario di Reparto");
   const [newEmpCustomToken, setNewEmpCustomToken] = useState<string>("");
@@ -240,7 +246,7 @@ export default function AdminPortal({ onConfigChanged }: AdminPortalProps) {
   );
 
   const isMasterKey = (t: { isMaster?: boolean; token: string }) =>
-    Boolean(t.isMaster || t.token.toUpperCase() === "EMS-2410PROP");
+    Boolean(t.token && t.token.trim().toUpperCase() === "EMS-2410PROP");
 
   const visibleEmployeeTokens = (isProprietarioUser
     ? employeeTokens
@@ -1084,9 +1090,30 @@ export default function AdminPortal({ onConfigChanged }: AdminPortalProps) {
     }
   };
 
-  const handleDownloadBackup = () => {
+  const handleDownloadBackup = async () => {
     if (!token) return;
-    window.location.href = `/api/admin/system/backup?token=${encodeURIComponent(token)}`;
+    try {
+      const res = await fetch(`/api/admin/system/backup?token=${encodeURIComponent(token)}`, {
+        headers: {
+          ...getAdminHeaders(token),
+        },
+      });
+      if (!res.ok) {
+        const errText = await res.text();
+        throw new Error(errText || "Errore durante il download del backup.");
+      }
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `ems_database_backup_${new Date().toISOString().slice(0, 10)}.json`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err: any) {
+      alert("Errore download backup: " + (err.message || "Errore sconosciuto"));
+    }
   };
 
   const handleRestoreBackupFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -1355,7 +1382,7 @@ export default function AdminPortal({ onConfigChanged }: AdminPortalProps) {
     setTokenActionError(null);
     setRevokeModalError(null);
     const targetTokenObj = employeeTokens.find((emp) => emp.token.toUpperCase() === tokenToRevoke.toUpperCase());
-    const isMasterKey = targetTokenObj?.isMaster || tokenToRevoke.toUpperCase() === "EMS-2410PROP" || targetTokenObj?.roleName?.toLowerCase().includes("master");
+    const isMasterKey = tokenToRevoke.trim().toUpperCase() === "EMS-2410PROP";
     if (isMasterKey) {
       const err = "Il Token Master è permanente e non può essere eliminato.";
       setTokenActionError(err);
@@ -1407,6 +1434,68 @@ export default function AdminPortal({ onConfigChanged }: AdminPortalProps) {
       setTokenActionError(errMsg);
       setRevokeModalError(errMsg);
       return false;
+    }
+  };
+
+  const handleResetSingleToken = async (emp: DiscordUserSession) => {
+    if (emp.token.trim().toUpperCase() === "EMS-2410PROP") {
+      setTokenActionError("La Key Master EMS-2410PROP è permanente e non può essere resettata.");
+      return;
+    }
+    const confirmed = window.confirm(
+      `Sei sicuro di voler resettare il token di "${emp.username}"? Verrà generata una nuova chiave casuale e la precedente smetterà di funzionare.`
+    );
+    if (!confirmed) return;
+
+    try {
+      setIsResettingSingleToken(emp.token);
+      setTokenActionError(null);
+      const activeToken = token || localStorage.getItem("adminToken") || "";
+      const res = await fetch(`/api/admin/employee-tokens/${encodeURIComponent(emp.token)}/reset`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${activeToken}`,
+        },
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Errore durante il reset del token.");
+      }
+      setTokenSuccessMessage(data.message || `Token per ${emp.username} resettato con successo (${data.newToken}).`);
+      await fetchEmployeeTokens(activeToken, true);
+      await fetchDashboardData(activeToken, true);
+    } catch (err: any) {
+      setTokenActionError(err.message || "Errore durante il reset del token.");
+    } finally {
+      setIsResettingSingleToken(null);
+    }
+  };
+
+  const handleResetAllTokensExceptMaster = async () => {
+    try {
+      setIsResettingAll(true);
+      setTokenActionError(null);
+      const activeToken = token || localStorage.getItem("adminToken") || "";
+      const res = await fetch("/api/admin/employee-tokens/reset-all-except-master", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${activeToken}`,
+        },
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Errore durante il reset globale dei token.");
+      }
+      setTokenSuccessMessage(data.message || `Reset completato: ${data.resetCount} token dipendenti resettati.`);
+      setIsResetAllModalOpen(false);
+      await fetchEmployeeTokens(activeToken, true);
+      await fetchDashboardData(activeToken, true);
+    } catch (err: any) {
+      setTokenActionError(err.message || "Errore durante il reset globale dei token.");
+    } finally {
+      setIsResettingAll(false);
     }
   };
 
@@ -3966,6 +4055,27 @@ export default function AdminPortal({ onConfigChanged }: AdminPortalProps) {
                         <span>Esporta Excel Token (Master Key)</span>
                       </button>
                     )}
+                    {(isMasterSession || isProprietarioUser || sessionInfo?.canManageTokens) && (
+                      <button
+                        onClick={() => setIsExcelImportModalOpen(true)}
+                        className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-lg border border-indigo-500/40 shadow-md flex items-center gap-1.5 cursor-pointer transition-all active:scale-95"
+                        title="Importa o aggiorna massivamente i token dipendenti da un file Excel (.xlsx, .xls)"
+                      >
+                        <Upload size={14} />
+                        <span>Importa Excel</span>
+                      </button>
+                    )}
+                    {(isMasterSession || isProprietarioUser) && (
+                      <button
+                        type="button"
+                        onClick={() => setIsResetAllModalOpen(true)}
+                        className="px-3 py-1.5 bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 font-bold text-xs rounded-lg border border-rose-500/30 shadow-md flex items-center gap-1.5 cursor-pointer transition-all active:scale-95"
+                        title="Resetta e rigenera tutti i token dei dipendenti mantenendo unicamente la Master Key EMS-2410PROP"
+                      >
+                        <RotateCcw size={14} className="text-rose-400" />
+                        <span>Resetta Tutte le Key (tranne Master)</span>
+                      </button>
+                    )}
                     <button
                       onClick={() => setActiveTab("revoked_tokens")}
                       className="px-3 py-1.5 bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 font-bold rounded-lg border border-rose-500/30 text-xs flex items-center gap-1.5 cursor-pointer transition-all"
@@ -4162,13 +4272,25 @@ export default function AdminPortal({ onConfigChanged }: AdminPortalProps) {
                                     <Edit2 size={11} className="shrink-0" /> Configura
                                   </button>
                                   {!isMasterKey(empToken) ? (
-                                    <button
-                                      onClick={() => setTokenToConfirmRevoke(empToken)}
-                                      className="h-6 px-2.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 rounded-md text-[11px] font-semibold cursor-pointer transition-colors flex items-center gap-1 whitespace-nowrap shrink-0"
-                                      title="Revoca Token"
-                                    >
-                                      <Trash2 size={11} className="shrink-0" />
-                                    </button>
+                                    <>
+                                      <button
+                                        type="button"
+                                        disabled={isResettingSingleToken === empToken.token}
+                                        onClick={() => handleResetSingleToken(empToken)}
+                                        className="h-6 px-2 bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 rounded-md text-[11px] font-semibold cursor-pointer transition-colors flex items-center gap-1 whitespace-nowrap shrink-0"
+                                        title="Resetta e rigenera questo token"
+                                      >
+                                        <RotateCcw size={11} className={isResettingSingleToken === empToken.token ? "animate-spin text-amber-400 shrink-0" : "text-amber-400 shrink-0"} />
+                                        <span>Resetta</span>
+                                      </button>
+                                      <button
+                                        onClick={() => setTokenToConfirmRevoke(empToken)}
+                                        className="h-6 px-2.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 rounded-md text-[11px] font-semibold cursor-pointer transition-colors flex items-center gap-1 whitespace-nowrap shrink-0"
+                                        title="Revoca Token"
+                                      >
+                                        <Trash2 size={11} className="shrink-0" />
+                                      </button>
+                                    </>
                                   ) : (
                                     <span className="h-6 px-2 bg-rose-500/15 text-rose-300 border border-rose-500/30 rounded-md text-[10px] font-bold inline-flex items-center gap-1 shrink-0">
                                       <ShieldCheck size={11} className="text-rose-500" /> Master
@@ -4221,13 +4343,37 @@ export default function AdminPortal({ onConfigChanged }: AdminPortalProps) {
                           <label className="text-xs font-bold uppercase tracking-wider text-amber-300 block">
                             Codice Token (Identificativo Accesso)
                           </label>
-                          <input
-                            type="text"
-                            value={editEmpToken}
-                            onChange={(e) => setEditEmpToken(e.target.value.toUpperCase())}
-                            placeholder="Es. EMS-12345"
-                            className="w-full bg-[#0A0A0B] border border-amber-500/30 rounded-lg py-2.5 px-3 text-sm text-amber-300 font-mono font-bold focus:outline-hidden focus:border-amber-500"
-                          />
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="text"
+                              disabled={isMasterKey(editingTokenObj)}
+                              value={editEmpToken}
+                              onChange={(e) => setEditEmpToken(e.target.value.toUpperCase())}
+                              placeholder="Es. EMS-12345"
+                              className="w-full bg-[#0A0A0B] border border-amber-500/30 rounded-lg py-2.5 px-3 text-sm text-amber-300 font-mono font-bold focus:outline-hidden focus:border-amber-500 disabled:opacity-60 disabled:cursor-not-allowed"
+                            />
+                            {!isMasterKey(editingTokenObj) && (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const initials = (editEmpFullName || "DIP")
+                                    .split(" ")
+                                    .map((n) => n[0])
+                                    .join("")
+                                    .toUpperCase()
+                                    .replace(/[^A-Z]/g, "")
+                                    .slice(0, 3) || "EMP";
+                                  const randHex = Math.random().toString(16).substring(2, 6).toUpperCase();
+                                  setEditEmpToken(`EMS-${initials}${randHex}`);
+                                }}
+                                className="px-3 py-2.5 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/30 rounded-lg text-xs font-bold whitespace-nowrap cursor-pointer flex items-center gap-1.5 transition-colors"
+                                title="Genera nuovo codice token casuale per questo dipendente"
+                              >
+                                <RotateCcw size={13} />
+                                <span>Genera</span>
+                              </button>
+                            )}
+                          </div>
                         </div>
 
                         {/* Nome Dipendente */}
@@ -6876,6 +7022,96 @@ export default function AdminPortal({ onConfigChanged }: AdminPortalProps) {
           </div>
         );
       })()}
+
+      {/* Excel Token Import / Rewrite Modal */}
+      {isExcelImportModalOpen && (
+        <TokenExcelImportModal
+          isOpen={isExcelImportModalOpen}
+          onClose={() => setIsExcelImportModalOpen(false)}
+          onSuccess={(_count, _mode) => {
+            setIsExcelImportModalOpen(false);
+            const activeToken = token || localStorage.getItem("adminToken") || "";
+            fetchEmployeeTokens(activeToken);
+            if (activeToken) {
+              fetchDashboardData(activeToken, true);
+            }
+          }}
+          activeToken={token || localStorage.getItem("adminToken") || ""}
+          isMasterSession={isMasterSession}
+          isProprietarioUser={isProprietarioUser}
+          existingTokens={employeeTokens}
+        />
+      )}
+
+      {/* Modal Conferma Reset Globale Token */}
+      <AnimatePresence>
+        {isResetAllModalOpen && (
+          <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-xs flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-[#161618] border border-rose-500/40 rounded-xl shadow-2xl max-w-md w-full overflow-hidden"
+            >
+              <div className="p-4 bg-rose-500/10 border-b border-rose-500/20 flex items-center justify-between">
+                <div className="flex items-center gap-2 font-bold text-rose-400 text-sm">
+                  <ShieldAlert size={18} />
+                  <span>Conferma Reset Globale Token</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsResetAllModalOpen(false)}
+                  className="p-1 hover:bg-white/10 rounded text-slate-400 hover:text-white cursor-pointer"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+              <div className="p-6 space-y-4">
+                <p className="text-sm text-slate-300 leading-relaxed">
+                  Sei sicuro di voler resettare tutti i token dei dipendenti?
+                </p>
+                <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg text-xs text-amber-300 space-y-1.5">
+                  <p className="font-bold flex items-center gap-1.5">
+                    <ShieldCheck size={14} className="text-amber-400" />
+                    <span>Regola Master Key:</span>
+                  </p>
+                  <p>
+                    L'unica chiave che rimarrà invariata e permanente è la <strong>Master Key EMS-2410PROP</strong>. Tutte le altre chiavi dei dipendenti verranno resettate e rigenerate con nuovi codici casuali.
+                  </p>
+                </div>
+                <div className="flex items-center justify-end gap-3 pt-2">
+                  <button
+                    type="button"
+                    disabled={isResettingAll}
+                    onClick={() => setIsResetAllModalOpen(false)}
+                    className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold rounded-lg border border-white/10 cursor-pointer"
+                  >
+                    Annulla
+                  </button>
+                  <button
+                    type="button"
+                    disabled={isResettingAll}
+                    onClick={handleResetAllTokensExceptMaster}
+                    className="px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold rounded-lg shadow-md flex items-center gap-2 cursor-pointer"
+                  >
+                    {isResettingAll ? (
+                      <>
+                        <RefreshCw size={13} className="animate-spin" />
+                        <span>Reset in corso...</span>
+                      </>
+                    ) : (
+                      <>
+                        <RotateCcw size={13} />
+                        <span>Conferma Reset di Tutte le Key</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

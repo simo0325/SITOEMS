@@ -482,7 +482,7 @@ export const OFFICIAL_OWNERS_SEED: OfficialMemberSeed[] = [
   {
     name: "Antony Romano",
     roleName: "Proprietario",
-    token: "EMS-ARPROP",
+    token: "EMS-ARB9E8",
     discordTag: "@anto.romano",
     cdaRoleName: "Consigliere Finale CDA",
     hasCdaAccess: true,
@@ -490,7 +490,7 @@ export const OFFICIAL_OWNERS_SEED: OfficialMemberSeed[] = [
   {
     name: "Giovanni Manzo",
     roleName: "Proprietario",
-    token: "EMS-GMPROP",
+    token: "EMS-GMB2B8",
     discordTag: "@smokafps",
     cdaRoleName: "Consigliere Finale CDA",
     hasCdaAccess: true,
@@ -498,7 +498,7 @@ export const OFFICIAL_OWNERS_SEED: OfficialMemberSeed[] = [
   {
     name: "Simone Rizzus",
     roleName: "Proprietario",
-    token: "EMS-SRPROP",
+    token: "EMS-SR4BE3",
     discordTag: "@simolmao",
     cdaRoleName: "Consigliere Finale CDA",
     hasCdaAccess: true,
@@ -535,9 +535,6 @@ export const OFFICIAL_IMAGE_MEMBERS_SEED: OfficialMemberSeed[] = [
 
 export const ALLOWED_OFFICIAL_TOKEN_KEYS = new Set<string>([
   "EMS-2410PROP",
-  "EMS-ARPROP",
-  "EMS-GMPROP",
-  "EMS-SRPROP",
   "EMS-TSD286",
   "EMS-FC6767",
   "EMS-LBC6A6",
@@ -913,18 +910,23 @@ export function canAccessRoleElection(user?: DiscordUserSession | { roleName?: s
 export function isOwnerKey(userOrToken?: string | { token?: string; roleName?: string; isMaster?: boolean } | null): boolean {
   if (!userOrToken) return false;
   if (typeof userOrToken === "object") {
-    if (userOrToken.isMaster) return true;
-    const cleanRole = (userOrToken.roleName || "").trim().toLowerCase();
-    if (cleanRole.includes("proprietario") && !cleanRole.includes("vice") && !cleanRole.includes("v.")) return true;
     const t = (userOrToken.token || "").trim().toUpperCase();
-    if (t === "EMS-2410PROP" || t === "EMS-ARPROP" || t === "EMS-GMPROP" || t === "EMS-SRPROP" || t === "OSPEDALEPILLOLA2025!MASTERKEYPRIVATA") return true;
-    if (t.includes("PROP")) return true;
-    return false;
+    return t === "EMS-2410PROP" || t === "OSPEDALEPILLOLA2025!MASTERKEYPRIVATA";
   }
   const t = String(userOrToken).trim().toUpperCase();
-  if (t === "EMS-2410PROP" || t === "EMS-ARPROP" || t === "EMS-GMPROP" || t === "EMS-SRPROP" || t === "OSPEDALEPILLOLA2025!MASTERKEYPRIVATA") return true;
-  if (t.includes("PROP")) return true;
-  return false;
+  return t === "EMS-2410PROP" || t === "OSPEDALEPILLOLA2025!MASTERKEYPRIVATA";
 }
+
+export interface EmployeeTokenImportItem {
+  username: string;
+  roleName: string;
+  cdaRoleName?: string;
+  hasCdaAccess?: boolean;
+  discordTag?: string;
+  token?: string;
+  hideFromHierarchy?: boolean;
+  isDev?: boolean;
+}
+
 
 

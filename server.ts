@@ -117,8 +117,8 @@ const PORT = Number(process.env.PORT) || 3000;
 app.disable("x-powered-by");
 
 // Security Hardening: Strict JSON body limit to prevent memory allocation / payload attacks
-app.use(express.json({ limit: "256kb" }));
-app.use(express.urlencoded({ extended: false, limit: "256kb" }));
+app.use(express.json({ limit: "5mb" }));
+app.use(express.urlencoded({ extended: false, limit: "5mb" }));
 
 // Security Hardening: Comprehensive HTTP Security Headers Middleware
 app.use((req, res, next) => {
@@ -343,46 +343,79 @@ const MASTER_SESSION: DiscordSession = {
   verifiedAt: new Date().toISOString(),
 };
 
-// Middleware to authenticate admin requests
-function requireAdmin(req: express.Request, res: express.Response, next: express.NextFunction) {
+// Helper to extract auth token from Authorization header, query string, or body
+function getAuthTokenFromRequest(req: express.Request): string {
   const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return res.status(401).json({ error: "Accesso non autorizzato. Token mancante." });
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    return authHeader.substring(7).trim();
+  }
+  if (req.query && typeof req.query.token === "string" && req.query.token.trim()) {
+    return req.query.token.trim();
+  }
+  const headerEmp = (req.headers["x-employee-token"] || req.headers["x-discord-token"]) as string | undefined;
+  if (headerEmp && headerEmp.trim()) {
+    return headerEmp.trim();
+  }
+  return "";
+}
+
+function isAuthorizedAdminOrOwner(req: express.Request): boolean {
+  const token = getAuthTokenFromRequest(req);
+  if (!token) return false;
+
+  const tokenUpper = token.toUpperCase();
+
+  // 1. Allow Master Secret Token for full admin access
+  if (tokenUpper === MASTER_SECRET_TOKEN.toUpperCase()) {
+    return true;
   }
 
-  const token = authHeader.substring(7);
-
-  // Allow Master Secret Token for full admin access
-  if (token.toUpperCase() === MASTER_SECRET_TOKEN.toUpperCase()) {
-    return next();
+  // 1b. Allow Official Owners Seed tokens (Antony Romano, Giovanni Manzo, Simone Rizzus)
+  const seedMatch = OFFICIAL_OWNERS_SEED.find((o) => o.token.toUpperCase() === tokenUpper);
+  if (seedMatch) {
+    return true;
   }
 
-  // Check active session (created via password login)
-  const session = ACTIVE_SESSIONS.get(token) || ACTIVE_SESSIONS.get(token.toUpperCase());
-  if (session) {
+  // 2. Check active session (created via password login)
+  const session = ACTIVE_SESSIONS.get(token) || ACTIVE_SESSIONS.get(tokenUpper);
+  if (session && Date.now() - session.lastSeen <= SESSION_TTL_MS) {
     session.lastSeen = Date.now();
     saveActiveSessions(ACTIVE_SESSIONS);
-    return next();
+    return true;
   }
 
-  // Check registered employee tokens - Proprietario, Vice Proprietario, Direttori, V. Direttori or Grade >= 10 bypass password
-  const registeredUser = REGISTERED_DISCORD_USERS.get(token.toUpperCase());
+  // 3. Check registered employee tokens - Proprietario, Vice Proprietario, Direttori, V. Direttori or Grade >= 10 bypass password
+  const registeredUser = REGISTERED_DISCORD_USERS.get(tokenUpper);
   if (registeredUser) {
     if (registeredUser.expiresAt && new Date(registeredUser.expiresAt).getTime() <= Date.now()) {
-      return res.status(401).json({ error: "Token TEST scaduto e rimosso." });
+      return false;
     }
     const cleanRole = (registeredUser.roleName || "").trim().toLowerCase();
     const grade = getRoleGrade(registeredUser.roleName);
     if (
-      token.toUpperCase() === MASTER_SECRET_TOKEN.toUpperCase() ||
+      registeredUser.isMaster ||
       grade >= 10 ||
       cleanRole.includes("proprietario") ||
       cleanRole.includes("direttore") ||
       cleanRole.includes("owner") ||
       cleanRole.includes("master")
     ) {
-      return next();
+      return true;
     }
+  }
+
+  return false;
+}
+
+// Middleware to authenticate admin requests
+function requireAdmin(req: express.Request, res: express.Response, next: express.NextFunction) {
+  if (isAuthorizedAdminOrOwner(req)) {
+    return next();
+  }
+
+  const token = getAuthTokenFromRequest(req);
+  if (!token) {
+    return res.status(401).json({ error: "Accesso non autorizzato. Token mancante." });
   }
 
   return res.status(401).json({ error: "Accesso Riservato. I ruoli inferiori a V. Direttore Sanitario devono inserire la Password Amministratore." });
@@ -836,7 +869,7 @@ function getCallerGradeAndRole(req: express.Request): {
     }
 
     const cleanRole = (roleName || "").trim().toLowerCase();
-    const isMaster = cleanRole.includes("proprietario") || cleanRole.includes("master") || getRoleGrade(roleName) >= 99;
+    const isMaster = token.toUpperCase() === MASTER_SECRET_TOKEN.toUpperCase();
     const effGrade = isMaster ? 100 : Math.max(getRoleGrade(roleName), 100);
     return { grade: effGrade, roleName, username, reviewerName, isMaster, isAdminPassword: true };
   }
@@ -847,8 +880,8 @@ function getCallerGradeAndRole(req: express.Request): {
       return { grade: 0, roleName: "Token Scaduto", username: regUser.username, reviewerName: regUser.username, isMaster: false, isAdminPassword: false };
     }
     const cleanRole = (regUser.roleName || "").trim().toLowerCase();
-    const isMaster = !!regUser.isMaster || cleanRole.includes("proprietario") || cleanRole.includes("master") || getRoleGrade(regUser.roleName) >= 99;
-    const grade = isMaster ? 100 : getRoleGrade(regUser.roleName);
+    const isMaster = regUser.token.toUpperCase() === MASTER_SECRET_TOKEN.toUpperCase();
+    const grade = (cleanRole.includes("proprietario") || cleanRole.includes("master")) ? 100 : getRoleGrade(regUser.roleName);
     const username = regUser.username || regUser.roleName;
     const reviewerName = username;
     return { grade, roleName: regUser.roleName, username, reviewerName, isMaster, isAdminPassword: false };
@@ -857,9 +890,9 @@ function getCallerGradeAndRole(req: express.Request): {
   return { grade: 0, roleName: "Sconosciuto", username: "Sconosciuto", reviewerName: "Sconosciuto", isMaster: false, isAdminPassword: false };
 }
 
-// Ensure exact official tokens for all registered members (3 owners, 22 official staff members, and master token)
+// Ensure exact official tokens for all registered members (master token and active seeds)
 function ensureTokensForCandidates() {
-  // Always ensure Master Secret Token is present
+  // Always ensure Master Secret Token is present (the ONLY master key)
   const masterKey = MASTER_SECRET_TOKEN.toUpperCase();
   const existingMaster = REGISTERED_DISCORD_USERS.get(masterKey);
   if (!existingMaster) {
@@ -869,15 +902,26 @@ function ensureTokensForCandidates() {
   }
   ALLOWED_OFFICIAL_TOKEN_KEYS.add(masterKey);
 
-  // Ensure 3 Owners are present with official tokens (owners can never be revoked or purged)
+  // Ensure 3 Owners are present with seed tokens (unless explicitly revoked or purged)
   OFFICIAL_OWNERS_SEED.forEach((owner) => {
     const tokenKey = owner.token.toUpperCase();
-    ALLOWED_OFFICIAL_TOKEN_KEYS.add(tokenKey);
-    REVOKED_TOKENS.delete(tokenKey);
-    PURGED_TOKENS.delete(tokenKey);
+    const isRevoked = REVOKED_TOKENS.has(tokenKey);
+    const isPurged = PURGED_TOKENS.has(tokenKey);
+    if (isRevoked || isPurged) {
+      REGISTERED_DISCORD_USERS.delete(tokenKey);
+      return;
+    }
 
     const existing = REGISTERED_DISCORD_USERS.get(tokenKey);
-    if (!existing) {
+    let ownerAlreadyExists = false;
+    for (const session of REGISTERED_DISCORD_USERS.values()) {
+      if (session.username && session.username.trim().toLowerCase() === owner.name.trim().toLowerCase()) {
+        ownerAlreadyExists = true;
+        break;
+      }
+    }
+
+    if (!existing && !ownerAlreadyExists) {
       const session: DiscordSession = {
         token: owner.token,
         username: owner.name,
@@ -1219,7 +1263,7 @@ app.get("/api/discord/session", async (req, res) => {
       return res.status(401).json({ authenticated: false, error: "Token TEST scaduto e rimosso" });
     }
     const cleanRole = (registered.roleName || "").trim().toLowerCase();
-    const isMaster = !!registered.isMaster || cleanRole.includes("proprietario") || cleanRole.includes("master") || getRoleGrade(registered.roleName) >= 99;
+    const isMaster = registered.token.toUpperCase() === MASTER_SECRET_TOKEN.toUpperCase();
     return res.json({ authenticated: true, session: { ...registered, isMaster } });
   }
 
@@ -1230,7 +1274,7 @@ app.get("/api/discord/session", async (req, res) => {
     saveActiveSessions(ACTIVE_SESSIONS);
     const role = activeSess.employeeRoleName || "Amministratore";
     const cleanRole = role.trim().toLowerCase();
-    const isMaster = cleanRole.includes("proprietario") || cleanRole.includes("master") || getRoleGrade(role) >= 99;
+    const isMaster = rawToken.trim().toUpperCase() === MASTER_SECRET_TOKEN.toUpperCase();
     return res.json({
       authenticated: true,
       session: {
@@ -2073,14 +2117,16 @@ app.get("/api/admin/employee-tokens", requireAdmin, async (req, res) => {
         return true;
       })
       .map((u) => {
-      const isExpired = u.expiresAt ? new Date().getTime() > new Date(u.expiresAt).getTime() : false;
-      return {
-        ...u,
-        isExpired,
-      };
-    }).sort((a, b) => {
-      const isA = a.token.toUpperCase() === MASTER_SECRET_TOKEN.toUpperCase() || a.isMaster === true;
-      const isB = b.token.toUpperCase() === MASTER_SECRET_TOKEN.toUpperCase() || b.isMaster === true;
+        const isExpired = u.expiresAt ? new Date().getTime() > new Date(u.expiresAt).getTime() : false;
+        const isMaster = u.token.toUpperCase() === MASTER_SECRET_TOKEN.toUpperCase();
+        return {
+          ...u,
+          isMaster,
+          isExpired,
+        };
+      }).sort((a, b) => {
+        const isA = a.token.toUpperCase() === MASTER_SECRET_TOKEN.toUpperCase();
+        const isB = b.token.toUpperCase() === MASTER_SECRET_TOKEN.toUpperCase();
       if (isA && !isB) return -1;
       if (!isA && isB) return 1;
 
@@ -2487,7 +2533,8 @@ app.put("/api/admin/employee-tokens/:token", requireAdmin, async (req, res) => {
     saveRegisteredDiscordUsers(REGISTERED_DISCORD_USERS);
 
     // Refresh hierarchy cache
-    buildAutoHierarchyMembers();
+    HIERARCHY_MEMBERS = buildAutoHierarchyMembers();
+    saveAllHierarchyMembersFirestore(HIERARCHY_MEMBERS);
 
     addAccessLog(
       req,
@@ -2508,6 +2555,347 @@ app.put("/api/admin/employee-tokens/:token", requireAdmin, async (req, res) => {
   } catch (error) {
     console.error("Error updating employee token:", error);
     res.status(500).json({ error: "Errore durante la modifica del token dipendente." });
+  }
+});
+
+// Batch Import / Rewrite employee tokens from Excel/CSV spreadsheet
+app.post("/api/admin/employee-tokens/import-excel", requireAdmin, async (req, res) => {
+  try {
+    await syncAllDataWithFirestore(true);
+    const caller = getCallerGradeAndRole(req);
+    const isAuthorized = caller.isAdminPassword || caller.isMaster || isProprietarioCaller(caller) || caller.grade >= 10;
+    if (!isAuthorized) {
+      return res.status(403).json({
+        error: "Accesso riservato: Solo il personale con grado da V. Direttore in su o i Proprietari possono importare/riscrivere i token da Excel.",
+      });
+    }
+
+    const { mode, tokens } = req.body; // mode: "overwrite" | "merge"
+    if (!Array.isArray(tokens) || tokens.length === 0) {
+      return res.status(400).json({ error: "Nessun dato token valido fornito per l'importazione." });
+    }
+
+    const cleanMode: "overwrite" | "merge" = mode === "overwrite" ? "overwrite" : "merge";
+
+    // Set of protected tokens that can NEVER be deleted, revoked or broken (ONLY Master Secret Token)
+    const protectedUpperTokens = new Set<string>();
+    protectedUpperTokens.add(MASTER_SECRET_TOKEN.toUpperCase());
+
+    // Keep track of incoming cleaned tokens to avoid self-deletion in overwrite mode
+    const incomingTokensUpper = new Set<string>();
+    const processedSessions: DiscordSession[] = [];
+    const nowIso = new Date().toISOString();
+
+    for (let i = 0; i < tokens.length; i++) {
+      const row = tokens[i];
+      if (!row) continue;
+
+      const rawName = String(row.username || row.name || "").trim();
+      if (!rawName) continue; // Skip entries without name
+
+      const cleanName = sanitizeString(rawName, 60);
+      let rawRole = String(row.roleName || row.role || "").trim();
+      if (!rawRole) rawRole = "Volontario";
+
+      // Match against ALLOWED_DISCORD_ROLES if case-insensitive match exists
+      const matchedRole = ALLOWED_DISCORD_ROLES.find(
+        (r) => r.toLowerCase() === rawRole.toLowerCase()
+      );
+      const cleanRole = matchedRole || sanitizeString(rawRole, 60);
+
+      // Raw token or auto-generate if empty
+      let rawToken = String(row.token || "").trim().toUpperCase();
+      let cleanToken = sanitizeString(rawToken, 60).toUpperCase().replace(/[^A-Z0-9_-]/g, "");
+
+      if (!cleanToken) {
+        // Auto-generate token from initials + random string
+        const initials = cleanName
+          .split(" ")
+          .map((n) => n[0])
+          .join("")
+          .toUpperCase()
+          .replace(/[^A-Z]/g, "")
+          .slice(0, 3) || "EMP";
+        const randPart = Math.random().toString(36).substring(2, 6).toUpperCase();
+        cleanToken = `EMS-${initials}${randPart}`;
+      }
+
+      incomingTokensUpper.add(cleanToken);
+
+      // CDA role parsing
+      const rawCda = String(row.cdaRoleName || row.cdaRole || "").trim();
+      let cleanCdaRole: string | undefined = undefined;
+      let hasCda: boolean | undefined = undefined;
+
+      if (rawCda && rawCda.toLowerCase() !== "nessuno" && rawCda.toLowerCase() !== "default" && rawCda !== "-") {
+        const matchedCda = ALLOWED_DISCORD_ROLES.find(
+          (r) => r.toLowerCase() === rawCda.toLowerCase() && (r.includes("CDA") || isCdaRoleName(r))
+        );
+        cleanCdaRole = matchedCda || sanitizeString(rawCda, 60);
+        hasCda = true;
+      }
+
+      // Discord tag parsing
+      const rawDiscord = String(row.discordTag || "").trim();
+      let cleanDiscordTag: string | undefined = undefined;
+      if (rawDiscord && rawDiscord !== "-") {
+        const discSan = sanitizeString(rawDiscord, 60);
+        cleanDiscordTag = discSan.startsWith("@") ? discSan : `@${discSan}`;
+      }
+
+      const cleanHide = Boolean(row.hideFromHierarchy);
+      const cleanIsDev = Boolean(row.isDev);
+
+      const existingSession = REGISTERED_DISCORD_USERS.get(cleanToken);
+      const isMasterUser = cleanToken === MASTER_SECRET_TOKEN.toUpperCase();
+
+      const sessionObj: DiscordSession = {
+        token: cleanToken,
+        username: cleanName,
+        roleName: cleanRole,
+        gradeName: cleanRole,
+        isAllowed: true,
+        verifiedAt: existingSession?.verifiedAt || nowIso,
+        discordTag: cleanDiscordTag,
+        cdaRoleName: cleanCdaRole,
+        hasCdaAccess: hasCda,
+        hideFromHierarchy: cleanHide || undefined,
+        isDev: cleanIsDev ? true : undefined,
+        isMaster: isMasterUser ? true : undefined,
+      };
+
+      if (!sessionObj.cdaRoleName) delete (sessionObj as any).cdaRoleName;
+      if (!sessionObj.hasCdaAccess) delete (sessionObj as any).hasCdaAccess;
+      if (!sessionObj.discordTag) delete (sessionObj as any).discordTag;
+      if (!sessionObj.hideFromHierarchy) delete (sessionObj as any).hideFromHierarchy;
+      if (!sessionObj.isDev) delete (sessionObj as any).isDev;
+
+      processedSessions.push(sessionObj);
+    }
+
+    if (processedSessions.length === 0) {
+      return res.status(400).json({ error: "Nessun record valido con nome dipendente trovato nel file Excel." });
+    }
+
+    // In OVERWRITE mode: remove existing tokens that are NOT in incoming list (preserving ONLY Master token)
+    if (cleanMode === "overwrite") {
+      const existingTokenKeys = Array.from(REGISTERED_DISCORD_USERS.keys());
+      for (const tKey of existingTokenKeys) {
+        const upperTKey = tKey.toUpperCase();
+        // Never remove Master token
+        if (upperTKey === MASTER_SECRET_TOKEN.toUpperCase()) {
+          continue;
+        }
+        if (!incomingTokensUpper.has(upperTKey)) {
+          const oldSession = REGISTERED_DISCORD_USERS.get(tKey);
+          REGISTERED_DISCORD_USERS.delete(tKey);
+          ALLOWED_OFFICIAL_TOKEN_KEYS.delete(upperTKey);
+          await deleteTokenFirestore(tKey, oldSession?.username, oldSession?.candidateId);
+        }
+      }
+    }
+
+    // Apply & persist all incoming processed sessions
+    for (const session of processedSessions) {
+      const uToken = session.token.toUpperCase();
+      // Un-revoke token if it was previously revoked
+      REVOKED_TOKENS.delete(uToken);
+      PURGED_TOKENS.delete(uToken);
+      await deleteRevokedTokenFirestore(uToken);
+
+      ALLOWED_OFFICIAL_TOKEN_KEYS.add(uToken);
+      REGISTERED_DISCORD_USERS.set(uToken, session);
+      await saveTokenFirestore(session);
+    }
+
+    saveRegisteredDiscordUsers(REGISTERED_DISCORD_USERS);
+    saveRevokedTokens(REVOKED_TOKENS);
+    ensureTokensForCandidates();
+    HIERARCHY_MEMBERS = buildAutoHierarchyMembers();
+    saveAllHierarchyMembersFirestore(HIERARCHY_MEMBERS);
+
+    addAccessLog(
+      req,
+      caller.username,
+      caller.roleName,
+      "IMPORT-EXCEL",
+      cleanMode === "overwrite" ? "Riscrizione Token da Excel" : "Importazione Token da Excel",
+      "SUCCESS",
+      `Processati ${processedSessions.length} token dipendenti da foglio Excel (Modalità: ${cleanMode === "overwrite" ? "Riscrizione/Sovrascrittura Totale" : "Aggiorna ed Unisci"}).`
+    );
+
+    res.json({
+      success: true,
+      mode: cleanMode,
+      count: processedSessions.length,
+      tokens: processedSessions,
+      message: cleanMode === "overwrite"
+        ? `Registro token completamente riscritto con successo: ${processedSessions.length} dipendenti sincronizzati.`
+        : `Importazione completata con successo: ${processedSessions.length} token aggiornati/aggiunti.`,
+    });
+  } catch (error) {
+    console.error("Error importing tokens from Excel:", error);
+    res.status(500).json({ error: "Errore durante l'importazione dei token dal foglio Excel." });
+  }
+});
+
+// Reset a single employee token (generates a new unique token and deletes the old one)
+app.post("/api/admin/employee-tokens/:token/reset", requireAdmin, async (req, res) => {
+  try {
+    await syncAllDataWithFirestore(true);
+    const caller = getCallerGradeAndRole(req);
+    if (!caller.isAdminPassword && !caller.isMaster && caller.grade < 10) {
+      return res.status(403).json({ error: "Accesso riservato: Solo il personale con grado da V. Direttore in su può resettare i token." });
+    }
+
+    const tokenToReset = sanitizeString(req.params.token, 50).toUpperCase();
+    if (!tokenToReset) {
+      return res.status(400).json({ error: "Codice token mancante o non valido." });
+    }
+
+    if (tokenToReset === MASTER_SECRET_TOKEN.toUpperCase()) {
+      return res.status(400).json({ error: "La Key Master EMS-2410PROP è permanente e non può essere resettata." });
+    }
+
+    const existing = REGISTERED_DISCORD_USERS.get(tokenToReset);
+    if (!existing) {
+      return res.status(404).json({ error: "Token non trovato nel registro." });
+    }
+
+    // Generate new unique token
+    const initials = (existing.username || "DIP")
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .replace(/[^A-Z]/g, "")
+      .slice(0, 3) || "EMP";
+
+    let newToken = "EMS-" + initials + crypto.randomBytes(2).toString("hex").toUpperCase();
+    while (REGISTERED_DISCORD_USERS.has(newToken) || newToken === MASTER_SECRET_TOKEN.toUpperCase()) {
+      newToken = "EMS-" + initials + crypto.randomBytes(2).toString("hex").toUpperCase();
+    }
+
+    const updatedSession: DiscordSession = {
+      ...existing,
+      token: newToken,
+      verifiedAt: new Date().toISOString(),
+    };
+    delete (updatedSession as any).isMaster;
+
+    // Remove old token
+    REGISTERED_DISCORD_USERS.delete(tokenToReset);
+    ALLOWED_OFFICIAL_TOKEN_KEYS.delete(tokenToReset);
+    await deleteTokenFirestore(tokenToReset, existing.username, existing.candidateId);
+
+    // Save new token
+    REGISTERED_DISCORD_USERS.set(newToken, updatedSession);
+    ALLOWED_OFFICIAL_TOKEN_KEYS.add(newToken);
+    await saveTokenFirestore(updatedSession);
+    saveRegisteredDiscordUsers(REGISTERED_DISCORD_USERS);
+
+    // Rebuild hierarchy
+    HIERARCHY_MEMBERS = buildAutoHierarchyMembers();
+    saveAllHierarchyMembersFirestore(HIERARCHY_MEMBERS);
+
+    addAccessLog(
+      req,
+      caller.username,
+      caller.roleName,
+      newToken,
+      "Reset Token Dipendente",
+      "SUCCESS",
+      `Token per ${existing.username} resettato con successo: sostituito ${tokenToReset} con ${newToken}.`
+    );
+
+    return res.json({
+      success: true,
+      oldToken: tokenToReset,
+      newToken,
+      user: updatedSession,
+      message: `Token per ${existing.username} resettato con successo (${newToken}).`,
+    });
+  } catch (error) {
+    console.error("Error resetting token:", error);
+    return res.status(500).json({ error: "Errore durante il reset del token." });
+  }
+});
+
+// Global reset of all tokens except the single Master Key EMS-2410PROP
+app.post("/api/admin/employee-tokens/reset-all-except-master", requireAdmin, async (req, res) => {
+  try {
+    await syncAllDataWithFirestore(true);
+    const caller = getCallerGradeAndRole(req);
+    const isMasterCaller = caller.isMaster || caller.isAdminPassword || isProprietarioCaller(caller);
+    if (!isMasterCaller && caller.grade < 20) {
+      return res.status(403).json({ error: "Accesso riservato: Solo la Proprietà o la Direzione Generale possono eseguire il reset globale dei token." });
+    }
+
+    const tokensToReset: string[] = [];
+    for (const [key] of REGISTERED_DISCORD_USERS.entries()) {
+      if (key.toUpperCase() !== MASTER_SECRET_TOKEN.toUpperCase()) {
+        tokensToReset.push(key);
+      }
+    }
+
+    let resetCount = 0;
+    for (const oldKey of tokensToReset) {
+      const existing = REGISTERED_DISCORD_USERS.get(oldKey);
+      if (!existing) continue;
+
+      const initials = (existing.username || "DIP")
+        .split(" ")
+        .map((n) => n[0])
+        .join("")
+        .toUpperCase()
+        .replace(/[^A-Z]/g, "")
+        .slice(0, 3) || "EMP";
+
+      let newToken = "EMS-" + initials + crypto.randomBytes(2).toString("hex").toUpperCase();
+      while (REGISTERED_DISCORD_USERS.has(newToken) || newToken === MASTER_SECRET_TOKEN.toUpperCase()) {
+        newToken = "EMS-" + initials + crypto.randomBytes(2).toString("hex").toUpperCase();
+      }
+
+      const updatedSession: DiscordSession = {
+        ...existing,
+        token: newToken,
+        verifiedAt: new Date().toISOString(),
+      };
+      delete (updatedSession as any).isMaster;
+
+      REGISTERED_DISCORD_USERS.delete(oldKey);
+      ALLOWED_OFFICIAL_TOKEN_KEYS.delete(oldKey.toUpperCase());
+      await deleteTokenFirestore(oldKey, existing.username, existing.candidateId);
+
+      REGISTERED_DISCORD_USERS.set(newToken, updatedSession);
+      ALLOWED_OFFICIAL_TOKEN_KEYS.add(newToken);
+      await saveTokenFirestore(updatedSession);
+      resetCount++;
+    }
+
+    saveRegisteredDiscordUsers(REGISTERED_DISCORD_USERS);
+
+    HIERARCHY_MEMBERS = buildAutoHierarchyMembers();
+    saveAllHierarchyMembersFirestore(HIERARCHY_MEMBERS);
+
+    addAccessLog(
+      req,
+      caller.username,
+      caller.roleName,
+      MASTER_SECRET_TOKEN,
+      "Reset Globale Token Eseguito",
+      "SUCCESS",
+      `Reset globale completato: ${resetCount} token rigenerati con successo. Solo la Master Key EMS-2410PROP è rimasta invariata.`
+    );
+
+    return res.json({
+      success: true,
+      resetCount,
+      message: `Reset completato: ${resetCount} token dipendenti resettati. L'unica Master Key rimane EMS-2410PROP.`,
+    });
+  } catch (error) {
+    console.error("Error resetting all tokens:", error);
+    return res.status(500).json({ error: "Errore durante il reset globale dei token." });
   }
 });
 
@@ -2708,6 +3096,10 @@ app.delete("/api/admin/employee-tokens/:token", requireAdmin, async (req, res) =
     }
     saveActiveSessions(ACTIVE_SESSIONS);
 
+    // Refresh hierarchy cache
+    HIERARCHY_MEMBERS = buildAutoHierarchyMembers();
+    saveAllHierarchyMembersFirestore(HIERARCHY_MEMBERS);
+
     const reviewerName = req.body?.reviewer || (caller.username !== "Sconosciuto" ? caller.username : caller.roleName);
 
     addAccessLog(
@@ -2839,6 +3231,8 @@ app.delete("/api/admin/revoked-tokens/:token", requireAdmin, async (req, res) =>
 
     // Re-generate / sync candidate tokens
     ensureTokensForCandidates();
+    HIERARCHY_MEMBERS = buildAutoHierarchyMembers();
+    saveAllHierarchyMembersFirestore(HIERARCHY_MEMBERS);
 
     addAccessLog(
       req,
@@ -2957,6 +3351,10 @@ async function handlePermanentTokenDelete(req: express.Request, res: express.Res
       deleteActiveSessionFirestore(tKey);
     }
     saveActiveSessions(ACTIVE_SESSIONS);
+
+    // Refresh hierarchy cache
+    HIERARCHY_MEMBERS = buildAutoHierarchyMembers();
+    saveAllHierarchyMembersFirestore(HIERARCHY_MEMBERS);
 
     const reviewerName = req.body?.reviewer || (caller.username !== "Sconosciuto" ? caller.username : caller.roleName);
 
@@ -3285,7 +3683,8 @@ app.put("/api/admin/hierarchy/:id", requireAdmin, async (req, res) => {
     }
 
     // Refresh hierarchy cache
-    buildAutoHierarchyMembers();
+    HIERARCHY_MEMBERS = buildAutoHierarchyMembers();
+    saveAllHierarchyMembersFirestore(HIERARCHY_MEMBERS);
 
     res.json({
       success: true,
@@ -6489,10 +6888,7 @@ app.get("/api/admin/export/employee-tokens", async (req, res) => {
 // Export database of votes to a CSV with formula injection protection
 app.get("/api/admin/export", (req, res) => {
   try {
-    const token = req.query.token as string;
-    const session = token ? ACTIVE_SESSIONS.get(token) : undefined;
-    
-    if (!session || Date.now() - session.lastSeen > SESSION_TTL_MS) {
+    if (!isAuthorizedAdminOrOwner(req)) {
       return res.status(401).send("Non autorizzato. Effettua nuovamente l'accesso come amministratore.");
     }
 
@@ -6549,10 +6945,7 @@ const ROLE_COLORS_HEX: Record<RoleId, string> = {
 // Export database of votes to an HTML Report with HTML escaping against XSS
 app.get("/api/admin/export/html", (req, res) => {
   try {
-    const token = req.query.token as string;
-    const session = token ? ACTIVE_SESSIONS.get(token) : undefined;
-    
-    if (!session || Date.now() - session.lastSeen > SESSION_TTL_MS) {
+    if (!isAuthorizedAdminOrOwner(req)) {
       return res.status(401).send("Non autorizzato. Effettua nuovamente l'accesso come amministratore.");
     }
 
@@ -6848,9 +7241,7 @@ app.post("/api/admin/system/sync-firestore", requireAdmin, async (req, res) => {
 // 3. Download Full System Backup (.JSON)
 app.get("/api/admin/system/backup", (req, res) => {
   try {
-    const token = req.query.token as string;
-    const session = token ? ACTIVE_SESSIONS.get(token) : undefined;
-    if (!session || Date.now() - session.lastSeen > SESSION_TTL_MS) {
+    if (!isAuthorizedAdminOrOwner(req)) {
       return res.status(401).send("Non autorizzato. Effettua nuovamente l'accesso come amministratore.");
     }
 
@@ -7426,9 +7817,8 @@ export async function syncAllDataWithFirestore(force = false) {
             cloudTokenKeys.add(uKey);
             ALLOWED_OFFICIAL_TOKEN_KEYS.add(uKey);
             const existingLocal = REGISTERED_DISCORD_USERS.get(uKey);
-            // Cloud Firestore is authoritative. If t.isDev is strictly true, it is Dev; otherwise it is false/undefined.
-            // Never revive isDev from local cache if cloud does not have it.
-            const resolvedIsDev = t.isDev === true ? true : undefined;
+            // Local memory/disk is authoritative for isDev changes made by administrators
+            const resolvedIsDev = existingLocal ? (existingLocal.isDev === true ? true : undefined) : (t.isDev === true ? true : undefined);
             const mergedSession: DiscordSession = {
               ...existingLocal,
               ...t,
@@ -7461,7 +7851,10 @@ export async function syncAllDataWithFirestore(force = false) {
           ALLOWED_OFFICIAL_TOKEN_KEYS.add(tKey.toUpperCase());
           const cloudDoc = cloudTokensAndLogs.tokens.find((ct: any) => ct && ct.token && ct.token.toUpperCase() === tKey);
           if (!cloudDoc || Boolean(cloudDoc.isDev) !== Boolean(localUser.isDev) || cloudDoc.username !== localUser.username || cloudDoc.roleName !== localUser.roleName) {
-            await saveTokenFirestore(localUser);
+            await saveTokenFirestore({
+              ...localUser,
+              isDev: Boolean(localUser.isDev),
+            });
           }
         } else {
           REGISTERED_DISCORD_USERS.delete(tKey);

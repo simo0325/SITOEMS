@@ -74,7 +74,12 @@ let firestoreDb: any = null;
 let firestoreQuotaExhausted = false;
 let quotaExhaustedResetTimer: NodeJS.Timeout | null = null;
 
-if (firebaseConfig && (firebaseConfig.apiKey || firebaseConfig.projectId)) {
+const isFirestoreExplicitlyDisabled =
+  process.env.DISABLE_FIRESTORE === "true" ||
+  process.env.LOCAL_DB_ONLY === "true" ||
+  process.env.ENABLE_FIRESTORE === "false";
+
+if (!isFirestoreExplicitlyDisabled && firebaseConfig && (firebaseConfig.apiKey || firebaseConfig.projectId)) {
   try {
     const firebaseApp = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
     const dbId = firebaseConfig.firestoreDatabaseId && firebaseConfig.firestoreDatabaseId !== "(default)"
@@ -90,7 +95,11 @@ if (firebaseConfig && (firebaseConfig.apiKey || firebaseConfig.projectId)) {
     firestoreQuotaExhausted = true;
   }
 } else {
-  console.warn("[Firestore] No valid firebase-applet-config.json found. Operating in local disk database mode.");
+  if (isFirestoreExplicitlyDisabled) {
+    console.log("[Database] Firebase disattivato via configurazione (.env). Funzionamento 100% in locale su VPS (db.json).");
+  } else {
+    console.warn("[Firestore] No valid firebase-applet-config.json found. Operating in local disk database mode.");
+  }
   firestoreQuotaExhausted = true;
 }
 
