@@ -75,6 +75,7 @@ import {
   submitRoleElectionVote,
   clearAllRoleElectionVotes,
   deleteRoleElectionVote,
+  batchSyncTokensFirestore,
 } from "./server/db.js";
 import {
   ROLE_IDS_SORTED_ASC,
@@ -567,6 +568,7 @@ REGISTERED_DISCORD_USERS.set(MASTER_SECRET_TOKEN.toUpperCase(), {
   isMaster: true,
   isDev: existingMasterOnBoot?.isDev ? true : undefined,
 });
+let hasCustomTokensImported = REGISTERED_DISCORD_USERS.size > 1;
 const VERIFIED_BOT_CODES = new Map<string, { username: string; roleName: string; createdAt: number }>();
 
 // Helper function to automatically delete expired TEST tokens and invalidate sessions
@@ -853,6 +855,16 @@ function getCallerGradeAndRole(req: express.Request): {
     return { grade: 100, roleName: "Proprietario (Master)", username: rName, reviewerName: rName, isMaster: true, isAdminPassword: true };
   }
 
+  // Allow Official Owners Seed tokens directly as authorized Proprietari
+  const ownerSeedMatch = OFFICIAL_OWNERS_SEED.find((o) => o.token.toUpperCase() === token.toUpperCase());
+  if (ownerSeedMatch) {
+    let rName = ownerSeedMatch.name;
+    if (cleanHeaderReviewer) {
+      rName = cleanHeaderReviewer;
+    }
+    return { grade: 100, roleName: "Proprietario", username: rName, reviewerName: rName, isMaster: true, isAdminPassword: true };
+  }
+
   const activeSess = ACTIVE_SESSIONS.get(token);
   if (activeSess) {
     let username = activeSess.employeeUsername ? activeSess.employeeUsername.replace(/\s*\(.*?\)\s*$/, "").trim() : "Amministratore";
@@ -942,38 +954,45 @@ function ensureTokensForCandidates() {
     }
   });
 
-  // Ensure Official Members from Image are present with exact tokens (unless explicitly revoked or purged)
-  OFFICIAL_IMAGE_MEMBERS_SEED.forEach((member) => {
-    const tokenKey = member.token.toUpperCase();
-    ALLOWED_OFFICIAL_TOKEN_KEYS.add(tokenKey);
-    const isRevoked = REVOKED_TOKENS.has(tokenKey);
-    const isPurged = PURGED_TOKENS.has(tokenKey);
-    if (isRevoked || isPurged) {
-      REGISTERED_DISCORD_USERS.delete(tokenKey);
-      return;
-    }
+  // Ensure Official Members from Image are present ONLY on fresh initial setup
+  // Never re-add deleted/overwritten tokens if custom tokens have been imported or registered
+  const nonMasterStaffCount = Array.from(REGISTERED_DISCORD_USERS.values()).filter(
+    (u) => !isOwnerKey(u.token) && u.token.toUpperCase() !== MASTER_SECRET_TOKEN.toUpperCase()
+  ).length;
 
-    const existing = REGISTERED_DISCORD_USERS.get(tokenKey);
-    if (!existing) {
-      const session: DiscordSession = {
-        token: member.token,
-        username: member.name,
-        roleName: member.roleName,
-        gradeName: member.roleName,
-        cdaRoleName: member.cdaRoleName,
-        hasCdaAccess: Boolean(member.hasCdaAccess || member.cdaRoleName),
-        discordTag: member.discordTag,
-        hideFromHierarchy: false,
-        isAllowed: true,
-        verifiedAt: new Date().toISOString(),
-      };
-      if (!member.cdaRoleName) {
-        delete (session as any).cdaRoleName;
+  if (nonMasterStaffCount === 0 && !hasCustomTokensImported) {
+    OFFICIAL_IMAGE_MEMBERS_SEED.forEach((member) => {
+      const tokenKey = member.token.toUpperCase();
+      ALLOWED_OFFICIAL_TOKEN_KEYS.add(tokenKey);
+      const isRevoked = REVOKED_TOKENS.has(tokenKey);
+      const isPurged = PURGED_TOKENS.has(tokenKey);
+      if (isRevoked || isPurged) {
+        REGISTERED_DISCORD_USERS.delete(tokenKey);
+        return;
       }
-      REGISTERED_DISCORD_USERS.set(tokenKey, session);
-      saveTokenFirestore(session);
-    }
-  });
+
+      const existing = REGISTERED_DISCORD_USERS.get(tokenKey);
+      if (!existing) {
+        const session: DiscordSession = {
+          token: member.token,
+          username: member.name,
+          roleName: member.roleName,
+          gradeName: member.roleName,
+          cdaRoleName: member.cdaRoleName,
+          hasCdaAccess: Boolean(member.hasCdaAccess || member.cdaRoleName),
+          discordTag: member.discordTag,
+          hideFromHierarchy: false,
+          isAllowed: true,
+          verifiedAt: new Date().toISOString(),
+        };
+        if (!member.cdaRoleName) {
+          delete (session as any).cdaRoleName;
+        }
+        REGISTERED_DISCORD_USERS.set(tokenKey, session);
+        saveTokenFirestore(session);
+      }
+    });
+  }
 
   // Strict Purge: remove any token that is in REVOKED_TOKENS or PURGED_TOKENS
   for (const [k, u] of Array.from(REGISTERED_DISCORD_USERS.entries())) {
@@ -2561,7 +2580,6 @@ app.put("/api/admin/employee-tokens/:token", requireAdmin, async (req, res) => {
 // Batch Import / Rewrite employee tokens from Excel/CSV spreadsheet
 app.post("/api/admin/employee-tokens/import-excel", requireAdmin, async (req, res) => {
   try {
-    await syncAllDataWithFirestore(true);
     const caller = getCallerGradeAndRole(req);
     const isAuthorized = caller.isAdminPassword || caller.isMaster || isProprietarioCaller(caller) || caller.grade >= 10;
     if (!isAuthorized) {
@@ -2678,6 +2696,7 @@ app.post("/api/admin/employee-tokens/import-excel", requireAdmin, async (req, re
     }
 
     // In OVERWRITE mode: remove existing tokens that are NOT in incoming list (preserving ONLY Master token)
+    const tokensToDelete: string[] = [];
     if (cleanMode === "overwrite") {
       const existingTokenKeys = Array.from(REGISTERED_DISCORD_USERS.keys());
       for (const tKey of existingTokenKeys) {
@@ -2687,32 +2706,58 @@ app.post("/api/admin/employee-tokens/import-excel", requireAdmin, async (req, re
           continue;
         }
         if (!incomingTokensUpper.has(upperTKey)) {
-          const oldSession = REGISTERED_DISCORD_USERS.get(tKey);
+          tokensToDelete.push(upperTKey);
           REGISTERED_DISCORD_USERS.delete(tKey);
           ALLOWED_OFFICIAL_TOKEN_KEYS.delete(upperTKey);
-          await deleteTokenFirestore(tKey, oldSession?.username, oldSession?.candidateId);
         }
       }
     }
 
-    // Apply & persist all incoming processed sessions
+    // Apply & persist all incoming processed sessions in memory
+    const tokensToUnrevoke: string[] = [];
     for (const session of processedSessions) {
       const uToken = session.token.toUpperCase();
       // Un-revoke token if it was previously revoked
-      REVOKED_TOKENS.delete(uToken);
-      PURGED_TOKENS.delete(uToken);
-      await deleteRevokedTokenFirestore(uToken);
+      if (REVOKED_TOKENS.has(uToken) || PURGED_TOKENS.has(uToken)) {
+        REVOKED_TOKENS.delete(uToken);
+        PURGED_TOKENS.delete(uToken);
+        tokensToUnrevoke.push(uToken);
+      }
 
       ALLOWED_OFFICIAL_TOKEN_KEYS.add(uToken);
       REGISTERED_DISCORD_USERS.set(uToken, session);
-      await saveTokenFirestore(session);
     }
 
+    // Always guarantee Master Secret Token session
+    const existingMaster = REGISTERED_DISCORD_USERS.get(MASTER_SECRET_TOKEN.toUpperCase());
+    REGISTERED_DISCORD_USERS.set(MASTER_SECRET_TOKEN.toUpperCase(), {
+      ...MASTER_SESSION,
+      ...existingMaster,
+      token: MASTER_SECRET_TOKEN,
+      roleName: "Proprietario",
+      gradeName: "Proprietario",
+      isAllowed: true,
+      isMaster: true,
+    });
+    ALLOWED_OFFICIAL_TOKEN_KEYS.add(MASTER_SECRET_TOKEN.toUpperCase());
+
+    // Mark that custom tokens are imported so seeds never overwrite user's list
+    hasCustomTokensImported = true;
+
+    // Save immediately to local VPS storage
     saveRegisteredDiscordUsers(REGISTERED_DISCORD_USERS);
     saveRevokedTokens(REVOKED_TOKENS);
+    savePurgedTokens(PURGED_TOKENS);
     ensureTokensForCandidates();
     HIERARCHY_MEMBERS = buildAutoHierarchyMembers();
-    saveAllHierarchyMembersFirestore(HIERARCHY_MEMBERS);
+
+    // Sync to Cloud Firestore efficiently in a single batch without blocking response
+    batchSyncTokensFirestore(tokensToDelete, processedSessions, tokensToUnrevoke).catch((e) =>
+      console.error("Firestore batchSyncTokens error:", e)
+    );
+    saveAllHierarchyMembersFirestore(HIERARCHY_MEMBERS).catch((e) =>
+      console.error("Firestore saveHierarchyMembers error:", e)
+    );
 
     addAccessLog(
       req,
@@ -2735,7 +2780,7 @@ app.post("/api/admin/employee-tokens/import-excel", requireAdmin, async (req, re
     });
   } catch (error) {
     console.error("Error importing tokens from Excel:", error);
-    res.status(500).json({ error: "Errore durante l'importazione dei token dal foglio Excel." });
+    res.status(500).json({ error: "Errore durante l'importazione dei token dal foglio Excel.", details: String(error) });
   }
 });
 
@@ -3063,18 +3108,18 @@ app.delete("/api/admin/employee-tokens/:token", requireAdmin, async (req, res) =
       matchedKeys.forEach((k) => REVOKED_TOKENS.set(k.toUpperCase(), { ...revokedEntry, token: k.toUpperCase() }));
     }
     saveRevokedTokens(REVOKED_TOKENS);
-    await saveRevokedTokenFirestore(revokedEntry);
+    saveRevokedTokenFirestore(revokedEntry).catch((e) => console.error("Firestore saveRevokedToken error:", e));
 
     // Delete from memory & local disk
     matchedKeys.forEach((k) => REGISTERED_DISCORD_USERS.delete(k));
     REGISTERED_DISCORD_USERS.delete(tokenToRevoke);
     saveRegisteredDiscordUsers(REGISTERED_DISCORD_USERS);
 
-    // Delete from Firestore
-    await deleteTokenFirestore(tokenToRevoke, matchedUsername, matchedCandId);
+    // Delete from Firestore non-blockingly
+    deleteTokenFirestore(tokenToRevoke, matchedUsername, matchedCandId).catch((e) => console.error("Firestore deleteToken error:", e));
     for (const k of matchedKeys) {
       if (k !== tokenToRevoke) {
-        await deleteTokenFirestore(k, matchedUsername, matchedCandId);
+        deleteTokenFirestore(k, matchedUsername, matchedCandId).catch((e) => console.error("Firestore deleteToken error:", e));
       }
     }
 
@@ -3098,7 +3143,7 @@ app.delete("/api/admin/employee-tokens/:token", requireAdmin, async (req, res) =
 
     // Refresh hierarchy cache
     HIERARCHY_MEMBERS = buildAutoHierarchyMembers();
-    saveAllHierarchyMembersFirestore(HIERARCHY_MEMBERS);
+    saveAllHierarchyMembersFirestore(HIERARCHY_MEMBERS).catch((e) => console.error("Firestore saveHierarchyMembers error:", e));
 
     const reviewerName = req.body?.reviewer || (caller.username !== "Sconosciuto" ? caller.username : caller.roleName);
 

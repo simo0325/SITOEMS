@@ -1,88 +1,88 @@
 {
   "settings": {
-    "description": "Portale istituzionale per l'assegnazione democratica dei ruoli gerarchici interni. Esprimi la tua preferenza per ciascuna delle cariche indicate.",
     "allowMultipleSelection": true,
-    "requireAllRoles": false,
+    "description": "Portale istituzionale per l'assegnazione democratica dei ruoli gerarchici interni. Esprimi la tua preferenza per ciascuna delle cariche indicate.",
     "votingActive": false,
+    "requireAllRoles": false,
     "title": "Votazione Interna Ruoli Organizzazione"
   },
   "adminPasswordHash": "64fc27d30b1371377a5d7c60d9b84162:100000:9b4bcf8ed1cd12e991416149a55ac96cfa9a267fb9362db9949c3c472350f1dc581ea10876d242341f9f405ac5e3a69b5663e9ef5afb2b8508b7d59cd6d839db",
   "emergencyPasswordHash": "d84d28d98526e271033a47b3cc30c9bc:100000:58d9940b609f96130d444b9b81d9e32ebe014abca2bf750793854b24e61895869ad1a79fac11c55b5b4bade00828c1203eb29f76c02bf401cab4777191b22f60",
   "candidates": [
     {
-      "name": "Theo Smith",
+      "id": "cand-01",
       "roleId": "direttore_generale",
-      "id": "cand-01"
+      "name": "Theo Smith"
     },
     {
-      "id": "cand-02",
+      "roleId": "direttore",
       "name": "Luca Brizzante",
+      "id": "cand-02"
+    },
+    {
+      "name": "Matias Corleone",
+      "roleId": "direttore",
+      "id": "cand-03"
+    },
+    {
+      "name": "Filippo Ciro",
+      "id": "cand-04",
       "roleId": "direttore"
     },
     {
-      "roleId": "direttore",
-      "id": "cand-03",
-      "name": "Matias Corleone"
-    },
-    {
-      "roleId": "direttore",
-      "name": "Filippo Ciro",
-      "id": "cand-04"
-    },
-    {
-      "roleId": "v_direttore",
       "name": "Igor Lestrenge",
+      "roleId": "v_direttore",
       "id": "cand-05"
     },
     {
+      "name": "Ares Migliorini",
       "id": "cand-06",
-      "roleId": "v_direttore",
-      "name": "Ares Migliorini"
+      "roleId": "v_direttore"
     },
     {
+      "name": "Ciccio Losavio",
       "id": "cand-07",
-      "roleId": "segretario_direzione",
-      "name": "Ciccio Losavio"
+      "roleId": "segretario_direzione"
     },
     {
-      "name": "Dutch Esposito",
       "roleId": "segretario_direzione",
-      "id": "cand-08"
+      "id": "cand-08",
+      "name": "Dutch Esposito"
     },
     {
-      "id": "cand-09",
+      "name": "Diego Trombini",
       "roleId": "supervisore_generale",
-      "name": "Diego Trombini"
+      "id": "cand-09"
     },
     {
-      "id": "cand-10",
       "roleId": "supervisore",
-      "name": "Jonathan Giacomarra"
+      "name": "Jonathan Giacomarra",
+      "id": "cand-10"
     },
     {
+      "roleId": "v_supervisore",
       "name": "Rocco Ali",
-      "id": "cand-11",
-      "roleId": "v_supervisore"
+      "id": "cand-11"
     },
     {
       "name": "Raffaele Bravi",
-      "roleId": "aiuto_supervisore",
-      "id": "cand-12"
+      "id": "cand-12",
+      "roleId": "aiuto_supervisore"
     },
     {
+      "name": "Rick Maltese",
       "id": "cand-13",
-      "roleId": "v_responsabile_presidio",
-      "name": "Rick Maltese"
+      "roleId": "v_responsabile_presidio"
     },
     {
+      "name": "Giangi Leanza",
       "roleId": "v_responsabile_presidio",
-      "id": "cand-14",
-      "name": "Giangi Leanza"
+      "id": "cand-14"
     },
     {
+      "id": "00fd0aa59fabcc92",
       "name": "Ares Migliorini",
-      "roleId": "segretario_direzione",
-      "id": "00fd0aa59fabcc92"
+      "roleId": "segretario_direzione"
     },
     {
       "name": "Yuki Cross",
@@ -95,13 +95,13 @@
       "roleId": "v_supervisore"
     },
     {
+      "roleId": "supervisore_generale",
       "id": "120012b303db25f3",
-      "name": "Dutch Esposito",
-      "roleId": "supervisore_generale"
+      "name": "Dutch Esposito"
     },
     {
-      "id": "1acbe51daef7dbfe",
       "roleId": "supervisore",
+      "id": "1acbe51daef7dbfe",
       "name": "Taranto"
     },
     {
@@ -111,32 +111,32 @@
     },
     {
       "roleId": "direttore_generale",
-      "name": "Luca Brizzante",
-      "id": "46538a590429638e"
+      "id": "46538a590429638e",
+      "name": "Luca Brizzante"
     },
     {
-      "name": "Jolyne Kujo",
+      "roleId": "supervisore",
       "id": "55ed4d13991bfdb1",
-      "roleId": "supervisore"
+      "name": "Jolyne Kujo"
     },
     {
+      "id": "7329e6e554f236a0",
       "roleId": "responsabile_presidio",
-      "name": "Raffaele Bravi",
-      "id": "7329e6e554f236a0"
+      "name": "Raffaele Bravi"
     },
     {
-      "roleId": "v_primario",
+      "id": "76258bb88796bf08",
       "name": "Walter Esposito",
-      "id": "76258bb88796bf08"
+      "roleId": "v_primario"
     },
     {
-      "name": "Linn Walker",
       "roleId": "primario",
-      "id": "7d1dd52a3a7d6b21"
+      "id": "7d1dd52a3a7d6b21",
+      "name": "Linn Walker"
     },
     {
-      "name": "Diego Trombini",
       "id": "7d7a52c2bc04ace3",
+      "name": "Diego Trombini",
       "roleId": "segretario_direzione"
     },
     {
@@ -146,811 +146,835 @@
     },
     {
       "roleId": "segretario_direzione",
-      "name": "Ciccio Losavio",
-      "id": "881d99992d0149c1"
+      "id": "881d99992d0149c1",
+      "name": "Ciccio Losavio"
     },
     {
-      "roleId": "direttore",
+      "name": "Matias Corleone",
       "id": "9bea2385c0662d55",
-      "name": "Matias Corleone"
+      "roleId": "direttore"
     },
     {
       "roleId": "v_direttore",
-      "id": "bc81e9c828c56b30",
-      "name": "Filippo Ciro"
+      "name": "Filippo Ciro",
+      "id": "bc81e9c828c56b30"
     },
     {
-      "name": "Giangi Leanza",
       "roleId": "v_primario",
+      "name": "Giangi Leanza",
       "id": "c9fc7fbe5ace11d0"
     },
     {
       "roleId": "direttore_generale",
-      "id": "cc327e99380eef56",
-      "name": "Theo Smith"
+      "name": "Theo Smith",
+      "id": "cc327e99380eef56"
     },
     {
-      "roleId": "aiuto_supervisore",
       "id": "e6baf2b95a66fa6c",
+      "roleId": "aiuto_supervisore",
       "name": "Rocco Ali"
     },
     {
-      "name": "Mimmo Diesel",
+      "roleId": "responsabile_presidio",
       "id": "ef0543d7960b4ff8",
-      "roleId": "responsabile_presidio"
+      "name": "Mimmo Diesel"
     },
     {
       "roleId": "v_direttore",
-      "id": "f163b01c50a37b1c",
-      "name": "Igor Lestrange"
+      "name": "Igor Lestrange",
+      "id": "f163b01c50a37b1c"
     },
     {
       "roleId": "direttore",
-      "name": "Franco Maxime",
-      "id": "f5fc4fa12e0a480c"
+      "id": "f5fc4fa12e0a480c",
+      "name": "Franco Maxime"
     },
     {
       "id": "f71ca87f5fc6174b",
-      "roleId": "v_primario",
-      "name": "Rick Maltese"
+      "name": "Rick Maltese",
+      "roleId": "v_primario"
     }
   ],
   "votes": [],
   "candidature": [
     {
+      "currentRole": "Primario",
+      "fullName": "Lily Flores",
+      "timeSlot": "La mia disponibilità dal lunedì al venerdì varia in base agli impegni, ma generalmente riesco a ritagliarmi qualche ora sia al mattino che al pomerigg",
       "cdaData": {
-        "renderedAt": "2026-09-08T08:24:16.325Z",
         "renderedByRole": "Proprietario (Master)",
-        "expiresAt": "2026-09-09T08:24:16.325Z",
-        "status": "IN_VOTING",
+        "renderedBy": "Proprietario (Master)",
         "votes": {
-          "raffaele_bravi": {
-            "voterName": "Raffaele Bravi",
-            "reason": "Ritengo che sia un medico affidabile e potrebbe essere un buon funzionario imparziale.",
-            "voterRole": "Membro CDA",
-            "decision": "FAVOREVOLE",
-            "voterToken": "EMS-RB1237",
-            "timestamp": "2026-09-08T09:30:00.206Z"
-          },
           "diego_trombini": {
-            "reason": "secondo me è brava e merita la promozione",
-            "timestamp": "2026-09-08T08:38:23.010Z",
-            "voterToken": "EMS-DT0311",
             "voterRole": "Membro CDA",
             "voterName": "Diego Trombini",
+            "reason": "secondo me è brava e merita la promozione",
+            "voterToken": "EMS-DT0311",
+            "timestamp": "2026-09-08T08:38:23.010Z",
             "decision": "FAVOREVOLE"
+          },
+          "rocco_ali": {
+            "decision": "FAVOREVOLE",
+            "timestamp": "2026-09-08T08:26:33.244Z",
+            "reason": "Favorevole",
+            "voterToken": "EMS-RAA405",
+            "voterRole": "Membro CDA",
+            "voterName": "Rocco Ali"
+          },
+          "simone_rizzus": {
+            "timestamp": "2026-09-08T09:41:36.030Z",
+            "voterToken": "EMS-2410PROP",
+            "voterName": "Simone Rizzus",
+            "voterRole": "Proprietario (Master)",
+            "decision": "FAVOREVOLE"
+          },
+          "dutch_esposito": {
+            "timestamp": "2026-09-08T10:01:21.123Z",
+            "voterToken": "EMS-DEC97C",
+            "voterName": "Dutch Esposito",
+            "voterRole": "Vice Presidente CDA",
+            "decision": "FAVOREVOLE"
+          },
+          "raffaele_bravi": {
+            "decision": "FAVOREVOLE",
+            "reason": "Ritengo che sia un medico affidabile e potrebbe essere un buon funzionario imparziale.",
+            "voterToken": "EMS-RB1237",
+            "timestamp": "2026-09-08T09:30:00.206Z",
+            "voterRole": "Membro CDA",
+            "voterName": "Raffaele Bravi"
           },
           "giovanni_manzo": {
             "timestamp": "2026-09-08T08:25:18.363Z",
-            "voterToken": "EMS-2410PROP",
-            "decision": "FAVOREVOLE",
+            "voterName": "Giovanni Manzo",
             "voterRole": "Proprietario (Master)",
-            "voterName": "Giovanni Manzo"
-          },
-          "simone_rizzus": {
             "decision": "FAVOREVOLE",
-            "timestamp": "2026-09-08T09:41:36.030Z",
-            "voterName": "Simone Rizzus",
-            "voterToken": "EMS-2410PROP",
-            "voterRole": "Proprietario (Master)"
+            "voterToken": "EMS-2410PROP"
           },
-          "rocco_ali": {
-            "reason": "Favorevole",
-            "timestamp": "2026-09-08T08:26:33.244Z",
-            "voterToken": "EMS-RAA405",
+          "ares_migliorini": {
+            "timestamp": "2026-09-08T09:58:35.735Z",
+            "voterName": "Ares Migliorini",
             "voterRole": "Membro CDA",
             "decision": "FAVOREVOLE",
-            "voterName": "Rocco Ali"
+            "reason": "Persona seria che ha voglia di fare.",
+            "voterToken": "EMS-AM59DB"
           }
         },
-        "renderedBy": "Proprietario (Master)"
+        "status": "IN_VOTING",
+        "expiresAt": "2026-09-09T08:24:16.325Z",
+        "renderedAt": "2026-09-08T08:24:16.325Z"
       },
-      "fullName": "Lily Flores",
-      "timeSlot": "La mia disponibilità dal lunedì al venerdì varia in base agli impegni, ma generalmente riesco a ritagliarmi qualche ora sia al mattino che al pomerigg",
-      "status": "PENDING",
+      "offerText": "Mi ritengo una persona seria, disponibile e sempre pronta a collaborare con il resto del reparto.\nDurante il mio percorso all'interno dell'EMS ho cercato di impegnarmi e migliorare, imparando dalle esperienze e dalle situazioni affrontate.\nSento di essere cresciuta sia nel modo di svolgere il mio lavoro sia nella gestione delle responsabilità.\nPer questo motivo vorrei avere l'opportunità di fare un ulteriore passo avanti e mettermi alla prova con un ruolo maggiore.\nLa promozione rappresenterebbe per me un riconoscimento dell'impegno dimostrato finora, ma soprattutto una nuova possibilità per crescere.\nVorrei continuare a dare il massimo e contribuire sempre di più al buon funzionamento e alla crescita dell'azienda.",
       "id": "CAND-1788837841608-7C33",
-      "desiredRole": "V. Primario di Reparto",
       "submittedAt": "2026-09-08T03:24:01.608Z",
-      "currentRole": "Primario",
-      "offerText": "Mi ritengo una persona seria, disponibile e sempre pronta a collaborare con il resto del reparto.\nDurante il mio percorso all'interno dell'EMS ho cercato di impegnarmi e migliorare, imparando dalle esperienze e dalle situazioni affrontate.\nSento di essere cresciuta sia nel modo di svolgere il mio lavoro sia nella gestione delle responsabilità.\nPer questo motivo vorrei avere l'opportunità di fare un ulteriore passo avanti e mettermi alla prova con un ruolo maggiore.\nLa promozione rappresenterebbe per me un riconoscimento dell'impegno dimostrato finora, ma soprattutto una nuova possibilità per crescere.\nVorrei continuare a dare il massimo e contribuire sempre di più al buon funzionamento e alla crescita dell'azienda."
+      "desiredRole": "V. Primario di Reparto",
+      "status": "PENDING"
     },
     {
-      "cdaData": {
-        "cdaActionReason": "Accettata direttamente 11 voti positivi",
-        "votes": {},
-        "cdaActionRole": "Proprietario (Master)",
-        "cdaActionAt": "2026-09-05T21:10:42.178Z",
-        "status": "APPROVED",
-        "renderedBy": "Proprietario (Master)",
-        "renderedAt": "2026-09-05T21:10:24.868Z",
-        "renderedByRole": "Proprietario (Master)",
-        "cdaActionBy": "Proprietario (Master)",
-        "expiresAt": "2026-09-06T21:10:24.868Z"
-      },
       "currentRole": "V. Primario di Reparto",
-      "reviewedBy": "Proprietario (Master)",
-      "desiredRole": "Primario di Reparto",
-      "submittedAt": "2026-09-05T21:09:30.265Z",
-      "offerText": "​Presento la mia candidatura per il passaggio al grado di V. Responsabile Del Presidio, a coronamento del mio percorso e dell'esperienza maturata nei ruoli operativi e gestionali all'interno del corpo dei Funzionari. Durante il mio servizio ho sempre mantenuto la massima presenza sul campo, dimostrando serietà, imparzialità e rispetto rigoroso della gerarchia, rappresentando un punto di riferimento affidabile sia per i colleghi che per la Dirigenza.\n​Come V. Responsabile Del Presidio, il mio obiettivo sarà garantire una gestione eccellente della struttura e del personale operativo, assicurando la copertura dei turni e la continuità dei servizi dell'ospedale.\nMetterò a disposizione massima dedizione per la supervisione logistica e organizzativa (offrendo piena disponibilità ad assumere anche l'incarico di Addetto Rifornimenti per la corretta gestione del materiale sanitario).\nContinuerò a garantire affiancamento, supporto e formazione continua per la crescita di tutto il personale sanitario.\nLa motivazione per questa promozione nasce dalla volontà di assumere una maggiore responsabilità gestionale, offrendo alla Supervisione e alla Dirigenza una figura solida, costante e proattiva",
-      "id": "CAND-1788642570265-021E",
-      "fullName": "Massimo Arresto",
-      "status": "APPROVED",
       "timeSlot": "Lun - dom; 11:00 - 16:00 / 23:00 -03:00",
-      "reviewedAt": "2026-09-05T21:10:42.178Z"
+      "fullName": "Massimo Arresto",
+      "id": "CAND-1788642570265-021E",
+      "desiredRole": "Primario di Reparto",
+      "status": "APPROVED",
+      "submittedAt": "2026-09-05T21:09:30.265Z",
+      "reviewedAt": "2026-09-05T21:10:42.178Z",
+      "offerText": "​Presento la mia candidatura per il passaggio al grado di V. Responsabile Del Presidio, a coronamento del mio percorso e dell'esperienza maturata nei ruoli operativi e gestionali all'interno del corpo dei Funzionari. Durante il mio servizio ho sempre mantenuto la massima presenza sul campo, dimostrando serietà, imparzialità e rispetto rigoroso della gerarchia, rappresentando un punto di riferimento affidabile sia per i colleghi che per la Dirigenza.\n​Come V. Responsabile Del Presidio, il mio obiettivo sarà garantire una gestione eccellente della struttura e del personale operativo, assicurando la copertura dei turni e la continuità dei servizi dell'ospedale.\nMetterò a disposizione massima dedizione per la supervisione logistica e organizzativa (offrendo piena disponibilità ad assumere anche l'incarico di Addetto Rifornimenti per la corretta gestione del materiale sanitario).\nContinuerò a garantire affiancamento, supporto e formazione continua per la crescita di tutto il personale sanitario.\nLa motivazione per questa promozione nasce dalla volontà di assumere una maggiore responsabilità gestionale, offrendo alla Supervisione e alla Dirigenza una figura solida, costante e proattiva",
+      "reviewedBy": "Proprietario (Master)",
+      "cdaData": {
+        "expiresAt": "2026-09-06T21:10:24.868Z",
+        "status": "APPROVED",
+        "renderedAt": "2026-09-05T21:10:24.868Z",
+        "votes": {},
+        "renderedByRole": "Proprietario (Master)",
+        "renderedBy": "Proprietario (Master)",
+        "cdaActionReason": "Accettata direttamente 11 voti positivi",
+        "cdaActionBy": "Proprietario (Master)",
+        "cdaActionAt": "2026-09-05T21:10:42.178Z",
+        "cdaActionRole": "Proprietario (Master)"
+      }
     },
     {
-      "status": "APPROVED",
+      "reviewedAt": "2026-09-06T20:08:52.966Z",
       "currentRole": "V. Primario di Reparto",
       "id": "CAND-1788638793262-FEA7",
-      "timeSlot": "Sempre in settimana pomeriggio e sera weekend anche notte",
-      "offerText": "Cosa offro come persona/dipendente:\nCome persona offro serenità, disponibilità e simpatia, cercando di mantenere un buon rapporto con tutti i colleghi.\n\nCome dipendente offro impegno, serietà, professionalità e costanza. Quando sono in servizio cerco di essere sempre attivo e disponibile ad aiutare, mettendomi a disposizione dell’EMS nel modo migliore possibile.\n\nCon la possibile promozione diventerei Addetto Ticket, un ruolo che considero importante perché permette di fornire assistenza e informazioni a chi ne ha bisogno. Credo di poter svolgere questo incarico in modo rapido ed efficace grazie alla mia presenza e alla mia disponibilità.\n\nMi sto inoltre impegnando per ampliare le mie competenze e completare i vari percorsi dell’EMS, con l’obiettivo di essere sempre più preparato e utile al reparto.\n\nRitengo quindi di essere pronto per assumermi maggiori responsabilità e dimostrare di meritare la fiducia che mi verrà data.\n\nGrazie a tutti per l’attenzione",
-      "desiredRole": "Primario di Reparto",
       "reviewedBy": "Sistema CDA (Timer 24h)",
-      "submittedAt": "2026-09-05T20:06:33.262Z",
-      "reviewedAt": "2026-09-06T20:08:52.966Z",
-      "fullName": "Matteo Piscitelli",
+      "status": "APPROVED",
       "cdaData": {
-        "cdaActionReason": "Approvata automaticamente per maggioranza favorevole alla scadenza del timer 24h (5 favorevoli, 3 contrari, 0 astenuti).",
+        "expiresAt": "2026-09-06T20:06:57.575Z",
         "renderedBy": "Proprietario (Master)",
+        "cdaActionBy": "Sistema CDA (Timer 24h)",
+        "status": "APPROVED",
+        "cdaActionReason": "Approvata automaticamente per maggioranza favorevole alla scadenza del timer 24h (5 favorevoli, 3 contrari, 0 astenuti).",
+        "renderedByRole": "Proprietario (Master)",
         "cdaActionAt": "2026-09-06T20:08:52.966Z",
-        "cdaActionRole": "Sistema Automatico",
+        "renderedAt": "2026-09-05T20:06:57.575Z",
         "votes": {
           "giovanni_manzo": {
-            "timestamp": "2026-09-05T20:25:30.964Z",
-            "voterToken": "EMS-2410PROP",
-            "decision": "FAVOREVOLE",
             "voterName": "Giovanni Manzo",
-            "voterRole": "Proprietario (Master)"
-          },
-          "simone_rizzus": {
-            "voterToken": "EMS-2410PROP",
-            "decision": "FAVOREVOLE",
-            "timestamp": "2026-09-05T20:10:12.540Z",
             "voterRole": "Proprietario (Master)",
-            "voterName": "Simone Rizzus"
-          },
-          "diego_trombini": {
-            "reason": "io lho trovato sempre o quasi sempre on e disponibile per assunzioni ecc. secondo me merita la promozione",
-            "voterRole": "Membro CDA",
             "decision": "FAVOREVOLE",
-            "voterName": "Diego Trombini",
-            "voterToken": "EMS-DT0311",
-            "timestamp": "2026-09-06T10:35:01.319Z"
-          },
-          "theo_smith": {
-            "voterName": "Theo Smith",
-            "decision": "CONTRARIO",
-            "reason": "Dopo ciò che è successo non mi sento sicuro che promuoverlo sia la corretta soluzione",
-            "voterRole": "Presidente CDA",
-            "voterToken": "EMS-TSD286",
-            "timestamp": "2026-09-06T10:34:56.264Z"
+            "voterToken": "EMS-2410PROP",
+            "timestamp": "2026-09-05T20:25:30.964Z"
           },
           "ares_migliorini": {
             "reason": "Grado che a parer mio si meriterebbe",
-            "voterToken": "EMS-AM59DB",
             "timestamp": "2026-09-06T10:56:15.287Z",
-            "decision": "FAVOREVOLE",
-            "voterName": "Ares Migliorini",
-            "voterRole": "Membro CDA"
-          },
-          "dutch_esposito": {
-            "voterRole": "Vice Presidente CDA",
-            "voterToken": "EMS-DEC97C",
-            "voterName": "Dutch Esposito",
-            "reason": "Dopo quello che ha fatto , deve dimostrare di aver capito la lezione",
-            "timestamp": "2026-09-05T20:12:34.126Z",
-            "decision": "CONTRARIO"
-          },
-          "jonathan_giacomarra": {
-            "timestamp": "2026-09-05T21:11:05.850Z",
-            "reason": "...",
-            "voterToken": "EMS-JG211B",
+            "voterToken": "EMS-AM59DB",
             "voterRole": "Membro CDA",
-            "voterName": "Jonathan Giacomarra",
-            "decision": "CONTRARIO"
+            "voterName": "Ares Migliorini",
+            "decision": "FAVOREVOLE"
           },
           "giuseppe_politics": {
+            "decision": "FAVOREVOLE",
             "reason": "ottima gestione delle unita e attivita generale e disponibile sempre",
             "timestamp": "2026-09-05T20:18:16.949Z",
-            "decision": "FAVOREVOLE",
             "voterToken": "EMS-GP67SC",
-            "voterName": "Giuseppe Politics",
-            "voterRole": "Membro CDA"
-          }
-        },
-        "expiresAt": "2026-09-06T20:06:57.575Z",
-        "status": "APPROVED",
-        "renderedByRole": "Proprietario (Master)",
-        "cdaActionBy": "Sistema CDA (Timer 24h)",
-        "renderedAt": "2026-09-05T20:06:57.575Z"
-      },
-      "token": "EMS-MA264H"
-    },
-    {
-      "status": "APPROVED",
-      "submittedAt": "2026-09-05T20:02:23.084Z",
-      "offerText": "lavoro all'Ems da anni ed e un lavoro che mi e sempre piaciuto fare\nper me lavorare all'Ems e come una famiglia dal risveglio fino a quando vado a dormire sono sempre in servizio\nsono grato dell Ems e di tutti i miei colleghi ad aiutarmi a crescere in tutto sia nell'applicativo che nel gestire dove ho delle mancanze\nil mio obbiettivo e crescere e imparare e gistire al meglio i miei compiti\nringrazio della fiducia per me non e scontata cordiali saluti Antonio Palermo",
-      "desiredRole": "Responsabile Del Presidio",
-      "fullName": "Antonio Palermo",
-      "reviewedAt": "2026-09-06T20:08:52.966Z",
-      "currentRole": "V. Responsabile Del Presidio",
-      "timeSlot": "da lunedi a domenica dalle 17:00 alle 06:00",
-      "reviewedBy": "Sistema CDA (Timer 24h)",
-      "cdaData": {
-        "cdaActionBy": "Sistema CDA (Timer 24h)",
-        "votes": {
-          "giuseppe_politics": {
-            "reason": "Mario Jordan 2.0",
             "voterRole": "Membro CDA",
-            "voterName": "Giuseppe Politics",
-            "decision": "CONTRARIO",
-            "voterToken": "EMS-GP67SC",
-            "timestamp": "2026-09-05T20:18:46.853Z"
-          },
-          "giovanni_manzo": {
-            "timestamp": "2026-09-05T20:25:40.763Z",
-            "voterToken": "EMS-2410PROP",
-            "voterRole": "Proprietario (Master)",
-            "decision": "FAVOREVOLE",
-            "voterName": "Giovanni Manzo"
-          },
-          "jonathan_giacomarra": {
-            "decision": "FAVOREVOLE",
-            "reason": "...",
-            "voterToken": "EMS-JG211B",
-            "timestamp": "2026-09-05T20:05:48.348Z",
-            "voterName": "Jonathan Giacomarra",
-            "voterRole": "Membro CDA"
-          },
-          "diego_trombini": {
-            "timestamp": "2026-09-06T10:35:29.229Z",
-            "voterToken": "EMS-DT0311",
-            "decision": "FAVOREVOLE",
-            "reason": "è sempre attivo e per me dovrebbe essere promosso",
-            "voterRole": "Membro CDA",
-            "voterName": "Diego Trombini"
-          },
-          "ares_migliorini": {
-            "voterRole": "Membro CDA",
-            "reason": "A volte tende ad essere un po' eccessivo con i gradi bassi, ma alla fine svolge il suo lavoro con serietà.",
-            "voterName": "Ares Migliorini",
-            "decision": "FAVOREVOLE",
-            "timestamp": "2026-09-06T10:47:53.209Z",
-            "voterToken": "EMS-AM59DB"
-          },
-          "simone_rizzus": {
-            "timestamp": "2026-09-05T20:51:22.570Z",
-            "voterToken": "EMS-2410PROP",
-            "reason": "MAA SUCA",
-            "voterRole": "Proprietario (Master)",
-            "decision": "CONTRARIO",
-            "voterName": "Simone Rizzus"
+            "voterName": "Giuseppe Politics"
           },
           "theo_smith": {
+            "timestamp": "2026-09-06T10:34:56.264Z",
+            "reason": "Dopo ciò che è successo non mi sento sicuro che promuoverlo sia la corretta soluzione",
             "voterToken": "EMS-TSD286",
-            "decision": "FAVOREVOLE",
-            "timestamp": "2026-09-06T10:34:25.595Z",
+            "decision": "CONTRARIO",
             "voterName": "Theo Smith",
             "voterRole": "Presidente CDA"
           },
-          "dutch_esposito": {
-            "voterName": "Dutch Esposito",
-            "voterToken": "EMS-DEC97C",
-            "voterRole": "Vice Presidente CDA",
-            "decision": "FAVOREVOLE",
-            "timestamp": "2026-09-05T20:06:25.625Z"
-          }
-        },
-        "renderedByRole": "Proprietario (Master)",
-        "cdaActionRole": "Sistema Automatico",
-        "renderedBy": "Proprietario (Master)",
-        "cdaActionReason": "Approvata automaticamente per maggioranza favorevole alla scadenza del timer 24h (6 favorevoli, 2 contrari, 0 astenuti).",
-        "renderedAt": "2026-09-05T20:05:22.689Z",
-        "status": "APPROVED",
-        "expiresAt": "2026-09-06T20:05:22.689Z",
-        "cdaActionAt": "2026-09-06T20:08:52.966Z"
-      },
-      "id": "CAND-1788638543084-F702"
-    },
-    {
-      "token": "EMS-KP28RC",
-      "reviewedBy": "Proprietario (Master)",
-      "currentRole": "V. Responsabile Del Presidio",
-      "submittedAt": "2026-09-05T19:56:05.300Z",
-      "desiredRole": "Responsabile Del Presidio",
-      "fullName": "Kevin Panetto",
-      "id": "CAND-1788638165300-2085",
-      "offerText": "La mia Esperienza che porto in EMS da quando ho inziato è sempre quella di dare il massimo in ogni reparto in cui sono , non tirandomi mai indietro in nessuna difficolta e sopratutto dando sempre il massimo in ogni mansione e responsabilità che mi viene assegnata, mi reputo una persona molto efficiente e in grado di reggere qualsiasi situazione , i miei punti di forza sono impegno costante , determinazione e grande ambizione senza mai pormi dei limiti, affidabilità e capacità di lavorare sotto pressione e disponibilità nel lavoro di squadra con i colleghi, il mio contributo nel reparto che richiedo la promozione è quello di un controllo constante dei colleghi cosi da evitare l'uso di oggetti illegali in servizio che possono compromettere la visibilità dell'EMS o situazioni poco gradevoli, sono sempre disponibile ad aiutare colleghi con qualsiasi dubbio in testa , rispondendo in maniera corretta e professionale ad ogni loro domanda o dubbio di qualsiasi genere , se c'è bisogno sono sempre pronto anche a formare dei tirocinanti nel caso ci fosse necessità.. Sono molto motivato ad essere promosso perchè mi sono posto come obbiettivo quello di ritornare con il tempo e il duro lavoro ai livelli di un tempo, ovviamente dove ho sbagliato l'ho capito e quindi sono più che sicuro che gli errori commessi in passato non ripresenteranno più , quindi non mi pongo limiti e in qualsiasi grado fino ad ora sono stato ho sempre dato e continuerò a dare il mio massimo senza mai adagiarmi sugli allori!, oltre a quello che faccio in game sono sempre molto disponibile anche a livello di discord , stando sempre attento ai ticket e a qualsiasi fabbisogno viene richiesto , l'EMS per me è un lavoro serio e non come lo vedono tanti come un passatempo da non dedicarci impegno e serietà.\n.\n.\n.\n.",
-      "cdaData": {
-        "cdaActionReason": "Candidatura accettata gia' precedentemente 10 voti positivi 1 contrario",
-        "cdaActionRole": "Proprietario (Master)",
-        "cdaActionBy": "Proprietario (Master)",
-        "status": "APPROVED",
-        "cdaActionAt": "2026-09-05T19:56:49.734Z"
-      },
-      "timeSlot": "Mattina e pomeriggio sempre , la sera in base a quando lavoro altrimenti ci sono sempre e anche la notte",
-      "status": "APPROVED",
-      "reviewedAt": "2026-09-05T19:56:49.734Z"
-    },
-    {
-      "fullName": "Rick Maltese",
-      "cdaData": {
-        "votingStartedAt": "2026-09-06T08:42:33.921Z",
-        "status": "RETURNED",
-        "cdaActionReason": "RIFIUTATA DA PARTE DI UNO DEI CONSIGLIERI FINALE CDA",
-        "cdaActionBy": "Proprietario (Master)",
-        "cdaActionRole": "Proprietario (Master)",
-        "expiresAt": "2026-09-07T08:42:33.921Z",
-        "cdaActionAt": "2026-09-06T08:44:03.031Z",
-        "votes": {}
-      },
-      "submittedAt": "2026-09-05T18:45:31.991Z",
-      "reviewedAt": "2026-09-06T08:44:03.031Z",
-      "id": "CAND-1788633931991-F870",
-      "offerText": "abbastanza conoscenza dell'ambiente nell'ems mi ritengo una persona imparziale e cerco sempre di mettermi nei panni degli altri, \ncome servizio cerchero di coprire i buchi di orari dove mancano alcuni funzionari,  soprattutto visto che mi e' capitato spesso di trovare in pochi addetti alle promorzioni \ncosi da poter abbreviare i tempi di formazioni ed entrate nei vari reparti facendo direttamente io se sono attivo magari ad un orario in cui ci sono pochi, \nper i controlli in alpha cercherei di garantire un ambiente piu serio, oltre a questo ho notato una carenza di supervisori attivi ultimamente almeno per questo periodo o entrare sotto prova in modo da coprire questo buco. \noltre al mio operatore vorrei provare ad alzare la voce su alcune problematiche con alcuni reparti che vengono non dico tralasciati ma oramai sono li solo in vetrina e raramente qualcuno e' interessato,\nfaro il possibile per risolvere alcune questioni interne riguardante come i gradi piu bassi guardano i direttori/proprietari non c'e abbastanza comprensione tra loro, inoltre spererei in un nuovo sistema di meritocrazia non basato solo su segnalazioni positive o cio' che e'\nstato visto in game perche' se una persona si fa 50 ore ma poi non viene valutato perche magari si e preso un warn per un errore magari per qualche incomprensione e l'ha fatto proprio quando c'erano degli alti gradi in servizio si dovrebbe anche tenere conto di quello che ha fatto mentre non c'era nessuno, un sistema di monitoraggio che cerchi di calibrare efficienza a lavoro (se ha fatto tanto mentre era in servizio) e correttezza dell'operato (se ci sono state segnalazioni di permessi effettuati in modo sbagliato o fatture sbagliate) e da questo si tiene una specie di percentuale di operato corretto in rapporto alle ore fatte e alla correttezza",
-      "reviewedBy": "Proprietario (Master)",
-      "rejectionReason": "RIFIUTATA DA PARTE DI UNO DEI CONSIGLIERI FINALE CDA",
-      "timeSlot": "disponibile tutto il giorno per entrare in servizio al momento in caso sono comunque disponibile nel fascio orario serale o notte.",
-      "desiredRole": "Responsabile Del Presidio",
-      "status": "REJECTED",
-      "token": "EMS-RM6E9E",
-      "currentRole": "V. Responsabile Del Presidio"
-    },
-    {
-      "cdaData": {
-        "renderedAt": "2026-09-05T18:43:13.599Z",
-        "cdaActionBy": "Sistema CDA (Timer 24h)",
-        "renderedByRole": "Proprietario (Master)",
-        "votes": {
-          "simone_rizzus": {
-            "decision": "FAVOREVOLE",
-            "voterToken": "EMS-2410PROP",
-            "voterRole": "Proprietario (Master)",
-            "voterName": "Simone Rizzus",
-            "timestamp": "2026-09-05T19:54:39.240Z"
-          },
-          "giovanni_manzo": {
-            "decision": "FAVOREVOLE",
-            "voterName": "Giovanni Manzo",
-            "voterToken": "EMS-2410PROP",
-            "voterRole": "Proprietario (Master)",
-            "timestamp": "2026-09-05T20:26:01.193Z"
-          },
-          "filippo_ciro": {
-            "voterName": "Filippo Ciro",
-            "voterRole": "Membro CDA",
-            "decision": "CONTRARIO",
-            "voterToken": "EMS-FC6767",
-            "timestamp": "2026-09-05T18:48:10.766Z",
-            "reason": "A parere mio ha bisogno di ancora qualche giorno di esperienza"
-          },
-          "ares_migliorini": {
-            "voterRole": "Membro CDA",
-            "voterName": "Ares Migliorini",
-            "voterToken": "EMS-AM59DB",
-            "timestamp": "2026-09-05T18:58:21.918Z",
-            "decision": "ASTENUTO",
-            "reason": "Non ho elementi sufficienti per valutare."
-          },
           "jonathan_giacomarra": {
-            "voterName": "Jonathan Giacomarra",
-            "decision": "FAVOREVOLE",
             "voterRole": "Membro CDA",
+            "voterName": "Jonathan Giacomarra",
             "reason": "...",
+            "decision": "CONTRARIO",
             "voterToken": "EMS-JG211B",
-            "timestamp": "2026-09-05T19:53:50.565Z"
+            "timestamp": "2026-09-05T21:11:05.850Z"
+          },
+          "simone_rizzus": {
+            "timestamp": "2026-09-05T20:10:12.540Z",
+            "decision": "FAVOREVOLE",
+            "voterToken": "EMS-2410PROP",
+            "voterName": "Simone Rizzus",
+            "voterRole": "Proprietario (Master)"
           },
           "dutch_esposito": {
             "voterToken": "EMS-DEC97C",
-            "reason": "BRAVO RAGAZZO , COMPETENTE",
-            "voterName": "Dutch Esposito",
+            "reason": "Dopo quello che ha fatto , deve dimostrare di aver capito la lezione",
+            "decision": "CONTRARIO",
             "voterRole": "Vice Presidente CDA",
-            "decision": "FAVOREVOLE",
-            "timestamp": "2026-09-05T19:06:21.767Z"
+            "voterName": "Dutch Esposito",
+            "timestamp": "2026-09-05T20:12:34.126Z"
           },
-          "giuseppe_politics": {
-            "timestamp": "2026-09-05T20:19:34.044Z",
-            "reason": "mai visto",
-            "voterToken": "EMS-GP67SC",
-            "voterName": "Giuseppe Politics",
+          "diego_trombini": {
+            "decision": "FAVOREVOLE",
+            "voterToken": "EMS-DT0311",
+            "timestamp": "2026-09-06T10:35:01.319Z",
+            "reason": "io lho trovato sempre o quasi sempre on e disponibile per assunzioni ecc. secondo me merita la promozione",
             "voterRole": "Membro CDA",
-            "decision": "ASTENUTO"
+            "voterName": "Diego Trombini"
           }
         },
-        "cdaActionRole": "Sistema Automatico",
-        "status": "APPROVED",
-        "cdaActionAt": "2026-09-06T20:08:52.966Z",
-        "expiresAt": "2026-09-06T18:43:13.599Z",
-        "cdaActionReason": "Approvata automaticamente per maggioranza favorevole alla scadenza del timer 24h (4 favorevoli, 1 contrari, 2 astenuti).",
-        "renderedBy": "Proprietario (Master)"
+        "cdaActionRole": "Sistema Automatico"
       },
-      "currentRole": "Primario",
-      "reviewedBy": "Sistema CDA (Timer 24h)",
-      "id": "CAND-1788632243682-3CF9",
-      "fullName": "Vincenzo Escobar",
-      "submittedAt": "2026-09-05T18:17:23.682Z",
-      "desiredRole": "V. Primario di Reparto",
-      "status": "APPROVED",
-      "reviewedAt": "2026-09-06T20:08:52.966Z",
-      "offerText": "Spettabile Direzione,\n\ndesidero sottoporre alla vostra attenzione la mia candidatura per il passaggio a Funzionario.\nIl mio percorso poggia su una solida esperienza nel soccorso, arricchita da un passato in un’altra realtà cittadina da cui ho scelto consapevolmente di ripartire da zero, senza richiedere reintegri. Questa decisione mi ha permesso di dimostrare dedizione sul campo, consolidando competenze tecniche e maturità operativa.\nIn servizio ho sempre garantito massima professionalità e rispetto verso colleghi e utenza, mantenendo uno storico disciplinare impeccabile (zero warn). Assicuro inoltre una presenza costante, coprendo con regolarità anche le fasce notturne per garantire la continuità operativa del dipartimento.\nQuesto avanzamento mi permetterebbe di mettere a disposizione una visione gestionale più strutturata, supportando attivamente il coordinamento del personale, l'affiancamento delle nuove leve e offrendo un contributo concreto e responsabile alla crescita dell'EMS.\n\nRingraziandovi per il tempo e la valutazione, resto a disposizione per qualsiasi confronto.\n\nCordiali saluti,\nVincenzo Escobar",
-      "timeSlot": "variano... ma posso tutti i giorni"
+      "submittedAt": "2026-09-05T20:06:33.262Z",
+      "offerText": "Cosa offro come persona/dipendente:\nCome persona offro serenità, disponibilità e simpatia, cercando di mantenere un buon rapporto con tutti i colleghi.\n\nCome dipendente offro impegno, serietà, professionalità e costanza. Quando sono in servizio cerco di essere sempre attivo e disponibile ad aiutare, mettendomi a disposizione dell’EMS nel modo migliore possibile.\n\nCon la possibile promozione diventerei Addetto Ticket, un ruolo che considero importante perché permette di fornire assistenza e informazioni a chi ne ha bisogno. Credo di poter svolgere questo incarico in modo rapido ed efficace grazie alla mia presenza e alla mia disponibilità.\n\nMi sto inoltre impegnando per ampliare le mie competenze e completare i vari percorsi dell’EMS, con l’obiettivo di essere sempre più preparato e utile al reparto.\n\nRitengo quindi di essere pronto per assumermi maggiori responsabilità e dimostrare di meritare la fiducia che mi verrà data.\n\nGrazie a tutti per l’attenzione",
+      "desiredRole": "Primario di Reparto",
+      "timeSlot": "Sempre in settimana pomeriggio e sera weekend anche notte",
+      "fullName": "Matteo Piscitelli",
+      "token": "EMS-MA264H"
     },
     {
-      "reviewedBy": "Proprietario (Master)",
       "currentRole": "V. Responsabile Del Presidio",
-      "id": "CAND-1788632040716-2A0E",
-      "fullName": "Mirko Leone",
+      "id": "CAND-1788638543084-F702",
+      "timeSlot": "da lunedi a domenica dalle 17:00 alle 06:00",
+      "fullName": "Antonio Palermo",
+      "submittedAt": "2026-09-05T20:02:23.084Z",
       "desiredRole": "Responsabile Del Presidio",
-      "submittedAt": "2026-09-05T18:14:00.717Z",
-      "offerText": "Mi contraddistinguo per serietà, affidabilità e spirito di collaborazione, mantenendo sempre un atteggiamento professionale, rispettoso e disponibile nei confronti di colleghi e superiori.\nUno dei miei principali punti di forza è la capacità di utilizzare l’applicativo in autonomia. Grazie alla mia lunga esperienza nell’utilizzo del PC e della tecnologia, possiedo una buona predisposizione all’apprendimento di nuovi strumenti e funzionalità. Riesco a comprenderne rapidamente il funzionamento e a utilizzarli con sicurezza, precisione ed efficienza.\nSono una persona costante, determinata e motivata a migliorarmi. Mi impegno a svolgere con attenzione e responsabilità ogni compito che mi viene affidato, mettendomi a disposizione del reparto e dei colleghi quando necessario.\nCredo fortemente nel lavoro di squadra e nella collaborazione, elementi fondamentali per garantire un servizio EMS efficiente, organizzato e professionale.\nGrazie per l'attenzione",
-      "token": "EMS-ML373T",
-      "cdaData": {
-        "cdaActionRole": "Proprietario (Master)",
-        "cdaActionBy": "Proprietario (Master)",
-        "cdaActionReason": "accettata già precendente 11 voti positivi",
-        "cdaActionAt": "2026-09-05T18:14:19.785Z",
-        "status": "APPROVED"
-      },
-      "timeSlot": "Principalmente pomeriggio e sera, con disponibilità anche durante la mattina quando possibile. Nel weekend la mia disponibilità varia in base agli imp",
       "status": "APPROVED",
-      "reviewedAt": "2026-09-05T18:14:19.785Z"
-    },
-    {
-      "reviewedAt": "2026-08-24T21:21:44.827Z",
-      "token": "EMS-LR37DF",
-      "offerText": "Salve, vorrei proporre la mia candidatura per l'aumento di grado all'interno dell'EMS.\n\nRitengo di avere le qualità necessarie per ricoprire un grado maggiore, soprattutto per la mia disponibilità nell'aiutare gli altri e nel collaborare con i miei colleghi. Cerco sempre di essere presente quando c'è bisogno di una mano e di comportarmi in modo serio e professionale.\n\nPenso inoltre di avere le capacità e le conoscenze necessarie per assumermi maggiori responsabilità all'interno dell'EMS. Con il nuovo grado vorrei continuare a migliorare, aiutare i membri con meno esperienza e contribuire positivamente alla crescita del reparto.\n\nInoltre, con l'aumento di grado, vorrei poter dare il mio contributo anche nella gestione e nelle risposte ai ticket, aiutando le persone che ne avranno bisogno.\n\nSono motivato a dimostrare di meritare questa opportunità e a dare il massimo per l'EMS.",
+      "offerText": "lavoro all'Ems da anni ed e un lavoro che mi e sempre piaciuto fare\nper me lavorare all'Ems e come una famiglia dal risveglio fino a quando vado a dormire sono sempre in servizio\nsono grato dell Ems e di tutti i miei colleghi ad aiutarmi a crescere in tutto sia nell'applicativo che nel gestire dove ho delle mancanze\nil mio obbiettivo e crescere e imparare e gistire al meglio i miei compiti\nringrazio della fiducia per me non e scontata cordiali saluti Antonio Palermo",
+      "reviewedBy": "Sistema CDA (Timer 24h)",
+      "reviewedAt": "2026-09-06T20:08:52.966Z",
       "cdaData": {
-        "renderedByRole": "Proprietario (Master)",
-        "renderedBy": "Proprietario (Master)",
-        "cdaActionRole": "Sistema Automatico",
-        "expiresAt": "2026-08-23T11:34:03.169Z",
-        "cdaActionBy": "Sistema CDA (Timer 24h)",
-        "cdaActionAt": "2026-08-24T21:21:44.827Z",
-        "cdaActionReason": "Approvata automaticamente per maggioranza favorevole alla scadenza del timer 24h (4 favorevoli, 1 contrari, 0 astenuti).",
-        "status": "APPROVED",
-        "renderedAt": "2026-08-22T11:34:03.169Z",
         "votes": {
           "theo_smith": {
-            "voterName": "Theo Smith",
             "voterToken": "EMS-TSD286",
-            "decision": "FAVOREVOLE",
+            "voterName": "Theo Smith",
             "voterRole": "Presidente CDA",
-            "timestamp": "2026-08-22T13:10:28.811Z"
-          },
-          "antony_romano": {
-            "timestamp": "2026-08-22T11:49:37.284Z",
-            "decision": "FAVOREVOLE",
-            "voterRole": "Proprietario",
-            "voterToken": "EMS-AR693D",
-            "voterName": "Antony Romano"
+            "timestamp": "2026-09-06T10:34:25.595Z",
+            "decision": "FAVOREVOLE"
           },
           "ares_migliorini": {
-            "voterRole": "Membro CDA",
-            "voterName": "Ares Migliorini",
-            "reason": "Non ce lo vedo male come primario di reparto, alla fine le cose le fa bene e non causa problemi. Si vede che ha voglia di salire seriamente e non tanto per.",
+            "timestamp": "2026-09-06T10:47:53.209Z",
             "decision": "FAVOREVOLE",
             "voterToken": "EMS-AM59DB",
-            "timestamp": "2026-08-22T13:00:47.492Z"
+            "reason": "A volte tende ad essere un po' eccessivo con i gradi bassi, ma alla fine svolge il suo lavoro con serietà.",
+            "voterName": "Ares Migliorini",
+            "voterRole": "Membro CDA"
           },
-          "simone_rizzus": {
-            "voterRole": "Proprietario (Master)",
-            "voterName": "Simone Rizzus",
-            "timestamp": "2026-08-22T11:37:45.001Z",
-            "voterToken": "EMS-2410PROP",
-            "decision": "CONTRARIO"
+          "dutch_esposito": {
+            "voterName": "Dutch Esposito",
+            "voterRole": "Vice Presidente CDA",
+            "voterToken": "EMS-DEC97C",
+            "timestamp": "2026-09-05T20:06:25.625Z",
+            "decision": "FAVOREVOLE"
           },
-          "giovanni_manzo": {
-            "reason": "Favorevole con riserva (in prova), deve fare di più",
-            "timestamp": "2026-08-22T11:37:20.488Z",
-            "voterToken": "080704",
-            "decision": "FAVOREVOLE",
-            "voterRole": "Proprietario",
-            "voterName": "Giovanni Manzo"
-          }
-        }
-      },
-      "timeSlot": "TUTTI I GIORNI SERA / POMERIGGIO",
-      "status": "APPROVED",
-      "currentRole": "V. Primario di Reparto",
-      "submittedAt": "2026-08-22T08:47:36.531Z",
-      "fullName": "Logan Red",
-      "desiredRole": "Primario di Reparto",
-      "reviewedBy": "Sistema CDA (Timer 24h)",
-      "id": "CAND-1787388456531-B90E"
-    },
-    {
-      "offerText": "Presento la mia candidatura per il ruolo di V. Primario di Reparto forte dell'esperienza maturata come Primario, durante la quale ho dimostrato costante presenza, professionalità e rispetto delle procedure EMS.\nNel corso del mio servizio ho acquisito un'ottima conoscenza del regolamento interno e della gestione dei vari interventi, mantenendo sempre un'etica lavorativa impeccabile, basata su serietà, imparzialità e rispetto nei confronti sia dei cittadini che dei colleghi.\nCome V. Primario di Reparto, il mio obiettivo è contribuire all'efficienza e alla crescita del reparto, garantendo una supervisione costante e un supporto attivo nei momenti di maggiore affluenza o gestione delle emergenze.\nOffro totale disponibilità per l'affiancamento, la formazione e il tutoraggio delle nuove leve, aiutandole a integrarsi rapidamente e ad apprendere le corrette dinamiche dell'EMS.\nLa motivazione che mi spinge a richiedere questa promozione nasce dal desiderio di assumere maggiori responsabilità, mettendo la mia esperienza al servizio della Direzione e della crescita qualitativa di tutto il corpo sanitario.",
-      "reviewedAt": "2026-08-19T12:56:24.905Z",
-      "fullName": "Massimo Arresto",
-      "cdaData": {
-        "cdaActionReason": "ESITO POSITIVO",
-        "status": "APPROVED",
-        "votingStartedAt": "2026-08-18T17:28:29.125Z",
-        "cdaActionBy": "Proprietario (Master)",
-        "cdaActionAt": "2026-08-19T12:56:24.905Z",
-        "expiresAt": "2026-08-19T17:28:29.125Z",
-        "cdaActionRole": "Proprietario (Master)",
-        "votes": {
-          "giovanni_manzo": {
-            "voterName": "Giovanni Manzo",
-            "voterRole": "Proprietario",
-            "decision": "FAVOREVOLE",
-            "voterToken": "080704",
-            "timestamp": "2026-08-18T20:53:36.298Z"
-          },
-          "ciccio_losavio": {
-            "voterName": "Ciccio Losavio",
-            "voterToken": "EMS-CLA9CC",
+          "giuseppe_politics": {
+            "decision": "CONTRARIO",
+            "reason": "Mario Jordan 2.0",
+            "voterName": "Giuseppe Politics",
             "voterRole": "Membro CDA",
-            "decision": "FAVOREVOLE",
-            "timestamp": "2026-08-19T09:05:34.266Z"
+            "voterToken": "EMS-GP67SC",
+            "timestamp": "2026-09-05T20:18:46.853Z"
           },
           "diego_trombini": {
             "voterToken": "EMS-DT0311",
-            "timestamp": "2026-08-18T17:55:51.496Z",
-            "decision": "FAVOREVOLE",
             "voterName": "Diego Trombini",
+            "voterRole": "Membro CDA",
+            "decision": "FAVOREVOLE",
+            "timestamp": "2026-09-06T10:35:29.229Z",
+            "reason": "è sempre attivo e per me dovrebbe essere promosso"
+          },
+          "jonathan_giacomarra": {
+            "decision": "FAVOREVOLE",
+            "voterToken": "EMS-JG211B",
+            "reason": "...",
+            "voterName": "Jonathan Giacomarra",
+            "voterRole": "Membro CDA",
+            "timestamp": "2026-09-05T20:05:48.348Z"
+          },
+          "simone_rizzus": {
+            "voterName": "Simone Rizzus",
+            "reason": "MAA SUCA",
+            "voterToken": "EMS-2410PROP",
+            "voterRole": "Proprietario (Master)",
+            "decision": "CONTRARIO",
+            "timestamp": "2026-09-05T20:51:22.570Z"
+          },
+          "giovanni_manzo": {
+            "decision": "FAVOREVOLE",
+            "voterRole": "Proprietario (Master)",
+            "voterName": "Giovanni Manzo",
+            "voterToken": "EMS-2410PROP",
+            "timestamp": "2026-09-05T20:25:40.763Z"
+          }
+        },
+        "status": "APPROVED",
+        "renderedByRole": "Proprietario (Master)",
+        "cdaActionRole": "Sistema Automatico",
+        "cdaActionReason": "Approvata automaticamente per maggioranza favorevole alla scadenza del timer 24h (6 favorevoli, 2 contrari, 0 astenuti).",
+        "expiresAt": "2026-09-06T20:05:22.689Z",
+        "cdaActionBy": "Sistema CDA (Timer 24h)",
+        "renderedAt": "2026-09-05T20:05:22.689Z",
+        "renderedBy": "Proprietario (Master)",
+        "cdaActionAt": "2026-09-06T20:08:52.966Z"
+      }
+    },
+    {
+      "reviewedAt": "2026-09-05T19:56:49.734Z",
+      "status": "APPROVED",
+      "reviewedBy": "Proprietario (Master)",
+      "submittedAt": "2026-09-05T19:56:05.300Z",
+      "desiredRole": "Responsabile Del Presidio",
+      "token": "EMS-KP28RC",
+      "cdaData": {
+        "cdaActionBy": "Proprietario (Master)",
+        "status": "APPROVED",
+        "cdaActionAt": "2026-09-05T19:56:49.734Z",
+        "cdaActionRole": "Proprietario (Master)",
+        "cdaActionReason": "Candidatura accettata gia' precedentemente 10 voti positivi 1 contrario"
+      },
+      "currentRole": "V. Responsabile Del Presidio",
+      "offerText": "La mia Esperienza che porto in EMS da quando ho inziato è sempre quella di dare il massimo in ogni reparto in cui sono , non tirandomi mai indietro in nessuna difficolta e sopratutto dando sempre il massimo in ogni mansione e responsabilità che mi viene assegnata, mi reputo una persona molto efficiente e in grado di reggere qualsiasi situazione , i miei punti di forza sono impegno costante , determinazione e grande ambizione senza mai pormi dei limiti, affidabilità e capacità di lavorare sotto pressione e disponibilità nel lavoro di squadra con i colleghi, il mio contributo nel reparto che richiedo la promozione è quello di un controllo constante dei colleghi cosi da evitare l'uso di oggetti illegali in servizio che possono compromettere la visibilità dell'EMS o situazioni poco gradevoli, sono sempre disponibile ad aiutare colleghi con qualsiasi dubbio in testa , rispondendo in maniera corretta e professionale ad ogni loro domanda o dubbio di qualsiasi genere , se c'è bisogno sono sempre pronto anche a formare dei tirocinanti nel caso ci fosse necessità.. Sono molto motivato ad essere promosso perchè mi sono posto come obbiettivo quello di ritornare con il tempo e il duro lavoro ai livelli di un tempo, ovviamente dove ho sbagliato l'ho capito e quindi sono più che sicuro che gli errori commessi in passato non ripresenteranno più , quindi non mi pongo limiti e in qualsiasi grado fino ad ora sono stato ho sempre dato e continuerò a dare il mio massimo senza mai adagiarmi sugli allori!, oltre a quello che faccio in game sono sempre molto disponibile anche a livello di discord , stando sempre attento ai ticket e a qualsiasi fabbisogno viene richiesto , l'EMS per me è un lavoro serio e non come lo vedono tanti come un passatempo da non dedicarci impegno e serietà.\n.\n.\n.\n.",
+      "id": "CAND-1788638165300-2085",
+      "timeSlot": "Mattina e pomeriggio sempre , la sera in base a quando lavoro altrimenti ci sono sempre e anche la notte",
+      "fullName": "Kevin Panetto"
+    },
+    {
+      "reviewedBy": "Proprietario (Master)",
+      "cdaData": {
+        "cdaActionAt": "2026-09-06T08:44:03.031Z",
+        "cdaActionRole": "Proprietario (Master)",
+        "votingStartedAt": "2026-09-06T08:42:33.921Z",
+        "expiresAt": "2026-09-07T08:42:33.921Z",
+        "cdaActionReason": "RIFIUTATA DA PARTE DI UNO DEI CONSIGLIERI FINALE CDA",
+        "cdaActionBy": "Proprietario (Master)",
+        "votes": {},
+        "status": "RETURNED"
+      },
+      "reviewedAt": "2026-09-06T08:44:03.031Z",
+      "currentRole": "V. Responsabile Del Presidio",
+      "status": "REJECTED",
+      "id": "CAND-1788633931991-F870",
+      "desiredRole": "Responsabile Del Presidio",
+      "offerText": "abbastanza conoscenza dell'ambiente nell'ems mi ritengo una persona imparziale e cerco sempre di mettermi nei panni degli altri, \ncome servizio cerchero di coprire i buchi di orari dove mancano alcuni funzionari,  soprattutto visto che mi e' capitato spesso di trovare in pochi addetti alle promorzioni \ncosi da poter abbreviare i tempi di formazioni ed entrate nei vari reparti facendo direttamente io se sono attivo magari ad un orario in cui ci sono pochi, \nper i controlli in alpha cercherei di garantire un ambiente piu serio, oltre a questo ho notato una carenza di supervisori attivi ultimamente almeno per questo periodo o entrare sotto prova in modo da coprire questo buco. \noltre al mio operatore vorrei provare ad alzare la voce su alcune problematiche con alcuni reparti che vengono non dico tralasciati ma oramai sono li solo in vetrina e raramente qualcuno e' interessato,\nfaro il possibile per risolvere alcune questioni interne riguardante come i gradi piu bassi guardano i direttori/proprietari non c'e abbastanza comprensione tra loro, inoltre spererei in un nuovo sistema di meritocrazia non basato solo su segnalazioni positive o cio' che e'\nstato visto in game perche' se una persona si fa 50 ore ma poi non viene valutato perche magari si e preso un warn per un errore magari per qualche incomprensione e l'ha fatto proprio quando c'erano degli alti gradi in servizio si dovrebbe anche tenere conto di quello che ha fatto mentre non c'era nessuno, un sistema di monitoraggio che cerchi di calibrare efficienza a lavoro (se ha fatto tanto mentre era in servizio) e correttezza dell'operato (se ci sono state segnalazioni di permessi effettuati in modo sbagliato o fatture sbagliate) e da questo si tiene una specie di percentuale di operato corretto in rapporto alle ore fatte e alla correttezza",
+      "timeSlot": "disponibile tutto il giorno per entrare in servizio al momento in caso sono comunque disponibile nel fascio orario serale o notte.",
+      "fullName": "Rick Maltese",
+      "token": "EMS-RM6E9E",
+      "rejectionReason": "RIFIUTATA DA PARTE DI UNO DEI CONSIGLIERI FINALE CDA",
+      "submittedAt": "2026-09-05T18:45:31.991Z"
+    },
+    {
+      "currentRole": "Primario",
+      "reviewedAt": "2026-09-06T20:08:52.966Z",
+      "timeSlot": "variano... ma posso tutti i giorni",
+      "fullName": "Vincenzo Escobar",
+      "reviewedBy": "Sistema CDA (Timer 24h)",
+      "status": "APPROVED",
+      "desiredRole": "V. Primario di Reparto",
+      "cdaData": {
+        "renderedByRole": "Proprietario (Master)",
+        "renderedAt": "2026-09-05T18:43:13.599Z",
+        "cdaActionRole": "Sistema Automatico",
+        "status": "APPROVED",
+        "cdaActionReason": "Approvata automaticamente per maggioranza favorevole alla scadenza del timer 24h (4 favorevoli, 1 contrari, 2 astenuti).",
+        "renderedBy": "Proprietario (Master)",
+        "cdaActionAt": "2026-09-06T20:08:52.966Z",
+        "votes": {
+          "jonathan_giacomarra": {
+            "decision": "FAVOREVOLE",
+            "timestamp": "2026-09-05T19:53:50.565Z",
+            "voterToken": "EMS-JG211B",
+            "reason": "...",
+            "voterRole": "Membro CDA",
+            "voterName": "Jonathan Giacomarra"
+          },
+          "simone_rizzus": {
+            "timestamp": "2026-09-05T19:54:39.240Z",
+            "voterToken": "EMS-2410PROP",
+            "decision": "FAVOREVOLE",
+            "voterName": "Simone Rizzus",
+            "voterRole": "Proprietario (Master)"
+          },
+          "filippo_ciro": {
+            "voterRole": "Membro CDA",
+            "voterName": "Filippo Ciro",
+            "timestamp": "2026-09-05T18:48:10.766Z",
+            "reason": "A parere mio ha bisogno di ancora qualche giorno di esperienza",
+            "decision": "CONTRARIO",
+            "voterToken": "EMS-FC6767"
+          },
+          "dutch_esposito": {
+            "decision": "FAVOREVOLE",
+            "voterRole": "Vice Presidente CDA",
+            "voterName": "Dutch Esposito",
+            "timestamp": "2026-09-05T19:06:21.767Z",
+            "reason": "BRAVO RAGAZZO , COMPETENTE",
+            "voterToken": "EMS-DEC97C"
+          },
+          "giuseppe_politics": {
+            "decision": "ASTENUTO",
+            "reason": "mai visto",
+            "voterToken": "EMS-GP67SC",
+            "timestamp": "2026-09-05T20:19:34.044Z",
+            "voterRole": "Membro CDA",
+            "voterName": "Giuseppe Politics"
+          },
+          "ares_migliorini": {
+            "voterToken": "EMS-AM59DB",
+            "voterName": "Ares Migliorini",
+            "voterRole": "Membro CDA",
+            "timestamp": "2026-09-05T18:58:21.918Z",
+            "reason": "Non ho elementi sufficienti per valutare.",
+            "decision": "ASTENUTO"
+          },
+          "giovanni_manzo": {
+            "voterRole": "Proprietario (Master)",
+            "voterName": "Giovanni Manzo",
+            "decision": "FAVOREVOLE",
+            "timestamp": "2026-09-05T20:26:01.193Z",
+            "voterToken": "EMS-2410PROP"
+          }
+        },
+        "expiresAt": "2026-09-06T18:43:13.599Z",
+        "cdaActionBy": "Sistema CDA (Timer 24h)"
+      },
+      "submittedAt": "2026-09-05T18:17:23.682Z",
+      "id": "CAND-1788632243682-3CF9",
+      "offerText": "Spettabile Direzione,\n\ndesidero sottoporre alla vostra attenzione la mia candidatura per il passaggio a Funzionario.\nIl mio percorso poggia su una solida esperienza nel soccorso, arricchita da un passato in un’altra realtà cittadina da cui ho scelto consapevolmente di ripartire da zero, senza richiedere reintegri. Questa decisione mi ha permesso di dimostrare dedizione sul campo, consolidando competenze tecniche e maturità operativa.\nIn servizio ho sempre garantito massima professionalità e rispetto verso colleghi e utenza, mantenendo uno storico disciplinare impeccabile (zero warn). Assicuro inoltre una presenza costante, coprendo con regolarità anche le fasce notturne per garantire la continuità operativa del dipartimento.\nQuesto avanzamento mi permetterebbe di mettere a disposizione una visione gestionale più strutturata, supportando attivamente il coordinamento del personale, l'affiancamento delle nuove leve e offrendo un contributo concreto e responsabile alla crescita dell'EMS.\n\nRingraziandovi per il tempo e la valutazione, resto a disposizione per qualsiasi confronto.\n\nCordiali saluti,\nVincenzo Escobar"
+    },
+    {
+      "cdaData": {
+        "cdaActionAt": "2026-09-05T18:14:19.785Z",
+        "cdaActionBy": "Proprietario (Master)",
+        "cdaActionReason": "accettata già precendente 11 voti positivi",
+        "cdaActionRole": "Proprietario (Master)",
+        "status": "APPROVED"
+      },
+      "submittedAt": "2026-09-05T18:14:00.717Z",
+      "desiredRole": "Responsabile Del Presidio",
+      "status": "APPROVED",
+      "reviewedBy": "Proprietario (Master)",
+      "token": "EMS-ML373T",
+      "reviewedAt": "2026-09-05T18:14:19.785Z",
+      "offerText": "Mi contraddistinguo per serietà, affidabilità e spirito di collaborazione, mantenendo sempre un atteggiamento professionale, rispettoso e disponibile nei confronti di colleghi e superiori.\nUno dei miei principali punti di forza è la capacità di utilizzare l’applicativo in autonomia. Grazie alla mia lunga esperienza nell’utilizzo del PC e della tecnologia, possiedo una buona predisposizione all’apprendimento di nuovi strumenti e funzionalità. Riesco a comprenderne rapidamente il funzionamento e a utilizzarli con sicurezza, precisione ed efficienza.\nSono una persona costante, determinata e motivata a migliorarmi. Mi impegno a svolgere con attenzione e responsabilità ogni compito che mi viene affidato, mettendomi a disposizione del reparto e dei colleghi quando necessario.\nCredo fortemente nel lavoro di squadra e nella collaborazione, elementi fondamentali per garantire un servizio EMS efficiente, organizzato e professionale.\nGrazie per l'attenzione",
+      "id": "CAND-1788632040716-2A0E",
+      "timeSlot": "Principalmente pomeriggio e sera, con disponibilità anche durante la mattina quando possibile. Nel weekend la mia disponibilità varia in base agli imp",
+      "fullName": "Mirko Leone",
+      "currentRole": "V. Responsabile Del Presidio"
+    },
+    {
+      "status": "APPROVED",
+      "reviewedAt": "2026-08-24T21:21:44.827Z",
+      "cdaData": {
+        "renderedBy": "Proprietario (Master)",
+        "status": "APPROVED",
+        "renderedAt": "2026-08-22T11:34:03.169Z",
+        "expiresAt": "2026-08-23T11:34:03.169Z",
+        "votes": {
+          "theo_smith": {
+            "timestamp": "2026-08-22T13:10:28.811Z",
+            "voterToken": "EMS-TSD286",
+            "voterRole": "Presidente CDA",
+            "voterName": "Theo Smith",
+            "decision": "FAVOREVOLE"
+          },
+          "giovanni_manzo": {
+            "timestamp": "2026-08-22T11:37:20.488Z",
+            "voterToken": "080704",
+            "decision": "FAVOREVOLE",
+            "reason": "Favorevole con riserva (in prova), deve fare di più",
+            "voterName": "Giovanni Manzo",
+            "voterRole": "Proprietario"
+          },
+          "simone_rizzus": {
+            "voterToken": "EMS-2410PROP",
+            "decision": "CONTRARIO",
+            "voterName": "Simone Rizzus",
+            "voterRole": "Proprietario (Master)",
+            "timestamp": "2026-08-22T11:37:45.001Z"
+          },
+          "antony_romano": {
+            "timestamp": "2026-08-22T11:49:37.284Z",
+            "voterToken": "EMS-AR693D",
+            "voterRole": "Proprietario",
+            "voterName": "Antony Romano",
+            "decision": "FAVOREVOLE"
+          },
+          "ares_migliorini": {
+            "decision": "FAVOREVOLE",
+            "voterName": "Ares Migliorini",
+            "voterRole": "Membro CDA",
+            "voterToken": "EMS-AM59DB",
+            "reason": "Non ce lo vedo male come primario di reparto, alla fine le cose le fa bene e non causa problemi. Si vede che ha voglia di salire seriamente e non tanto per.",
+            "timestamp": "2026-08-22T13:00:47.492Z"
+          }
+        },
+        "cdaActionRole": "Sistema Automatico",
+        "cdaActionAt": "2026-08-24T21:21:44.827Z",
+        "cdaActionReason": "Approvata automaticamente per maggioranza favorevole alla scadenza del timer 24h (4 favorevoli, 1 contrari, 0 astenuti).",
+        "renderedByRole": "Proprietario (Master)",
+        "cdaActionBy": "Sistema CDA (Timer 24h)"
+      },
+      "reviewedBy": "Sistema CDA (Timer 24h)",
+      "currentRole": "V. Primario di Reparto",
+      "token": "EMS-LR37DF",
+      "offerText": "Salve, vorrei proporre la mia candidatura per l'aumento di grado all'interno dell'EMS.\n\nRitengo di avere le qualità necessarie per ricoprire un grado maggiore, soprattutto per la mia disponibilità nell'aiutare gli altri e nel collaborare con i miei colleghi. Cerco sempre di essere presente quando c'è bisogno di una mano e di comportarmi in modo serio e professionale.\n\nPenso inoltre di avere le capacità e le conoscenze necessarie per assumermi maggiori responsabilità all'interno dell'EMS. Con il nuovo grado vorrei continuare a migliorare, aiutare i membri con meno esperienza e contribuire positivamente alla crescita del reparto.\n\nInoltre, con l'aumento di grado, vorrei poter dare il mio contributo anche nella gestione e nelle risposte ai ticket, aiutando le persone che ne avranno bisogno.\n\nSono motivato a dimostrare di meritare questa opportunità e a dare il massimo per l'EMS.",
+      "submittedAt": "2026-08-22T08:47:36.531Z",
+      "desiredRole": "Primario di Reparto",
+      "id": "CAND-1787388456531-B90E",
+      "fullName": "Logan Red",
+      "timeSlot": "TUTTI I GIORNI SERA / POMERIGGIO"
+    },
+    {
+      "currentRole": "Primario",
+      "fullName": "Massimo Arresto",
+      "timeSlot": "Lun-Dom 15-17 / 23:00 - 02:00",
+      "id": "CAND-1787010152321-080B",
+      "status": "APPROVED",
+      "desiredRole": "V. Primario di Reparto",
+      "submittedAt": "2026-08-17T23:42:32.321Z",
+      "reviewedAt": "2026-08-19T12:56:24.905Z",
+      "offerText": "Presento la mia candidatura per il ruolo di V. Primario di Reparto forte dell'esperienza maturata come Primario, durante la quale ho dimostrato costante presenza, professionalità e rispetto delle procedure EMS.\nNel corso del mio servizio ho acquisito un'ottima conoscenza del regolamento interno e della gestione dei vari interventi, mantenendo sempre un'etica lavorativa impeccabile, basata su serietà, imparzialità e rispetto nei confronti sia dei cittadini che dei colleghi.\nCome V. Primario di Reparto, il mio obiettivo è contribuire all'efficienza e alla crescita del reparto, garantendo una supervisione costante e un supporto attivo nei momenti di maggiore affluenza o gestione delle emergenze.\nOffro totale disponibilità per l'affiancamento, la formazione e il tutoraggio delle nuove leve, aiutandole a integrarsi rapidamente e ad apprendere le corrette dinamiche dell'EMS.\nLa motivazione che mi spinge a richiedere questa promozione nasce dal desiderio di assumere maggiori responsabilità, mettendo la mia esperienza al servizio della Direzione e della crescita qualitativa di tutto il corpo sanitario.",
+      "reviewedBy": "Proprietario (Master)",
+      "cdaData": {
+        "cdaActionBy": "Proprietario (Master)",
+        "votes": {
+          "giovanni_manzo": {
+            "voterToken": "080704",
+            "voterName": "Giovanni Manzo",
+            "voterRole": "Proprietario",
+            "decision": "FAVOREVOLE",
+            "timestamp": "2026-08-18T20:53:36.298Z"
+          },
+          "diego_trombini": {
+            "timestamp": "2026-08-18T17:55:51.496Z",
+            "voterToken": "EMS-DT0311",
+            "voterName": "Diego Trombini",
+            "decision": "FAVOREVOLE",
+            "voterRole": "Membro CDA"
+          },
+          "ciccio_losavio": {
+            "decision": "FAVOREVOLE",
+            "voterToken": "EMS-CLA9CC",
+            "timestamp": "2026-08-19T09:05:34.266Z",
+            "voterName": "Ciccio Losavio",
             "voterRole": "Membro CDA"
           },
           "filippo_ciro": {
-            "timestamp": "2026-08-18T20:52:46.294Z",
             "voterToken": "EMS-FC6767",
             "voterRole": "Membro CDA",
-            "decision": "FAVOREVOLE",
-            "voterName": "Filippo Ciro"
+            "voterName": "Filippo Ciro",
+            "timestamp": "2026-08-18T20:52:46.294Z",
+            "decision": "FAVOREVOLE"
           }
-        }
-      },
-      "desiredRole": "V. Primario di Reparto",
-      "submittedAt": "2026-08-17T23:42:32.321Z",
-      "timeSlot": "Lun-Dom 15-17 / 23:00 - 02:00",
-      "currentRole": "Primario",
-      "reviewedBy": "Proprietario (Master)",
-      "status": "APPROVED",
-      "id": "CAND-1787010152321-080B"
+        },
+        "expiresAt": "2026-08-19T17:28:29.125Z",
+        "cdaActionRole": "Proprietario (Master)",
+        "votingStartedAt": "2026-08-18T17:28:29.125Z",
+        "status": "APPROVED",
+        "cdaActionAt": "2026-08-19T12:56:24.905Z",
+        "cdaActionReason": "ESITO POSITIVO"
+      }
     },
     {
-      "fullName": "Mirko Leone",
-      "submittedAt": "2026-08-16T19:04:54.834Z",
       "token": "EMS-ML373T",
+      "submittedAt": "2026-08-16T19:04:54.834Z",
       "desiredRole": "V. Responsabile Del Presidio",
-      "id": "CAND-1786907094834-FCED",
+      "reviewedAt": "2026-08-17T19:36:30.735Z",
+      "offerText": "Fin dal mio ingresso nel corpo EMS mi sono impegnato a svolgere il servizio con costanza, serietà e spirito di collaborazione.\nRitengo che i miei principali punti di forza siano l'affidabilità, la calma sotto pressione e il rispetto della gerarchia. Mi piace lavorare in squadra, contribuire a creare un ambiente di lavoro positivo, aiutando i colleghi quando necessario.\nIl mio obiettivo è crescere all'interno del reparto, assumermi maggiori responsabilità e dare un contributo concreto alla qualità del servizio EMS. \nSono pienamente disponibile ad affiancare i colleghi, supportare i nuovi membri durante il loro percorso di crescita e collaborare  quando ce n'è bisogno. Credo che il confronto e il lavoro di squadra siano fondamentali per migliorare come singoli e come corpo.\nLa mia motivazione per questa promozione nasce dalla voglia di continuare a crescere e dimostrare che l'impegno costante viene accompagnato dai fatti. Voglio mettermi in gioco con ancora più responsabilità, rappresentare al meglio l'EMS e contribuire ogni giorno al buon funzionamento del reparto.",
       "reviewedBy": "Sistema CDA (Timer 24h)",
-      "currentRole": "Primario di Reparto",
       "cdaData": {
-        "cdaActionRole": "Sistema Automatico",
-        "expiresAt": "2026-08-17T19:35:36.166Z",
         "renderedByRole": "Proprietario (Master)",
-        "cdaActionBy": "Sistema CDA (Timer 24h)",
-        "renderedAt": "2026-08-16T19:35:36.166Z",
+        "cdaActionAt": "2026-08-17T19:36:30.735Z",
+        "status": "APPROVED",
         "cdaActionReason": "Approvata automaticamente per maggioranza favorevole alla scadenza del timer 24h (7 favorevoli, 0 contrari, 0 astenuti).",
-        "renderedBy": "Proprietario (Master)",
+        "cdaActionBy": "Sistema CDA (Timer 24h)",
+        "cdaActionRole": "Sistema Automatico",
         "votes": {
+          "giovanni_manzo": {
+            "timestamp": "2026-08-16T19:37:31.253Z",
+            "voterToken": "080704",
+            "voterName": "Giovanni Manzo",
+            "voterRole": "Proprietario",
+            "decision": "FAVOREVOLE"
+          },
           "luca_brizzante": {
-            "voterName": "Luca Brizzante",
-            "voterRole": "Segretario CDA",
             "timestamp": "2026-08-16T19:48:56.894Z",
+            "voterRole": "Segretario CDA",
+            "voterName": "Luca Brizzante",
             "decision": "FAVOREVOLE",
             "voterToken": "EMS-LBC6A6"
           },
           "dutch_esposito": {
-            "voterName": "Dutch Esposito",
-            "decision": "FAVOREVOLE",
-            "voterRole": "Membro CDA",
+            "voterToken": "EMS-DEC97C",
             "timestamp": "2026-08-16T20:29:55.325Z",
-            "voterToken": "EMS-DEC97C"
-          },
-          "theo_smith": {
-            "voterToken": "EMS-TSD286",
-            "timestamp": "2026-08-16T19:42:51.411Z",
-            "voterName": "Theo Smith",
-            "voterRole": "Presidente CDA",
+            "voterRole": "Membro CDA",
+            "voterName": "Dutch Esposito",
             "decision": "FAVOREVOLE"
           },
-          "ciccio_losavio": {
-            "voterToken": "EMS-CLA9CC",
-            "timestamp": "2026-08-17T07:42:51.110Z",
-            "decision": "FAVOREVOLE",
-            "voterName": "Ciccio Losavio",
-            "voterRole": "Membro CDA"
+          "theo_smith": {
+            "timestamp": "2026-08-16T19:42:51.411Z",
+            "voterRole": "Presidente CDA",
+            "voterName": "Theo Smith",
+            "voterToken": "EMS-TSD286",
+            "decision": "FAVOREVOLE"
           },
           "ares_migliorini": {
             "reason": "Deve migliorare molto, ma ci può stare.",
-            "voterToken": "EMS-AM59DB",
+            "timestamp": "2026-08-16T19:54:36.678Z",
             "voterName": "Ares Migliorini",
             "voterRole": "Membro CDA",
             "decision": "FAVOREVOLE",
-            "timestamp": "2026-08-16T19:54:36.678Z"
+            "voterToken": "EMS-AM59DB"
           },
           "simone_rizzus": {
+            "decision": "FAVOREVOLE",
+            "voterToken": "EMS-2410PROP",
             "timestamp": "2026-08-16T19:36:31.239Z",
-            "decision": "FAVOREVOLE",
-            "voterName": "Simone Rizzus",
             "voterRole": "Proprietario (Master)",
-            "voterToken": "EMS-2410PROP"
+            "voterName": "Simone Rizzus"
           },
-          "giovanni_manzo": {
-            "timestamp": "2026-08-16T19:37:31.253Z",
-            "voterToken": "080704",
-            "decision": "FAVOREVOLE",
-            "voterName": "Giovanni Manzo",
-            "voterRole": "Proprietario"
+          "ciccio_losavio": {
+            "voterRole": "Membro CDA",
+            "voterName": "Ciccio Losavio",
+            "voterToken": "EMS-CLA9CC",
+            "timestamp": "2026-08-17T07:42:51.110Z",
+            "decision": "FAVOREVOLE"
           }
         },
-        "cdaActionAt": "2026-08-17T19:36:30.735Z",
-        "status": "APPROVED"
+        "expiresAt": "2026-08-17T19:35:36.166Z",
+        "renderedAt": "2026-08-16T19:35:36.166Z",
+        "renderedBy": "Proprietario (Master)"
       },
+      "currentRole": "Primario di Reparto",
       "status": "APPROVED",
-      "timeSlot": "Solitamente dal lunedì al venerdì sono disponibile mattina, pomeriggio e sera. Nel weekend la disponibilità varia in base agli impegni.",
-      "reviewedAt": "2026-08-17T19:36:30.735Z",
-      "offerText": "Fin dal mio ingresso nel corpo EMS mi sono impegnato a svolgere il servizio con costanza, serietà e spirito di collaborazione.\nRitengo che i miei principali punti di forza siano l'affidabilità, la calma sotto pressione e il rispetto della gerarchia. Mi piace lavorare in squadra, contribuire a creare un ambiente di lavoro positivo, aiutando i colleghi quando necessario.\nIl mio obiettivo è crescere all'interno del reparto, assumermi maggiori responsabilità e dare un contributo concreto alla qualità del servizio EMS. \nSono pienamente disponibile ad affiancare i colleghi, supportare i nuovi membri durante il loro percorso di crescita e collaborare  quando ce n'è bisogno. Credo che il confronto e il lavoro di squadra siano fondamentali per migliorare come singoli e come corpo.\nLa mia motivazione per questa promozione nasce dalla voglia di continuare a crescere e dimostrare che l'impegno costante viene accompagnato dai fatti. Voglio mettermi in gioco con ancora più responsabilità, rappresentare al meglio l'EMS e contribuire ogni giorno al buon funzionamento del reparto."
+      "id": "CAND-1786907094834-FCED",
+      "fullName": "Mirko Leone",
+      "timeSlot": "Solitamente dal lunedì al venerdì sono disponibile mattina, pomeriggio e sera. Nel weekend la disponibilità varia in base agli impegni."
     },
     {
-      "currentRole": "V. Primario di Reparto",
-      "token": "EMS-AP34FW",
-      "fullName": "Antonio Palermo",
-      "offerText": "salve sono contento di fare parte del Ems mi reputo una persona molto seria.\n Sono quasi sempre disponibile grazie ai miei colleghi sto crescendo sempre più.\nFaccio questo lavoro per passione come ho dimostrato.\nvorrei crescere al'Ems perche voglio dare sempre più lo faccio con piacere.\nSpero di meritare questa promozione e di non farvi perdere tempo\nGrazie della attenzione cordiali saluti Antonio Palermo",
       "reviewedBy": "Sistema CDA (Timer 24h)",
-      "submittedAt": "2026-08-16T17:15:07.554Z",
-      "desiredRole": "Primario di Reparto",
-      "timeSlot": "lunedi-domenica 17:00/06:00",
       "reviewedAt": "2026-08-17T17:16:29.856Z",
+      "offerText": "salve sono contento di fare parte del Ems mi reputo una persona molto seria.\n Sono quasi sempre disponibile grazie ai miei colleghi sto crescendo sempre più.\nFaccio questo lavoro per passione come ho dimostrato.\nvorrei crescere al'Ems perche voglio dare sempre più lo faccio con piacere.\nSpero di meritare questa promozione e di non farvi perdere tempo\nGrazie della attenzione cordiali saluti Antonio Palermo",
       "cdaData": {
-        "expiresAt": "2026-08-17T17:16:25.504Z",
+        "cdaActionBy": "Sistema CDA (Timer 24h)",
+        "renderedAt": "2026-08-16T17:16:25.504Z",
+        "cdaActionReason": "Approvata automaticamente per maggioranza favorevole alla scadenza del timer 24h (7 favorevoli, 0 contrari, 0 astenuti).",
         "cdaActionAt": "2026-08-17T17:16:29.856Z",
         "renderedBy": "Giovanni Manzo",
         "renderedByRole": "Proprietario",
+        "expiresAt": "2026-08-17T17:16:25.504Z",
         "votes": {
-          "giovanni_manzo": {
-            "voterRole": "Proprietario",
-            "voterName": "Giovanni Manzo",
-            "decision": "FAVOREVOLE",
-            "timestamp": "2026-08-16T17:16:42.643Z",
-            "voterToken": "080704"
+          "theo_smith": {
+            "voterToken": "EMS-TSD286",
+            "voterName": "Theo Smith",
+            "voterRole": "Presidente CDA",
+            "timestamp": "2026-08-16T17:20:36.545Z",
+            "decision": "FAVOREVOLE"
           },
           "ciccio_losavio": {
             "voterName": "Ciccio Losavio",
             "voterRole": "Membro CDA",
-            "decision": "FAVOREVOLE",
             "timestamp": "2026-08-17T07:43:04.653Z",
-            "voterToken": "EMS-CLA9CC"
+            "voterToken": "EMS-CLA9CC",
+            "decision": "FAVOREVOLE"
+          },
+          "dutch_esposito": {
+            "timestamp": "2026-08-16T20:29:47.458Z",
+            "voterToken": "EMS-DEC97C",
+            "voterName": "Dutch Esposito",
+            "voterRole": "Membro CDA",
+            "decision": "FAVOREVOLE"
           },
           "simone_rizzus": {
-            "voterRole": "Proprietario (Master)",
-            "voterName": "Simone Rizzus",
             "decision": "FAVOREVOLE",
             "timestamp": "2026-08-16T17:50:03.755Z",
+            "voterName": "Simone Rizzus",
+            "voterRole": "Proprietario (Master)",
             "voterToken": "EMS-2410PROP"
           },
           "ares_migliorini": {
+            "timestamp": "2026-08-16T19:46:14.744Z",
             "voterName": "Ares Migliorini",
-            "voterToken": "EMS-AM59DB",
             "voterRole": "Membro CDA",
-            "decision": "FAVOREVOLE",
             "reason": "Credo che onestamente ci sta come candidatura, è sensata. Effettivamente fa il suo lavoro e si impegna tanto, quindi non vedo perché non farlo salire un minimo.",
-            "timestamp": "2026-08-16T19:46:14.744Z"
-          },
-          "dutch_esposito": {
             "decision": "FAVOREVOLE",
-            "timestamp": "2026-08-16T20:29:47.458Z",
-            "voterName": "Dutch Esposito",
-            "voterToken": "EMS-DEC97C",
-            "voterRole": "Membro CDA"
+            "voterToken": "EMS-AM59DB"
+          },
+          "giovanni_manzo": {
+            "timestamp": "2026-08-16T17:16:42.643Z",
+            "voterToken": "080704",
+            "voterName": "Giovanni Manzo",
+            "voterRole": "Proprietario",
+            "decision": "FAVOREVOLE"
           },
           "luca_brizzante": {
             "timestamp": "2026-08-16T19:48:52.359Z",
-            "voterToken": "EMS-LBC6A6",
-            "decision": "FAVOREVOLE",
             "voterRole": "Segretario CDA",
-            "voterName": "Luca Brizzante"
-          },
-          "theo_smith": {
+            "voterName": "Luca Brizzante",
             "decision": "FAVOREVOLE",
-            "timestamp": "2026-08-16T17:20:36.545Z",
-            "voterName": "Theo Smith",
-            "voterToken": "EMS-TSD286",
-            "voterRole": "Presidente CDA"
+            "voterToken": "EMS-LBC6A6"
           }
         },
-        "renderedAt": "2026-08-16T17:16:25.504Z",
-        "cdaActionBy": "Sistema CDA (Timer 24h)",
-        "cdaActionReason": "Approvata automaticamente per maggioranza favorevole alla scadenza del timer 24h (7 favorevoli, 0 contrari, 0 astenuti).",
         "status": "APPROVED",
         "cdaActionRole": "Sistema Automatico"
       },
+      "currentRole": "V. Primario di Reparto",
+      "timeSlot": "lunedi-domenica 17:00/06:00",
+      "fullName": "Antonio Palermo",
       "id": "CAND-1786900507554-75E3",
-      "status": "APPROVED"
+      "submittedAt": "2026-08-16T17:15:07.554Z",
+      "token": "EMS-AP34FW",
+      "status": "APPROVED",
+      "desiredRole": "Primario di Reparto"
     },
     {
+      "reviewedBy": "Sistema CDA (Timer 24h)",
+      "reviewedAt": "2026-08-16T09:33:19.278Z",
+      "token": "EMS-NLDF73",
       "cdaData": {
-        "cdaActionAt": "2026-08-16T09:33:19.278Z",
+        "renderedBy": "Giovanni Manzo",
+        "cdaActionBy": "Sistema CDA (Timer 24h)",
+        "cdaActionRole": "Sistema Automatico",
+        "cdaActionReason": "Rifiutata automaticamente per maggioranza contraria alla scadenza del timer 24h (3 favorevoli, 4 contrari, 0 astenuti).",
         "status": "REJECTED",
+        "cdaActionAt": "2026-08-16T09:33:19.278Z",
+        "renderedAt": "2026-08-15T09:04:01.149Z",
         "votes": {
-          "igor_lestrange": {
-            "timestamp": "2026-08-15T09:56:12.385Z",
-            "reason": "Favorevole",
-            "voterToken": "EMS-ILB5D2",
-            "decision": "FAVOREVOLE",
-            "voterName": "Igor Lestrange",
-            "voterRole": "Membro CDA"
-          },
-          "giovanni_manzo": {
-            "voterName": "Giovanni Manzo",
-            "voterRole": "Proprietario",
-            "decision": "CONTRARIO",
-            "timestamp": "2026-08-15T09:08:11.055Z",
-            "reason": "A Primario di Reparto",
-            "voterToken": "080704"
-          },
           "matias_corleone": {
             "voterRole": "Vice Presidente CDA",
-            "reason": "È sempre stato molto presente e molto attivo, svolge i compiti che gli vengono assegnati e ha senso di responsabilità. Ha una bella testa, ho avuto modo di confrontarmici insieme a Dutch quando fu del disguido con le promozioni straordinarie cda, e ha sempre usato toni e argomentazioni molto mature.",
             "voterName": "Matias Corleone",
-            "voterToken": "EMS-MCA496",
+            "reason": "È sempre stato molto presente e molto attivo, svolge i compiti che gli vengono assegnati e ha senso di responsabilità. Ha una bella testa, ho avuto modo di confrontarmici insieme a Dutch quando fu del disguido con le promozioni straordinarie cda, e ha sempre usato toni e argomentazioni molto mature.",
+            "decision": "FAVOREVOLE",
             "timestamp": "2026-08-15T09:09:28.254Z",
+            "voterToken": "EMS-MCA496"
+          },
+          "dutch_esposito": {
+            "timestamp": "2026-08-15T21:03:03.285Z",
+            "voterToken": "EMS-DEC97C",
+            "voterName": "Dutch Esposito",
+            "voterRole": "Membro CDA",
+            "decision": "CONTRARIO"
+          },
+          "jolyne_kujo": {
+            "decision": "CONTRARIO",
+            "timestamp": "2026-08-15T14:30:39.930Z",
+            "voterToken": "EMS-JK58DF",
+            "voterName": "Jolyne Kujo",
+            "reason": "per me non è adatto a ricoprire il ruolo di V.Resposabile del presidio, trolla ogni giorno e si rifiuta molte volte anche di fare delle istruzioni",
+            "voterRole": "Membro CDA"
+          },
+          "igor_lestrange": {
+            "timestamp": "2026-08-15T09:56:12.385Z",
+            "voterToken": "EMS-ILB5D2",
+            "reason": "Favorevole",
+            "voterRole": "Membro CDA",
+            "voterName": "Igor Lestrange",
             "decision": "FAVOREVOLE"
           },
           "ares_migliorini": {
-            "timestamp": "2026-08-15T10:57:23.488Z",
+            "decision": "CONTRARIO",
             "reason": "Secondo me potrebbe salire a primario di reparto, ma v. responsabile del presidio un poʻ too much per ora",
+            "timestamp": "2026-08-15T10:57:23.488Z",
             "voterToken": "EMS-AM59DB",
             "voterRole": "Membro CDA",
-            "voterName": "Ares Migliorini",
-            "decision": "CONTRARIO"
-          },
-          "dutch_esposito": {
-            "decision": "CONTRARIO",
-            "voterName": "Dutch Esposito",
-            "voterRole": "Membro CDA",
-            "voterToken": "EMS-DEC97C",
-            "timestamp": "2026-08-15T21:03:03.285Z"
-          },
-          "jolyne_kujo": {
-            "voterName": "Jolyne Kujo",
-            "voterRole": "Membro CDA",
-            "decision": "CONTRARIO",
-            "timestamp": "2026-08-15T14:30:39.930Z",
-            "reason": "per me non è adatto a ricoprire il ruolo di V.Resposabile del presidio, trolla ogni giorno e si rifiuta molte volte anche di fare delle istruzioni",
-            "voterToken": "EMS-JK58DF"
+            "voterName": "Ares Migliorini"
           },
           "theo_smith": {
             "voterName": "Theo Smith",
-            "voterToken": "EMS-TSD286",
             "voterRole": "Presidente CDA",
-            "decision": "FAVOREVOLE",
-            "timestamp": "2026-08-15T09:17:40.095Z"
+            "timestamp": "2026-08-15T09:17:40.095Z",
+            "voterToken": "EMS-TSD286",
+            "decision": "FAVOREVOLE"
+          },
+          "giovanni_manzo": {
+            "timestamp": "2026-08-15T09:08:11.055Z",
+            "decision": "CONTRARIO",
+            "voterName": "Giovanni Manzo",
+            "voterRole": "Proprietario",
+            "voterToken": "080704",
+            "reason": "A Primario di Reparto"
           }
         },
-        "renderedAt": "2026-08-15T09:04:01.149Z",
-        "cdaActionRole": "Sistema Automatico",
-        "renderedBy": "Giovanni Manzo",
         "expiresAt": "2026-08-16T09:04:01.149Z",
-        "cdaActionReason": "Rifiutata automaticamente per maggioranza contraria alla scadenza del timer 24h (3 favorevoli, 4 contrari, 0 astenuti).",
-        "renderedByRole": "Proprietario",
-        "cdaActionBy": "Sistema CDA (Timer 24h)"
+        "renderedByRole": "Proprietario"
       },
-      "timeSlot": "ci sono ogni giorno dalla mattina alla sera salvo imprevisti ovviamente e la domenica ci sono solo per qualche ora causa mare",
-      "currentRole": "V. Primario di Reparto",
-      "desiredRole": "V. Responsabile Del Presidio",
-      "reviewedAt": "2026-08-16T09:33:19.278Z",
-      "status": "REJECTED",
-      "reviewedBy": "Sistema CDA (Timer 24h)",
       "rejectionReason": "Rifiutata automaticamente per maggioranza contraria alla scadenza del timer 24h (3 favorevoli, 4 contrari, 0 astenuti).",
-      "id": "CAND-1786706515940-1973",
       "offerText": "Mi ritengo valido per ricoprire questo ruolo che attualmente risulta scoperto. Con questa posizione vuota potrei svolgere mansioni fondamentali come i rifornimenti, visto che ormai i medikit non durano nemmeno mezza giornata. Ovviamente all'EMS offro un minimo di 30 ore alla settimana, anche se ultimamente sto calando leggermente per impegni fuori città. Offro ovviamente professionalità, dedizione e aiuto lavorativo a tutti, specialmente ai tirocinanti quando non capiscono qualcosa o hanno bisogno di semplici info sull'EMS; inoltre offrirei una gestione del desk cercando di tenerlo ordinato anche nelle ore più caotiche. Poiché ci sono quasi sempre, offrirei anche attività sui vari reparti garantendo ai cittadini elisoccorsi rapidi, chirurgia sempre disponibile ecc. Ovviamente per l'EMS offrirei la presenza di un istruttore dei vari reparti sempre attivo; cerco poi sempre di fare i check radio per non far farmare il cartellino a coloro che lo fanno, e cerco sempre di trovare una soluzione prima di mettere i warn quando possibile, provando quindi a mantenere un ambiente sereno senza conflitti interni all'EMS. Spero che la mia candidatura sia accolta poiché credo che in questi mesi si sia notata la dedizione, l'impegno e il tempo che do alla fazione, e spero che questo sia solo uno dei primi step che svolgerò all'interno dei funzionari. Grazie per l'attenzione. Distinti saluti - Nick Larsson (ps: so che non sono passate due settimane dall'ultima promozione ma mando la candidatura ora poiche domani è ferragosto e domenica c'è la riunione)\n.\n.\n.\n.",
-      "token": "EMS-NLDF73",
+      "submittedAt": "2026-08-14T11:21:55.940Z",
+      "currentRole": "V. Primario di Reparto",
+      "status": "REJECTED",
+      "id": "CAND-1786706515940-1973",
+      "desiredRole": "V. Responsabile Del Presidio",
       "fullName": "Nick Larsson",
-      "submittedAt": "2026-08-14T11:21:55.940Z"
+      "timeSlot": "ci sono ogni giorno dalla mattina alla sera salvo imprevisti ovviamente e la domenica ci sono solo per qualche ora causa mare"
     }
   ],
   "cdaProposals": [],
-  "gameScores": [],
+  "gameScores": [
+    {
+      "id": "c2a4c169-1362-41d4-9707-8d5c68a264aa",
+      "name": "Hitler",
+      "date": "2026-09-08T10:01:37.067Z",
+      "level": 19,
+      "score": 3626
+    }
+  ],
   "roleElectionConfig": {
     "updatedAt": "2026-09-05T09:27:09.265Z",
-    "maxCandidatesPerRole": 1,
+    "updatedBy": "Proprietario (Master EMS)",
     "description": "Sessione di votazione per l'assegnazione e preferenza dei ruoli organizzativi, riservata a partire dal grado di Segretario Direzione in su.",
+    "maxCandidatesPerRole": 1,
+    "isOpen": true,
     "deadline": null,
-    "durationHours": 24,
     "title": "Votazione Ruoli Direzionale EMS",
     "roles": [
       "Direttore Sanitario",
@@ -961,108 +985,107 @@
       "V. Supervisore",
       "Primario di Reparto"
     ],
-    "updatedBy": "Proprietario (Master EMS)",
-    "isOpen": true
+    "durationHours": 24
   },
   "roleElectionCandidates": [
     {
-      "role": "Direttore Sanitario",
       "id": "recand-01",
-      "createdAt": "2026-09-05T09:13:01.562Z",
-      "name": "Luca Brizzante"
-    },
-    {
-      "id": "recand-02",
-      "name": "Matias Corleone",
-      "createdAt": "2026-09-05T09:13:01.562Z",
-      "role": "Direttore Sanitario"
-    },
-    {
-      "createdAt": "2026-09-05T09:13:01.562Z",
-      "name": "Igor Lestrenge",
-      "id": "recand-03",
-      "role": "V. Direttore Sanitario"
-    },
-    {
-      "id": "recand-04",
-      "createdAt": "2026-09-05T09:13:01.562Z",
-      "name": "Ares Migliorini",
-      "role": "V. Direttore Sanitario"
-    },
-    {
-      "role": "Segretario Direzione",
-      "createdAt": "2026-09-05T09:13:01.562Z",
-      "id": "recand-06",
-      "name": "Dutch Esposito"
-    },
-    {
-      "name": "Diego Trombini",
-      "role": "Supervisore Generale",
-      "createdAt": "2026-09-05T09:13:01.562Z",
-      "id": "recand-07"
-    },
-    {
-      "name": "Jonathan Giacomarra",
-      "role": "Supervisore",
-      "createdAt": "2026-09-05T09:13:01.562Z",
-      "id": "recand-08"
-    },
-    {
-      "role": "V. Supervisore",
-      "createdAt": "2026-09-05T09:13:01.562Z",
-      "id": "recand-09",
-      "name": "Rocco Ali"
-    },
-    {
-      "id": "recand-10",
-      "role": "Responsabile Del Presidio",
-      "name": "Rick Maltese",
+      "role": "Direttore Sanitario",
+      "name": "Luca Brizzante",
       "createdAt": "2026-09-05T09:13:01.562Z"
     },
     {
+      "name": "Matias Corleone",
+      "role": "Direttore Sanitario",
+      "id": "recand-02",
+      "createdAt": "2026-09-05T09:13:01.562Z"
+    },
+    {
+      "id": "recand-03",
+      "role": "V. Direttore Sanitario",
+      "name": "Igor Lestrenge",
+      "createdAt": "2026-09-05T09:13:01.562Z"
+    },
+    {
+      "createdAt": "2026-09-05T09:13:01.562Z",
+      "role": "V. Direttore Sanitario",
+      "name": "Ares Migliorini",
+      "id": "recand-04"
+    },
+    {
+      "role": "Segretario Direzione",
+      "name": "Dutch Esposito",
+      "createdAt": "2026-09-05T09:13:01.562Z",
+      "id": "recand-06"
+    },
+    {
+      "id": "recand-07",
+      "createdAt": "2026-09-05T09:13:01.562Z",
+      "role": "Supervisore Generale",
+      "name": "Diego Trombini"
+    },
+    {
+      "id": "recand-08",
+      "createdAt": "2026-09-05T09:13:01.562Z",
+      "role": "Supervisore",
+      "name": "Jonathan Giacomarra"
+    },
+    {
+      "createdAt": "2026-09-05T09:13:01.562Z",
+      "role": "V. Supervisore",
+      "name": "Rocco Ali",
+      "id": "recand-09"
+    },
+    {
+      "createdAt": "2026-09-05T09:13:01.562Z",
+      "name": "Rick Maltese",
+      "role": "Responsabile Del Presidio",
+      "id": "recand-10"
+    },
+    {
+      "role": "Segretario Direzione",
       "name": "Ciccio Losavio",
       "id": "recand-05",
-      "role": "Segretario Direzione",
       "createdAt": "2026-09-07T18:20:58.298Z"
     }
   ],
   "roleElectionVotes": [
     {
+      "id": "revote-0f0a3486-1be7-495d-ba4a-4c7cd178c2e7",
+      "timestamp": "2026-09-05T09:16:44.184Z",
+      "isOwnerKey": false,
       "voterName": "Jonathan Giacomarra",
       "voterRole": "Segretario Direzione",
       "motivation": "d\n\nD\nD\nD\nD\nD",
       "selections": {
-        "Direttore Sanitario": [
-          "Luca Brizzante"
+        "V. Direttore Sanitario": [
+          "Ares Migliorini"
         ],
         "Supervisore Generale": [
           "Diego Trombini"
         ],
-        "V. Direttore Sanitario": [
-          "Ares Migliorini"
+        "Direttore Sanitario": [
+          "Luca Brizzante"
         ],
         "Responsabile Del Presidio": [
           "Rick Maltese"
         ]
       },
-      "timestamp": "2026-09-05T09:16:44.184Z",
-      "id": "revote-0f0a3486-1be7-495d-ba4a-4c7cd178c2e7",
-      "isOwnerKey": false,
       "voterToken": "EMS-JG211B"
     },
     {
-      "voterToken": "EMS-2410PROP",
       "isOwnerKey": true,
-      "timestamp": "2026-09-05T09:27:15.042Z",
+      "voterRole": "Proprietario (Master)",
+      "voterName": "Proprietario (Master)",
       "selections": {
         "Direttore Sanitario": [
           "Luca Brizzante"
         ]
       },
-      "motivation": "",
+      "voterToken": "EMS-2410PROP",
       "id": "revote-aafa3731-a97f-4272-8332-e18784cde3af",
-      "voterName": "Proprietario (Master)",
-      "voterRole": "Proprietario (Master)"
+      "timestamp": "2026-09-05T09:27:15.042Z",
+      "motivation": ""
     }
   ]
 }

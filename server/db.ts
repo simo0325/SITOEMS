@@ -1013,6 +1013,46 @@ export async function deleteTokenFirestore(tokenStr: string, username?: string, 
   }
 }
 
+export async function batchSyncTokensFirestore(
+  tokensToDelete: string[],
+  tokensToSave: any[],
+  tokensToUnrevoke: string[] = []
+): Promise<void> {
+  if (!firestoreDb || firestoreQuotaExhausted) return;
+  try {
+    const snap = await getDocs(collection(firestoreDb, "employee_tokens"));
+    const deleteUpperSet = new Set(tokensToDelete.map((t) => t.toUpperCase()));
+    const batch = writeBatch(firestoreDb);
+
+    snap.forEach((d) => {
+      const data = d.data();
+      const docTokenUpper = (data?.token || d.id || "").toUpperCase();
+      if (deleteUpperSet.has(docTokenUpper) || deleteUpperSet.has(d.id.toUpperCase())) {
+        batch.delete(d.ref);
+      }
+    });
+
+    for (const tokenDoc of tokensToSave) {
+      if (tokenDoc && tokenDoc.token) {
+        const docRef = doc(firestoreDb, "employee_tokens", tokenDoc.token.toUpperCase());
+        batch.set(docRef, sanitizeForFirestore(tokenDoc));
+      }
+    }
+
+    for (const revToken of tokensToUnrevoke) {
+      const upperRev = revToken.toUpperCase();
+      const revRef = doc(firestoreDb, "revoked_tokens", upperRev);
+      batch.delete(revRef);
+      const purgedRef = doc(firestoreDb, "purged_tokens", upperRev);
+      batch.delete(purgedRef);
+    }
+
+    await batch.commit();
+  } catch (e) {
+    handleFirestoreError("batchSyncTokens", e);
+  }
+}
+
 export async function syncRevokedTokensFirestore(): Promise<any[]> {
   if (!firestoreDb || firestoreQuotaExhausted) return [];
   try {

@@ -362,12 +362,24 @@ export const TokenExcelImportModal: React.FC<TokenExcelImportModalProps> = ({
     setSubmitSuccess(null);
 
     try {
+      const tokenToUse = activeToken || localStorage.getItem("adminToken") || localStorage.getItem("discordToken") || "";
+      const empToken = localStorage.getItem("discordToken") || "";
+      const revName = localStorage.getItem("ems_reviewer_name") || "";
+
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${tokenToUse}`,
+      };
+      if (empToken) {
+        headers["X-Employee-Token"] = empToken;
+      }
+      if (revName && revName !== "Amministratore") {
+        headers["X-Reviewer-Name"] = revName;
+      }
+
       const response = await fetch("/api/admin/employee-tokens/import-excel", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${activeToken}`,
-        },
+        headers,
         body: JSON.stringify({
           mode: importMode,
           tokens: parsedRows.map((r) => ({
