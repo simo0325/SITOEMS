@@ -173,7 +173,9 @@ export interface DiscordUserSession {
   verifiedAt: string;
   token: string;
   isMaster?: boolean;
+  discordId?: string;
   discordTag?: string;
+  avatar?: string;
   cdaRoleName?: string;
   hasCdaAccess?: boolean;
   isTestToken?: boolean;

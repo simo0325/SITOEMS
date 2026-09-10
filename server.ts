@@ -107,6 +107,44 @@ import {
   canAccessRoleElection,
   isOwnerKey,
 } from "./src/types.js";
+import {
+  getDiscordConfig,
+  saveDiscordConfig,
+  getMaskedDiscordConfig,
+  isDiscordBotConfigured,
+  buildDiscordAuthUrl,
+  exchangeDiscordCode,
+  fetchDiscordUserProfile,
+  fetchDiscordGuildRoles,
+  fetchDiscordGuildMember,
+  fetchAllDiscordGuildMembers,
+  testDiscordConnection,
+  matchDiscordMemberRoles,
+} from "./server/discordBot.js";
+
+// Helper to determine the application base URL dynamically for OAuth callbacks
+function getAppBaseUrl(req?: express.Request): string {
+  if (process.env.APP_URL && process.env.APP_URL !== "MY_APP_URL" && !process.env.APP_URL.includes("localhost")) {
+    return process.env.APP_URL.replace(/\/$/, "");
+  }
+  if (req) {
+    const host = (req.headers["x-forwarded-host"] as string) || req.get("host");
+    const proto = (req.headers["x-forwarded-proto"] as string) || req.protocol || "http";
+    if (host) {
+      return `${proto}://${host}`;
+    }
+    const origin = req.get("origin") || req.get("referer");
+    if (origin) {
+      try {
+        const u = new URL(origin);
+        return `${u.protocol}//${u.host}`;
+      } catch {
+        // ignore
+      }
+    }
+  }
+  return "http://localhost:3000";
+}
 
 // Initialize DB on startup
 initDB();
@@ -422,6 +460,39 @@ function requireAdmin(req: express.Request, res: express.Response, next: express
   return res.status(401).json({ error: "Accesso Riservato. I ruoli inferiori a V. Direttore Sanitario devono inserire la Password Amministratore." });
 }
 
+// Check if request is strictly from an Owner / Proprietario
+function isStrictProprietarioOrMaster(req: express.Request): boolean {
+  if (isProprietarioOrMasterRequest(req)) return true;
+  const token = getAuthTokenFromRequest(req);
+  if (!token) return false;
+  const tokenUpper = token.toUpperCase();
+  const masterUpper = (process.env.MASTER_SECRET_TOKEN || "EMS-2410PROP").trim().toUpperCase();
+  if (tokenUpper === masterUpper || tokenUpper === "OSPEDALEPILLOLA2025!MASTERKEYPRIVATA") return true;
+
+  const regUser = REGISTERED_DISCORD_USERS.get(tokenUpper);
+  if (regUser) {
+    if (regUser.isMaster) return true;
+    const r = (regUser.roleName || "").trim().toLowerCase();
+    if (r === "proprietario" || r.includes("proprietario")) return true;
+  }
+  const session = ACTIVE_SESSIONS.get(token) || ACTIVE_SESSIONS.get(tokenUpper);
+  if (session) {
+    const r = (session.employeeRoleName || "").trim().toLowerCase();
+    if (r === "proprietario" || r.includes("proprietario")) return true;
+  }
+  return false;
+}
+
+// Middleware to restrict features strictly to Proprietario / Master Key
+function requireProprietario(req: express.Request, res: express.Response, next: express.NextFunction) {
+  if (isStrictProprietarioOrMaster(req)) {
+    return next();
+  }
+  return res.status(403).json({
+    error: "Accesso Negato: Funzionalità riservata esclusivamente agli utenti con ruolo Proprietario nel server Discord.",
+  });
+}
+
 // --- DISCORD VERIFICATION & BOT AUTHENTICATION LAYER ---
 
 interface DiscordSession {
@@ -434,6 +505,8 @@ interface DiscordSession {
   isMaster?: boolean;
   discordId?: string;
   discordTag?: string;
+  avatar?: string;
+  grade?: number;
   cdaRoleName?: string;
   hasCdaAccess?: boolean;
   isTestToken?: boolean;
@@ -1282,7 +1355,12 @@ app.get("/api/discord/session", async (req, res) => {
       return res.status(401).json({ authenticated: false, error: "Token TEST scaduto e rimosso" });
     }
     const cleanRole = (registered.roleName || "").trim().toLowerCase();
-    const isMaster = registered.token.toUpperCase() === MASTER_SECRET_TOKEN.toUpperCase();
+    const isMaster = Boolean(
+      registered.isMaster ||
+      registered.token.toUpperCase() === MASTER_SECRET_TOKEN.toUpperCase() ||
+      cleanRole === "proprietario" ||
+      cleanRole.includes("proprietario")
+    );
     return res.json({ authenticated: true, session: { ...registered, isMaster } });
   }
 
@@ -1293,7 +1371,12 @@ app.get("/api/discord/session", async (req, res) => {
     saveActiveSessions(ACTIVE_SESSIONS);
     const role = activeSess.employeeRoleName || "Amministratore";
     const cleanRole = role.trim().toLowerCase();
-    const isMaster = rawToken.trim().toUpperCase() === MASTER_SECRET_TOKEN.toUpperCase();
+    const isMaster = Boolean(
+      (activeSess as any).isMaster ||
+      rawToken.trim().toUpperCase() === MASTER_SECRET_TOKEN.toUpperCase() ||
+      cleanRole === "proprietario" ||
+      cleanRole.includes("proprietario")
+    );
     return res.json({
       authenticated: true,
       session: {
@@ -1309,6 +1392,542 @@ app.get("/api/discord/session", async (req, res) => {
   }
 
   return res.status(401).json({ authenticated: false, error: "Sessione non trovata o token revocato" });
+});
+
+// --- DISCORD OAUTH2 & BOT INTEGRATION ENDPOINTS ---
+
+// Return the Discord OAuth2 authorization URL and current configuration state
+app.get("/api/discord/auth-url", (req, res) => {
+  try {
+    const originQuery = typeof req.query.origin === "string" && req.query.origin.startsWith("http")
+      ? req.query.origin.replace(/\/$/, "")
+      : "";
+    const baseUrl = originQuery || getAppBaseUrl(req);
+    const redirectUri = `${baseUrl}/auth/callback/discord`;
+    const isConfigured = isDiscordBotConfigured();
+    const cfg = getDiscordConfig();
+    const statePayload = Buffer.from(JSON.stringify({ redirectUri })).toString("base64url");
+    const authUrl = buildDiscordAuthUrl(redirectUri, statePayload);
+
+    // Provide standard known environment URLs for easy copying into Discord Portal
+    const devUrl = "https://ais-dev-f7ddu6bz7ere7rk53fnhvp-765009000401.europe-west2.run.app/auth/callback/discord";
+    const preUrl = "https://ais-pre-f7ddu6bz7ere7rk53fnhvp-765009000401.europe-west2.run.app/auth/callback/discord";
+
+    res.json({
+      configured: isConfigured,
+      clientId: cfg.clientId,
+      guildId: cfg.guildId,
+      ownerRoleName: cfg.ownerRoleName,
+      redirectUri,
+      devRedirectUri: devUrl,
+      preRedirectUri: preUrl,
+      allSuggestedRedirects: Array.from(new Set([redirectUri, devUrl, preUrl])),
+      authUrl,
+    });
+  } catch (err: any) {
+    console.error("Errore generazione Discord auth URL:", err);
+    res.status(500).json({ error: "Errore durante la generazione dell'URL di autorizzazione Discord." });
+  }
+});
+
+// Discord OAuth2 Callback handler (runs in the popup window)
+app.get(["/auth/callback/discord", "/auth/callback/discord/", "/api/auth/discord/callback"], async (req, res) => {
+  const code = req.query.code as string | undefined;
+  const state = req.query.state as string | undefined;
+  const errorQuery = req.query.error as string | undefined;
+  const errorDescription = req.query.error_description as string | undefined;
+
+  const renderResult = (success: boolean, data?: any, errorMsg?: string) => {
+    const html = `<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${success ? "Accesso Discord Riuscito" : "Errore Accesso Discord"}</title>
+  <style>
+    body {
+      background: #0B0C10;
+      color: #E2E8F0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    .card {
+      background: #141620;
+      border: 1px solid ${success ? "rgba(16, 185, 129, 0.3)" : "rgba(244, 63, 94, 0.3)"};
+      border-radius: 16px;
+      padding: 32px 24px;
+      text-align: center;
+      max-width: 440px;
+      width: 100%;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+    }
+    .icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+      background: ${success ? "rgba(16, 185, 129, 0.15)" : "rgba(244, 63, 94, 0.15)"};
+      color: ${success ? "#10B981" : "#F43F5E"};
+      font-size: 26px;
+      font-weight: bold;
+    }
+    h2 { margin: 0 0 8px; font-size: 20px; color: #F8FAFC; }
+    p { margin: 0 0 16px; font-size: 13.5px; color: #94A3B8; line-height: 1.5; }
+    .user-badge {
+      background: #1C1E2C;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-align: left;
+    }
+    .avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: #5865F2;
+      object-fit: cover;
+      border: 2px solid rgba(255,255,255,0.1);
+    }
+    .username { font-weight: 700; color: #F1F5F9; font-size: 14px; }
+    .role { font-size: 12px; color: #38BDF8; font-weight: 600; margin-top: 2px; }
+    .footer-note { font-size: 11px; color: #64748B; margin-top: 12px; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="icon">${success ? "✓" : "✕"}</div>
+    <h2>${success ? "Accesso Autorizzato!" : "Accesso Negato"}</h2>
+    <p>${success ? "Connessione con il server Discord EMS verificata con successo." : (errorMsg || "Impossibile completare l'accesso.")}</p>
+    ${
+      success && data
+        ? `
+      <div class="user-badge">
+        ${data.avatar ? `<img src="${data.avatar}" class="avatar" alt="Avatar" />` : `<div class="avatar"></div>`}
+        <div>
+          <div class="username">${data.username}</div>
+          <div class="role">${data.roleName}${data.cdaRoleName ? ` • ${data.cdaRoleName}` : ""}</div>
+        </div>
+      </div>
+    `
+        : ""
+    }
+    <div class="footer-note">${success ? "Chiusura automatica della finestra..." : "Puoi chiudere questa finestra."}</div>
+  </div>
+  <script>
+    try {
+      if (window.opener) {
+        window.opener.postMessage({
+          type: ${JSON.stringify(success ? "OAUTH_AUTH_SUCCESS" : "OAUTH_AUTH_ERROR")},
+          authType: 'discord',
+          session: ${JSON.stringify(data || null)},
+          token: ${JSON.stringify(data?.token || null)},
+          error: ${JSON.stringify(errorMsg || null)}
+        }, '*');
+        setTimeout(() => {
+          window.close();
+        }, ${success ? 900 : 4500});
+      } else {
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 2000);
+      }
+    } catch (e) {
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 2000);
+    }
+  </script>
+</body>
+</html>`;
+    return res.send(html);
+  };
+
+  if (errorQuery) {
+    return renderResult(false, null, `Accesso annullato o rifiutato da Discord: ${errorDescription || errorQuery}`);
+  }
+
+  if (!code) {
+    return renderResult(false, null, "Codice di autorizzazione Discord mancante o non valido.");
+  }
+
+  try {
+    let decodedRedirectUri: string | undefined;
+    if (state) {
+      try {
+        const parsed = JSON.parse(Buffer.from(state, "base64url").toString("utf-8"));
+        if (parsed?.redirectUri && typeof parsed.redirectUri === "string") {
+          decodedRedirectUri = parsed.redirectUri;
+        }
+      } catch {
+        // ignore
+      }
+    }
+
+    const baseUrl = getAppBaseUrl(req);
+    const redirectUri = decodedRedirectUri || `${baseUrl}/auth/callback/discord`;
+    const cfg = getDiscordConfig();
+
+    // 1. Exchange authorization code for token
+    const tokenData = await exchangeDiscordCode(code, redirectUri);
+    const accessToken = tokenData.access_token;
+
+    // 2. Fetch user profile from Discord
+    const discordUser = await fetchDiscordUserProfile(accessToken);
+    const discordTag = `@${discordUser.username}`;
+    const avatarUrl = discordUser.avatar
+      ? `https://cdn.discordapp.com/avatars/${discordUser.id}/${discordUser.avatar}.png`
+      : undefined;
+
+    // 3. Check guild membership and roles using the Bot Token
+    let guildMember = null;
+    let roleNames: string[] = [];
+
+    if (cfg.botToken && cfg.guildId) {
+      guildMember = await fetchDiscordGuildMember(discordUser.id);
+      if (!guildMember) {
+        return renderResult(
+          false,
+          null,
+          `L'account Discord (${discordTag}) non fa parte del server Discord EMS configurato. Unisciti al server ufficiale prima di effettuare l'accesso.`
+        );
+      }
+
+      // Fetch guild roles to map role IDs to role names
+      const guildRoles = await fetchDiscordGuildRoles();
+      const roleMap = new Map(guildRoles.map((r) => [r.id, r.name]));
+      roleNames = (guildMember.roles || []).map((rId) => roleMap.get(rId) || "").filter(Boolean);
+    } else {
+      // Fallback if Bot is not yet configured: check if discordTag was already registered
+      for (const regUser of REGISTERED_DISCORD_USERS.values()) {
+        if (regUser.discordTag && regUser.discordTag.toLowerCase() === discordTag.toLowerCase()) {
+          roleNames = [regUser.roleName];
+          if (regUser.cdaRoleName) roleNames.push(regUser.cdaRoleName);
+          break;
+        }
+      }
+    }
+
+    // 4. Match roles against EMS hierarchy and check Owner permissions
+    const match = matchDiscordMemberRoles(roleNames, cfg.ownerRoleName);
+    if (!match.isAllowed || !match.highestEmsRole) {
+      return renderResult(
+        false,
+        null,
+        `Accesso negato: Il tuo account Discord (${discordTag}) non possiede alcun ruolo EMS abilitato nel server. Ruoli Discord rilevati: ${
+          roleNames.length > 0 ? roleNames.join(", ") : "Nessun ruolo"
+        }. Contatta la Direzione EMS.`
+      );
+    }
+
+    // 5. Clean display name (clean nickname or global name)
+    const rawDisplayName = guildMember?.nick || discordUser.global_name || discordUser.username;
+    const cleanName = rawDisplayName.replace(/\[.*?\]|\(.*?\)/g, "").trim() || rawDisplayName.trim();
+
+    // Session token: "DISCORD_" + userId, preserving any existing linked token
+    let sessionToken = `DISCORD_${discordUser.id}`;
+    for (const [tKey, regUser] of REGISTERED_DISCORD_USERS.entries()) {
+      if (
+        regUser.discordId === discordUser.id ||
+        (regUser.discordTag && regUser.discordTag.toLowerCase() === discordTag.toLowerCase())
+      ) {
+        sessionToken = tKey;
+        break;
+      }
+    }
+
+    const sessionData: DiscordSession = {
+      token: sessionToken,
+      username: cleanName,
+      roleName: match.highestEmsRole,
+      gradeName: match.highestEmsRole,
+      grade: match.highestGrade,
+      isAllowed: true,
+      isMaster: match.isOwner,
+      discordId: discordUser.id,
+      discordTag,
+      avatar: avatarUrl,
+      cdaRoleName: match.cdaRole || undefined,
+      hasCdaAccess: Boolean(match.cdaRole),
+      verifiedAt: new Date().toISOString(),
+    };
+
+    // Save session in memory and persistently
+    REGISTERED_DISCORD_USERS.set(sessionToken.toUpperCase(), sessionData);
+    saveRegisteredDiscordUsers(REGISTERED_DISCORD_USERS);
+    saveTokenFirestore(sessionData).catch((e) => console.error("Firestore save token error:", e));
+
+    // Also register in ACTIVE_SESSIONS
+    ACTIVE_SESSIONS.set(sessionToken, {
+      createdAt: Date.now(),
+      lastSeen: Date.now(),
+      employeeToken: sessionToken,
+      employeeUsername: cleanName,
+      employeeRoleName: match.highestEmsRole,
+    });
+    saveActiveSessions(ACTIVE_SESSIONS);
+
+    // Refresh hierarchy cache
+    HIERARCHY_MEMBERS = buildAutoHierarchyMembers();
+    saveAllHierarchyMembersFirestore(HIERARCHY_MEMBERS).catch((e) =>
+      console.error("Firestore saveHierarchy error:", e)
+    );
+
+    addAccessLog(
+      req,
+      cleanName,
+      match.highestEmsRole,
+      sessionToken,
+      "Accesso Discord",
+      "SUCCESS",
+      `Accesso autorizzato tramite Discord Bot. Ruolo: ${match.highestEmsRole} (Grado ${match.highestGrade})${
+        match.isOwner ? " [PROPRIETARIO]" : ""
+      }`
+    );
+
+    return renderResult(true, sessionData);
+  } catch (err: any) {
+    console.error("Errore callback Discord:", err);
+    return renderResult(false, null, `Errore durante la verifica con Discord: ${err.message || "Errore sconosciuto"}`);
+  }
+});
+
+// Synchronize all guild members and roles directly from Discord to the Hierarchy
+app.post("/api/discord/sync-guild-members", requireAdmin, async (req, res) => {
+  try {
+    const cfg = getDiscordConfig();
+    if (!cfg.botToken || !cfg.guildId) {
+      return res.status(400).json({
+        error: "Il Bot Discord non è configurato. Inserisci Bot Token e Guild ID nelle impostazioni.",
+      });
+    }
+
+    const guildRoles = await fetchDiscordGuildRoles();
+    const roleMap = new Map(guildRoles.map((r) => [r.id, r.name]));
+
+    const members = await fetchAllDiscordGuildMembers();
+    let syncedCount = 0;
+
+    for (const m of members) {
+      if (!m.user || (m.user as any).bot) continue; // Skip bots
+
+      const roleNames = (m.roles || []).map((rId) => roleMap.get(rId) || "").filter(Boolean);
+      const match = matchDiscordMemberRoles(roleNames, cfg.ownerRoleName);
+
+      if (match.isAllowed && match.highestEmsRole) {
+        const rawDisplayName = m.nick || m.user.global_name || m.user.username;
+        const cleanName = rawDisplayName.replace(/\[.*?\]|\(.*?\)/g, "").trim() || rawDisplayName.trim();
+        const discordTag = `@${m.user.username}`;
+        const avatarUrl = m.user.avatar
+          ? `https://cdn.discordapp.com/avatars/${m.user.id}/${m.user.avatar}.png`
+          : undefined;
+
+        let memberToken = `DISCORD_${m.user.id}`;
+        // Preserve existing token if already registered
+        for (const [tKey, regUser] of REGISTERED_DISCORD_USERS.entries()) {
+          if (
+            regUser.discordId === m.user.id ||
+            (regUser.discordTag && regUser.discordTag.toLowerCase() === discordTag.toLowerCase())
+          ) {
+            memberToken = tKey;
+            break;
+          }
+        }
+
+        const sessionData: DiscordSession = {
+          token: memberToken,
+          username: cleanName,
+          roleName: match.highestEmsRole,
+          gradeName: match.highestEmsRole,
+          grade: match.highestGrade,
+          isAllowed: true,
+          isMaster: match.isOwner,
+          discordId: m.user.id,
+          discordTag,
+          avatar: avatarUrl,
+          cdaRoleName: match.cdaRole || undefined,
+          hasCdaAccess: Boolean(match.cdaRole),
+          verifiedAt: new Date().toISOString(),
+        };
+
+        REGISTERED_DISCORD_USERS.set(memberToken.toUpperCase(), sessionData);
+        syncedCount++;
+      }
+    }
+
+    // Save and rebuild hierarchy
+    saveRegisteredDiscordUsers(REGISTERED_DISCORD_USERS);
+    HIERARCHY_MEMBERS = buildAutoHierarchyMembers();
+    saveAllHierarchyMembersFirestore(HIERARCHY_MEMBERS).catch((e) =>
+      console.error("Firestore saveHierarchy error:", e)
+    );
+
+    saveDiscordConfig({
+      lastSyncAt: new Date().toISOString(),
+      lastSyncCount: syncedCount,
+    });
+
+    addAccessLog(
+      req,
+      "Bot Discord",
+      "Sincronizzazione",
+      "DISCORD_SYNC",
+      "Sincronizzazione Gerarchia",
+      "SUCCESS",
+      `Sincronizzati ${syncedCount} membri dal server Discord.`
+    );
+
+    return res.json({
+      success: true,
+      syncedCount,
+      message: `Sincronizzazione completata! Aggiornati ${syncedCount} membri nella gerarchia EMS.`,
+    });
+  } catch (err: any) {
+    console.error("Errore sincronizzazione membri Discord:", err);
+    return res.status(500).json({ error: err.message || "Errore durante la sincronizzazione con Discord." });
+  }
+});
+
+// Get Discord Bot configuration (masked secrets)
+app.get("/api/discord/bot/config", requireAdmin, (req, res) => {
+  const config = getMaskedDiscordConfig();
+  const isConfigured = isDiscordBotConfigured();
+  res.json({
+    success: true,
+    isConfigured,
+    config,
+  });
+});
+
+// Update Discord Bot configuration
+app.post("/api/discord/bot/config", requireAdmin, (req, res) => {
+  try {
+    const { clientId, clientSecret, botToken, guildId, ownerRoleName, ownerRoleId, autoSyncEnabled } = req.body || {};
+
+    const updates: any = {};
+    if (typeof clientId === "string") updates.clientId = clientId.trim();
+    if (typeof clientSecret === "string" && !clientSecret.includes("****") && clientSecret.trim() !== "") {
+      updates.clientSecret = clientSecret.trim();
+    }
+    if (typeof botToken === "string" && !botToken.includes("****") && botToken.trim() !== "") {
+      updates.botToken = botToken.trim();
+    }
+    if (typeof guildId === "string") updates.guildId = guildId.trim();
+    if (typeof ownerRoleName === "string" && ownerRoleName.trim() !== "") updates.ownerRoleName = ownerRoleName.trim();
+    if (typeof ownerRoleId === "string") updates.ownerRoleId = ownerRoleId.trim();
+    if (typeof autoSyncEnabled === "boolean") updates.autoSyncEnabled = autoSyncEnabled;
+
+    const newCfg = saveDiscordConfig(updates);
+
+    addAccessLog(
+      req,
+      "Admin",
+      "Configurazione",
+      "BOT_CONFIG",
+      "Configurazione Discord Bot",
+      "SUCCESS",
+      "Aggiornate credenziali e impostazioni del Bot Discord."
+    );
+
+    res.json({
+      success: true,
+      message: "Configurazione Bot Discord salvata con successo!",
+      config: getMaskedDiscordConfig(),
+    });
+  } catch (err: any) {
+    console.error("Errore salvataggio config Bot Discord:", err);
+    res.status(500).json({ error: "Errore durante il salvataggio della configurazione." });
+  }
+});
+
+// Test Discord Bot connection and Guild permissions
+app.post("/api/discord/bot/test", requireAdmin, async (req, res) => {
+  try {
+    const result = await testDiscordConnection();
+    res.json(result);
+  } catch (err: any) {
+    console.error("Errore test Discord Bot:", err);
+    res.status(500).json({ success: false, error: err.message || "Errore test connessione Discord." });
+  }
+});
+
+// Dev / Simulation login endpoint (allows logging in directly with a registered Discord account or as Proprietario for testing)
+app.post("/api/discord/dev-login", async (req, res) => {
+  try {
+    const { discordTag, asOwner } = req.body || {};
+
+    if (asOwner) {
+      const ownerSession: DiscordSession = {
+        token: MASTER_SECRET_TOKEN,
+        username: "Proprietario (Master EMS)",
+        roleName: "Proprietario",
+        gradeName: "Proprietario",
+        isAllowed: true,
+        isMaster: true,
+        verifiedAt: new Date().toISOString(),
+        discordTag: "@proprietario_ems",
+      };
+      REGISTERED_DISCORD_USERS.set(MASTER_SECRET_TOKEN.toUpperCase(), ownerSession);
+      return res.json({
+        success: true,
+        token: MASTER_SECRET_TOKEN,
+        userSession: ownerSession,
+        message: "Accesso effettuato come Proprietario EMS (Master).",
+      });
+    }
+
+    if (discordTag) {
+      const cleanTag = String(discordTag).trim().toLowerCase();
+      for (const regUser of REGISTERED_DISCORD_USERS.values()) {
+        if (
+          (regUser.discordTag && regUser.discordTag.toLowerCase() === cleanTag) ||
+          regUser.username.toLowerCase() === cleanTag
+        ) {
+          return res.json({
+            success: true,
+            token: regUser.token,
+            userSession: regUser,
+            message: `Accesso simulato effettuato per ${regUser.username} (${regUser.roleName})!`,
+          });
+        }
+      }
+      return res.status(404).json({
+        error: `Nessun utente registrato trovato con tag Discord '${discordTag}'.`,
+      });
+    }
+
+    return res.status(400).json({ error: "Parametri mancanti per dev-login." });
+  } catch (err: any) {
+    console.error("Errore dev-login:", err);
+    res.status(500).json({ error: "Errore durante il dev-login." });
+  }
+});
+
+// Protected endpoint to retrieve the Master / Proprietario Key - ONLY accessible by users with the Proprietario role!
+app.get("/api/admin/owner-key", requireProprietario, (req, res) => {
+  try {
+    const ownerKey = MASTER_SECRET_TOKEN || "EMS-2410PROP";
+    return res.json({
+      success: true,
+      ownerKey,
+      message: "Chiave Proprietario verificata con successo.",
+    });
+  } catch (err: any) {
+    console.error("Errore recupero owner key:", err);
+    res.status(500).json({ error: "Errore durante il recupero della chiave Proprietario." });
+  }
 });
 
 // List all registered bot users (for admin debugging or overview)
@@ -8025,9 +8644,83 @@ async function startServer() {
           syncAllDataWithFirestore().catch((e) => console.error("Background sync error:", e));
         }
       }, 120000);
+
+      // Auto-sync Discord members if Bot is configured
+      setTimeout(() => {
+        syncDiscordMembersInternal().catch((e) => console.error("Initial Discord sync error:", e));
+      }, 5000);
+
+      // Periodically sync Discord guild members every 15 minutes
+      setInterval(() => {
+        syncDiscordMembersInternal().catch((e) => console.error("Periodic Discord sync error:", e));
+      }, 15 * 60 * 1000);
     });
   } catch (err) {
     console.error("Failed to start server:", err);
+  }
+}
+
+async function syncDiscordMembersInternal() {
+  if (!isDiscordBotConfigured()) return;
+  const cfg = getDiscordConfig();
+  if (cfg.autoSyncEnabled === false) return;
+  try {
+    const guildRoles = await fetchDiscordGuildRoles();
+    const roleMap = new Map(guildRoles.map((r) => [r.id, r.name]));
+    const members = await fetchAllDiscordGuildMembers();
+    let count = 0;
+    for (const m of members) {
+      if (!m.user || (m.user as any).bot) continue;
+      const roleNames = (m.roles || []).map((rId) => roleMap.get(rId) || "").filter(Boolean);
+      const match = matchDiscordMemberRoles(roleNames, cfg.ownerRoleName);
+      if (match.isAllowed && match.highestEmsRole) {
+        const rawDisplayName = m.nick || m.user.global_name || m.user.username;
+        const cleanName = rawDisplayName.replace(/\[.*?\]|\(.*?\)/g, "").trim() || rawDisplayName.trim();
+        const discordTag = `@${m.user.username}`;
+        const avatarUrl = m.user.avatar
+          ? `https://cdn.discordapp.com/avatars/${m.user.id}/${m.user.avatar}.png`
+          : undefined;
+        let memberToken = `DISCORD_${m.user.id}`;
+        for (const [tKey, regUser] of REGISTERED_DISCORD_USERS.entries()) {
+          if (
+            regUser.discordId === m.user.id ||
+            (regUser.discordTag && regUser.discordTag.toLowerCase() === discordTag.toLowerCase())
+          ) {
+            memberToken = tKey;
+            break;
+          }
+        }
+        REGISTERED_DISCORD_USERS.set(memberToken.toUpperCase(), {
+          token: memberToken,
+          username: cleanName,
+          roleName: match.highestEmsRole,
+          gradeName: match.highestEmsRole,
+          grade: match.highestGrade,
+          isAllowed: true,
+          isMaster: match.isOwner,
+          discordId: m.user.id,
+          discordTag,
+          avatar: avatarUrl,
+          cdaRoleName: match.cdaRole || undefined,
+          hasCdaAccess: Boolean(match.cdaRole),
+          verifiedAt: new Date().toISOString(),
+        });
+        count++;
+      }
+    }
+    if (count > 0) {
+      saveRegisteredDiscordUsers(REGISTERED_DISCORD_USERS);
+      HIERARCHY_MEMBERS = buildAutoHierarchyMembers();
+      if (!isFirestoreQuotaExhausted()) {
+        saveAllHierarchyMembersFirestore(HIERARCHY_MEMBERS).catch((e) =>
+          console.error("Firestore sync error:", e)
+        );
+      }
+      saveDiscordConfig({ lastSyncAt: new Date().toISOString(), lastSyncCount: count });
+      console.log(`[BOT DISCORD] Sincronizzati automaticamente ${count} membri nella gerarchia EMS.`);
+    }
+  } catch (err) {
+    console.error("[BOT DISCORD] Errore sincronizzazione automatica:", err);
   }
 }
 

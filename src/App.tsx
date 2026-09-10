@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Home, Vote, Shield, CheckCircle, Info, ShieldCheck, LogOut, Award, FileText, Menu, ChevronDown, Key, Sparkles, Clock, Camera, FileSpreadsheet } from "lucide-react";
+import { Home, Vote, Shield, CheckCircle, Info, ShieldCheck, LogOut, Award, FileText, Menu, ChevronDown, Key, Sparkles, Clock, Camera, FileSpreadsheet, Bot } from "lucide-react";
 import LandingPage from "./components/LandingPage.js";
 import VoterPortal from "./components/VoterPortal.js";
 import AdminPortal from "./components/AdminPortal.js";
@@ -332,13 +332,20 @@ export default function App() {
               ) : (
                 <div 
                   onClick={() => handleNavigate("voter")}
-                  className="flex flex-wrap sm:flex-nowrap items-center justify-center gap-1.5 sm:gap-2.5 bg-gradient-to-r from-indigo-950/90 via-slate-900/90 to-indigo-950/90 border border-indigo-500/40 hover:border-indigo-400/80 rounded-full px-3 sm:px-4 py-1 sm:py-1.5 text-[11px] sm:text-xs shadow-lg shadow-indigo-950/50 cursor-pointer transition-all active:scale-95 group text-center mx-auto max-w-full"
-                  title="Clicca per aprire il Portale Elettore / Inserimento Token"
+                  className="flex flex-wrap sm:flex-nowrap items-center justify-center gap-1.5 sm:gap-2.5 bg-gradient-to-r from-indigo-950/90 via-slate-900/90 to-[#5865F2]/20 border border-[#5865F2]/40 hover:border-[#5865F2] rounded-full px-3 sm:px-4 py-1 sm:py-1.5 text-[11px] sm:text-xs shadow-lg shadow-indigo-950/50 cursor-pointer transition-all active:scale-95 group text-center mx-auto max-w-full"
+                  title="Sessione verificata Discord"
                 >
-                  <ShieldCheck size={14} className="text-indigo-400 shrink-0 group-hover:scale-110 transition-transform" />
-                  <span className="text-slate-300 font-medium text-xs hidden sm:inline">Sessione Log:</span>
+                  {discordSession.avatar ? (
+                    <img
+                      src={discordSession.avatar}
+                      alt={discordSession.username}
+                      className="w-5 h-5 rounded-full object-cover border border-white/20 shrink-0"
+                    />
+                  ) : (
+                    <Bot size={14} className="text-[#5865F2] shrink-0 group-hover:scale-110 transition-transform" />
+                  )}
                   <span className="text-white font-bold truncate max-w-[120px] sm:max-w-none">{discordSession.username}</span>
-                  <span className="text-indigo-300 font-bold bg-indigo-500/20 px-2 py-0.5 rounded-full border border-indigo-500/30 text-[10px] sm:text-[11px] shrink-0">
+                  <span className="text-indigo-200 font-bold bg-[#5865F2]/25 px-2 py-0.5 rounded-full border border-[#5865F2]/40 text-[10px] sm:text-[11px] shrink-0">
                     {discordSession.roleName}
                   </span>
                   <button
@@ -347,7 +354,7 @@ export default function App() {
                       handleDiscordLogout();
                     }}
                     className="text-slate-400 hover:text-rose-400 p-1 ml-0.5 transition-colors cursor-pointer rounded-full hover:bg-white/10 shrink-0"
-                    title="Disconnetti verifica Discord"
+                    title="Disconnetti account Discord"
                   >
                     <LogOut size={12} />
                   </button>
@@ -356,13 +363,13 @@ export default function App() {
             ) : (
               <div 
                 onClick={() => handleNavigate("voter")}
-                className="flex flex-wrap sm:flex-nowrap items-center justify-center gap-1.5 sm:gap-2.5 bg-slate-900/90 hover:bg-slate-800/90 border border-slate-800 hover:border-red-500/60 rounded-full px-3 sm:px-4 py-1 sm:py-1.5 text-[11px] sm:text-xs text-slate-300 shadow-md cursor-pointer transition-all active:scale-95 group text-center mx-auto max-w-full"
-                title="Clicca qui per inserire il tuo Token di Accesso"
+                className="flex flex-wrap sm:flex-nowrap items-center justify-center gap-1.5 sm:gap-2.5 bg-slate-900/90 hover:bg-[#5865F2]/10 border border-slate-800 hover:border-[#5865F2]/60 rounded-full px-3 sm:px-4 py-1 sm:py-1.5 text-[11px] sm:text-xs text-slate-300 shadow-md cursor-pointer transition-all active:scale-95 group text-center mx-auto max-w-full"
+                title="Accedi con il tuo account Discord"
               >
-                <Info size={13} className="text-red-400 shrink-0 group-hover:scale-110 transition-transform" />
-                <span className="font-medium text-slate-300 text-[11px] sm:text-xs">Nessuna sessione verificata attiva</span>
-                <span className="bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white text-[9px] sm:text-[10px] font-black uppercase px-2 py-0.5 rounded-full border border-red-400/40 shadow-sm flex items-center gap-1 shrink-0">
-                  Inserisci Token <Key size={10} />
+                <Bot size={14} className="text-[#5865F2] shrink-0 group-hover:scale-110 transition-transform" />
+                <span className="font-medium text-slate-300 text-[11px] sm:text-xs">Nessun account connesso</span>
+                <span className="bg-[#5865F2] hover:bg-[#4752C4] text-white text-[9px] sm:text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full border border-[#5865F2]/50 shadow-sm flex items-center gap-1 shrink-0">
+                  Accedi con Discord <Bot size={11} />
                 </span>
               </div>
             )}

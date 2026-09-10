@@ -48,6 +48,7 @@ import {
   Server,
   HardDrive,
   Cog,
+  Bot,
 } from "lucide-react";
 import {
   RoleId,
@@ -75,6 +76,7 @@ import RoleBadge from "./RoleBadge.js";
 import EmsHierarchy from "./EmsHierarchy.js";
 import RoleElectionAdmin from "./RoleElectionAdmin.js";
 import { TokenExcelImportModal } from "./TokenExcelImportModal.js";
+import DiscordBotAdmin from "./DiscordBotAdmin.js";
 
 interface AdminPortalProps {
   onConfigChanged: () => void;
@@ -87,7 +89,7 @@ interface RevokedTokenEntry {
   revokedAt: string;
 }
 
-type TabType = "candidates" | "votes" | "analytics" | "tokens" | "revoked_tokens" | "logs" | "hierarchy" | "candidature" | "cda_proposals" | "role_election" | "settings";
+type TabType = "candidates" | "votes" | "analytics" | "tokens" | "revoked_tokens" | "logs" | "hierarchy" | "candidature" | "cda_proposals" | "role_election" | "discord_bot" | "settings";
 
 export default function AdminPortal({ onConfigChanged }: AdminPortalProps) {
   const [token, setToken] = useState<string | null>(() => localStorage.getItem("adminToken"));
@@ -2264,6 +2266,16 @@ export default function AdminPortal({ onConfigChanged }: AdminPortalProps) {
           }`}
         >
           <Award size={16} /> Votazione Ruoli Direzione
+        </button>
+        <button
+          onClick={() => setActiveTab("discord_bot")}
+          className={`flex items-center gap-2 px-4 py-3 font-semibold text-xs uppercase tracking-wider cursor-pointer border-b-2 transition-all ${
+            activeTab === "discord_bot"
+              ? "border-[#5865F2] text-[#5865F2] font-extrabold"
+              : "border-transparent text-slate-400 hover:text-slate-200"
+          }`}
+        >
+          <Bot size={16} /> Bot Discord
         </button>
         <button
           onClick={() => setActiveTab("settings")}
@@ -6028,6 +6040,13 @@ export default function AdminPortal({ onConfigChanged }: AdminPortalProps) {
           {activeTab === "role_election" && (
             <div className="animate-fadeIn">
               <RoleElectionAdmin adminToken={token || undefined} isMaster={sessionInfo?.isMaster} />
+            </div>
+          )}
+
+          {/* TAB: BOT DISCORD */}
+          {activeTab === "discord_bot" && (
+            <div className="animate-fadeIn">
+              <DiscordBotAdmin adminToken={token || ""} sessionInfo={sessionInfo} />
             </div>
           )}
         </div>

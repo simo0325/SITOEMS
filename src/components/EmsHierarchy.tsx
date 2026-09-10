@@ -20,6 +20,7 @@ import {
   ChevronDown,
   UserCheck,
   Cog,
+  Bot,
 } from "lucide-react";
 import {
   HierarchyCategoryKey,
@@ -488,6 +489,30 @@ export default function EmsHierarchy({ isAdmin = false, adminToken }: EmsHierarc
       }
     } catch (err) {
       alert("Errore di rete durante la sincronizzazione.");
+    } finally {
+      setSyncing(false);
+    }
+  };
+
+  const handleDiscordSyncHierarchy = async () => {
+    setShowSyncConfirm(false);
+    try {
+      setSyncing(true);
+      const res = await fetch("/api/discord/sync-guild-members", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${adminToken || localStorage.getItem("adminToken") || localStorage.getItem("discordToken")}`,
+        },
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        fetchHierarchy();
+        showNotification(data.message || `Sincronizzati ${data.syncedCount} membri da Discord!`);
+      } else {
+        alert(data.error || "Errore durante la sincronizzazione con Discord.");
+      }
+    } catch (err) {
+      alert("Errore di rete durante la sincronizzazione con Discord.");
     } finally {
       setSyncing(false);
     }
@@ -1112,41 +1137,73 @@ export default function EmsHierarchy({ isAdmin = false, adminToken }: EmsHierarc
       {/* Modal Sincronizzazione Gerarchia */}
       {showSyncConfirm && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-fade-in">
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-6 space-y-5 shadow-2xl">
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-lg w-full p-6 space-y-5 shadow-2xl">
             <div className="flex items-center gap-3 text-cyan-400">
               <div className="p-3 bg-cyan-500/10 rounded-2xl border border-cyan-500/20">
                 <RefreshCw className="w-6 h-6" />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-white">Sincronizza Gerarchia</h3>
-                <p className="text-xs text-slate-400">Aggiorna da candidati e proprietari</p>
+                <h3 className="text-lg font-bold text-white">Sincronizzazione Organigramma</h3>
+                <p className="text-xs text-slate-400">Scegli la modalità di aggiornamento</p>
               </div>
             </div>
 
             <p className="text-sm text-slate-300 leading-relaxed">
-              Vuoi risincronizzare automaticamente l'organigramma con tutti i candidati ufficiali e i proprietari correnti registrati nel sistema?
+              Puoi sincronizzare la gerarchia importando automaticamente tutti i membri e ruoli ufficiali direttamente dal <strong>Server Discord EMS</strong> tramite il Bot, oppure ricaricare l'organigramma locale.
             </p>
 
-            <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+            <div className="space-y-3 pt-2">
               <button
                 type="button"
-                onClick={() => setShowSyncConfirm(false)}
-                className="px-4 py-2 bg-slate-800 text-slate-300 rounded-xl text-xs font-bold uppercase hover:bg-slate-700 transition-colors"
+                onClick={handleDiscordSyncHierarchy}
+                disabled={syncing}
+                className="w-full flex items-center justify-between p-4 bg-[#5865F2]/15 hover:bg-[#5865F2]/25 border border-[#5865F2]/40 rounded-2xl text-left transition-all cursor-pointer group"
               >
-                Annulla
+                <div className="flex items-center gap-3">
+                  <div className="p-2.5 bg-[#5865F2] text-white rounded-xl shadow-md">
+                    <Bot className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-bold text-white group-hover:text-[#5865F2] transition-colors">
+                      Sincronizza da Server Discord (Consigliato)
+                    </h4>
+                    <p className="text-xs text-slate-400">
+                      Rileva automaticamente ruoli, gradi e nomi dei membri del server EMS
+                    </p>
+                  </div>
+                </div>
+                <RefreshCw className={`w-4 h-4 text-[#5865F2] ${syncing ? "animate-spin" : ""}`} />
               </button>
+
               <button
                 type="button"
                 onClick={handleConfirmSyncHierarchy}
                 disabled={syncing}
-                className="flex items-center gap-2 px-5 py-2 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold text-xs uppercase rounded-xl shadow-lg shadow-cyan-950/50 cursor-pointer disabled:opacity-50"
+                className="w-full flex items-center justify-between p-4 bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 rounded-2xl text-left transition-all cursor-pointer group"
               >
-                {syncing ? (
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                ) : (
-                  <RefreshCw className="w-4 h-4" />
-                )}
-                Sincronizza Ora
+                <div className="flex items-center gap-3">
+                  <div className="p-2.5 bg-slate-700 text-slate-300 rounded-xl">
+                    <RefreshCw className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-bold text-white">
+                      Sincronizza Archivio Locale
+                    </h4>
+                    <p className="text-xs text-slate-400">
+                      Ricostruisce la gerarchia da candidati e proprietari registrati
+                    </p>
+                  </div>
+                </div>
+              </button>
+            </div>
+
+            <div className="flex items-center justify-end pt-3 border-t border-slate-800">
+              <button
+                type="button"
+                onClick={() => setShowSyncConfirm(false)}
+                className="px-4 py-2 bg-slate-800 text-slate-300 rounded-xl text-xs font-bold uppercase hover:bg-slate-700 transition-colors cursor-pointer"
+              >
+                Chiudi
               </button>
             </div>
           </div>
