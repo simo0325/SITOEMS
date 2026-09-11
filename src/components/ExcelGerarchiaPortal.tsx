@@ -56,6 +56,7 @@ export default function ExcelGerarchiaPortal({
     activeSession?.isMaster ||
     cleanRole.includes("proprietario") ||
     cleanRole.includes("vice proprietario") ||
+    cleanRole.includes("responsabile generale") ||
     cleanRole.includes("direttore generale") ||
     effectiveGrade >= 20 ||
     savedToken?.toUpperCase() === "EMS-2410PROP"
@@ -97,10 +98,11 @@ export default function ExcelGerarchiaPortal({
       if (
         !session.isMaster &&
         !role.includes("direttore generale") &&
+        !role.includes("responsabile generale") &&
         !role.includes("proprietario") &&
         grade < 20
       ) {
-        throw new Error("Accesso negato: Questa key appartiene al ruolo " + session.roleName + ", mentre la sezione richiede la Key del Direttore Generale.");
+        throw new Error("Accesso negato: Questa key appartiene al ruolo " + session.roleName + ", mentre la sezione richiede un ruolo dal Direttore Generale in su.");
       }
 
       setSuccessMessage(`Accesso Autorizzato! Benvenuto ${session.username} (${session.roleName}).`);

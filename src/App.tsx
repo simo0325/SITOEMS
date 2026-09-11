@@ -12,7 +12,7 @@ import NotificationMenu from "./components/NotificationMenu.js";
 import HospitalDinoGame from "./components/HospitalDinoGame.js";
 import RoleElectionPortal from "./components/RoleElectionPortal.js";
 import emsLogo from "./assets/images/ems_logo_1784649117886.jpg";
-import { DiscordUserSession, getUserEffectiveGrade, getSingleRoleGrade, canAccessRoleElection, canAccessCdaPortal, getRoleBadgeStyle, isCdaOnlyRoleName } from "./types.js";
+import { DiscordUserSession, getUserEffectiveGrade, getSingleRoleGrade, canAccessRoleElection, canAccessCdaPortal, getRoleBadgeStyle, isCdaOnlyRoleName, isMainHierarchyRole } from "./types.js";
 
 type AppMode = "home" | "voter" | "admin" | "hierarchy" | "candidatura" | "cda" | "excel_gerarchia" | "role_election";
 
@@ -170,6 +170,13 @@ export default function App() {
   const canAccessElection = discordSession ? canAccessRoleElection(discordSession) : false;
   const canAccessCda = canAccessCdaPortal(discordSession);
 
+  // Grade check for Excel Gerarchia access: strictly dal Direttore Generale in su (grade >= 20)
+  const minExcelGrade = getSingleRoleGrade("direttore generale"); // 20
+  const canAccessExcel = Boolean(
+    discordSession?.isMaster ||
+    (userEffectiveGrade >= minExcelGrade)
+  );
+
   useEffect(() => {
     if (mode === "admin" && !canAccessAdmin) {
       setMode("home");
@@ -177,7 +184,10 @@ export default function App() {
     if (mode === "cda" && discordSession && !canAccessCda) {
       setMode("home");
     }
-  }, [mode, canAccessAdmin, canAccessCda, discordSession]);
+    if (mode === "excel_gerarchia" && !canAccessExcel) {
+      setMode("home");
+    }
+  }, [mode, canAccessAdmin, canAccessCda, canAccessExcel, discordSession]);
 
   const handleConfigChanged = () => {
     setConfigVersion((prev) => prev + 1);
@@ -357,7 +367,7 @@ export default function App() {
                   </span>
                   {(() => {
                     const role = discordSession.roleName || "";
-                    if (!role || isCdaOnlyRoleName(role)) return null;
+                    if (!role || isCdaOnlyRoleName(role) || !isMainHierarchyRole(role)) return null;
                     const roleBadge = getRoleBadgeStyle(role);
                     return (
                       <span
@@ -405,7 +415,7 @@ export default function App() {
                   </span>
                   {(() => {
                     const role = discordSession.roleName || "";
-                    if (!role || isCdaOnlyRoleName(role)) return null;
+                    if (!role || isCdaOnlyRoleName(role) || !isMainHierarchyRole(role)) return null;
                     const roleBadge = getRoleBadgeStyle(role);
                     return (
                       <span
@@ -471,7 +481,7 @@ export default function App() {
                 <div className="fixed sm:absolute inset-x-3 sm:inset-auto sm:right-0 top-16 sm:top-full mt-0 sm:mt-2 max-h-[calc(100vh-4.5rem)] overflow-y-auto sm:w-72 max-w-xs sm:max-w-sm mx-auto sm:mx-0 bg-[#141419] border border-slate-700/90 rounded-2xl shadow-2xl z-[60] p-2 space-y-1 backdrop-blur-2xl animate-fadeIn">
                   <div className="px-3 py-2 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-white/10 mb-1 flex items-center justify-between">
                     <span>Menu Categorie</span>
-                    <span className="text-2xs text-red-400 font-bold">{canAccessAdmin ? 7 : 6} Sezioni</span>
+                    <span className="text-2xs text-red-400 font-bold">{4 + (canAccessCda ? 1 : 0) + (canAccessElection ? 1 : 0) + (canAccessAdmin ? 1 : 0) + (canAccessExcel ? 1 : 0)} Sezioni</span>
                   </div>
 
                   <button
@@ -496,23 +506,6 @@ export default function App() {
                   >
                     <Award size={16} className={mode === "hierarchy" ? "text-white" : "text-amber-400"} />
                     <span>Gerarchia EMS</span>
-                  </button>
-
-                  <button
-                    onClick={() => { handleNavigate("excel_gerarchia"); setIsNavOpen(false); }}
-                    className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all text-left cursor-pointer ${
-                      mode === "excel_gerarchia"
-                        ? "bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md shadow-emerald-950/50"
-                        : "text-slate-300 hover:bg-white/10 hover:text-white"
-                    }`}
-                  >
-                    <FileSpreadsheet size={16} className={mode === "excel_gerarchia" ? "text-white" : "text-emerald-400"} />
-                    <div className="flex items-center justify-between w-full">
-                      <span>Excel Gerarchia</span>
-                      <span className="text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30">
-                        Sheet
-                      </span>
-                    </div>
                   </button>
 
                   <button
@@ -580,6 +573,25 @@ export default function App() {
                     </button>
                   )}
 
+                  {canAccessExcel && (
+                    <button
+                      onClick={() => { handleNavigate("excel_gerarchia"); setIsNavOpen(false); }}
+                      className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all text-left cursor-pointer ${
+                        mode === "excel_gerarchia"
+                          ? "bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md shadow-emerald-950/50"
+                          : "text-slate-300 hover:bg-white/10 hover:text-white"
+                      }`}
+                    >
+                      <FileSpreadsheet size={16} className={mode === "excel_gerarchia" ? "text-white" : "text-emerald-400"} />
+                      <div className="flex items-center justify-between w-full">
+                        <span>Excel Gerarchia</span>
+                        <span className="text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30">
+                          ≥ Direttore Gen.
+                        </span>
+                      </div>
+                    </button>
+                  )}
+
                   {canAccessAdmin && (
                     <button
                       onClick={() => { handleNavigate("admin"); setIsNavOpen(false); }}
@@ -618,29 +630,33 @@ export default function App() {
           </div>
           <span className="text-purple-300 font-medium hidden sm:inline">
             • Utente: <strong>{discordSession.username}</strong>
-            {discordSession.roleName && !isCdaOnlyRoleName(discordSession.roleName) ? ` (${discordSession.roleName})` : ""}
+            {discordSession.roleName && !isCdaOnlyRoleName(discordSession.roleName) && isMainHierarchyRole(discordSession.roleName) ? ` (${discordSession.roleName})` : ""}
           </span>
         </div>
       )}
 
       {/* Main Content Area */}
       <main className="flex-grow w-full max-w-full overflow-x-hidden">
-        {mode === "home" && <LandingPage onNavigate={handleNavigate} canAccessCda={canAccessCda} />}
+        {mode === "home" && <LandingPage onNavigate={handleNavigate} canAccessCda={canAccessCda} canAccessExcel={canAccessExcel} />}
         
         {mode === "hierarchy" && (
           <EmsHierarchy
-            isAdmin={canAccessAdmin}
-            adminToken={discordSession?.token}
+            isAdmin={false}
+            adminToken={undefined}
             discordSession={discordSession}
           />
         )}
 
         {mode === "excel_gerarchia" && (
-          <ExcelGerarchiaPortal
-            discordSession={discordSession}
-            onNavigate={handleNavigate}
-            onSessionUpdated={(session) => setDiscordSession(session)}
-          />
+          canAccessExcel ? (
+            <ExcelGerarchiaPortal
+              discordSession={discordSession}
+              onNavigate={handleNavigate}
+              onSessionUpdated={(session) => setDiscordSession(session)}
+            />
+          ) : (
+            <LandingPage onNavigate={handleNavigate} canAccessCda={canAccessCda} canAccessExcel={canAccessExcel} />
+          )
         )}
 
         {mode === "candidatura" && (

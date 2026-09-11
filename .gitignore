@@ -10,4 +10,5 @@ coverage/
 # access_logs.json
 # db.json
 # discord_registered_users.json
-
+discord_bot_config.json
+.vscode/

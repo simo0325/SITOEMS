@@ -5461,7 +5461,25 @@ export default function AdminPortal({ onConfigChanged }: AdminPortalProps) {
 
           {/* TAB 7: GERARCHIA EMS */}
           {activeTab === "hierarchy" && (
-            <div className="animate-fadeIn">
+            <div className="space-y-4 animate-fadeIn">
+              <div className="bg-gradient-to-r from-emerald-950/40 via-slate-900 to-slate-900 border border-emerald-500/30 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xl">
+                <div className="flex items-start gap-3">
+                  <div className="p-2.5 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 shrink-0">
+                    <FileSpreadsheet size={20} />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
+                      <span>Area Amministrazione • Gestione Gerarchia EMS</span>
+                      <span className="text-[9px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold">
+                        Esclusiva Admin
+                      </span>
+                    </h3>
+                    <p className="text-xs text-slate-300 mt-1 leading-relaxed">
+                      L'importazione da fogli <strong>Excel (.xlsx, .xls, .csv)</strong> o dal <strong>Blocco Note</strong> (copia e incolla) è gestita esclusivamente qui nell'Area Amministrazione. Dalla visuale pubblica, tutti gli utenti visualizzano solo la gerarchia in sola lettura.
+                    </p>
+                  </div>
+                </div>
+              </div>
               <EmsHierarchy isAdmin={true} adminToken={token || undefined} />
             </div>
           )}

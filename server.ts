@@ -108,6 +108,9 @@ import {
   DEFAULT_ROLE_ELECTION_ROLES,
   canAccessRoleElection,
   isOwnerKey,
+  matchCanonicalMainHierarchyRole,
+  matchCanonicalCdaRole,
+  isMainHierarchyRole,
 } from "./src/types.js";
 import {
   getDiscordConfig,
@@ -783,20 +786,15 @@ function addAccessLog(
   saveAccessLogFirestore(newLog);
 }
 
-// Pre-defined / Known roles mapping for role verification
+// Pre-defined / Known roles mapping for role verification (Photo 1, 2, 3, 4)
 const AUTHORIZED_ROLE_GRADES: Record<string, number> = {
+  // 21 Ruoli Gerarchia Principale (Foto 1, 2, 4)
+  "Proprietario EMS": 100,
   "Proprietario": 100,
   "Vice Proprietario": 99,
-  "Consigliere Finale CDA": 98,
-  "Presidente CDA": 97,
-  "Vice Presidente CDA": 96,
-  "Segretario CDA": 95,
-  "Membro CDA": 94,
   "Responsabile Generale EMS": 21,
   "Responsabile Generale": 21,
   "Direttore Generale": 20,
-  "V. Direttore Generale": 19,
-  "Vice Direttore Generale": 19,
   "Direttore Sanitario": 18,
   "V. Direttore Sanitario": 17,
   "Vice Direttore Sanitario": 17,
@@ -806,86 +804,78 @@ const AUTHORIZED_ROLE_GRADES: Record<string, number> = {
   "V. Supervisore": 14,
   "Vice Supervisore": 14,
   "Assistente Supervisore": 13,
-  "Aiuto Supervisore": 13,
   "Responsabile Del Presidio": 12,
   "V. Responsabile Del Presidio": 11,
   "Vice Responsabile Del Presidio": 11,
-  "Primario di Reparto": 10,
+  "Primario di Reparto": 10.5,
+  "V. Primario di Reparto": 9.5,
+  "Vice Primario di Reparto": 9.5,
   "Primario": 10,
-  "V. Primario di Reparto": 9,
   "V. Primario": 9,
   "Vice Primario": 9,
-  "Medico Capo": 8,
-  "Medico Specialista": 7,
-  "Specialista": 7,
   "Medico Esperto": 6,
   "Medico": 5,
-  "Paramedico": 4,
-  "Soccorritore": 3,
   "Infermiere": 2.5,
-  "Infermiera": 2.5,
   "Tirocinante": 2,
-  "Allievo": 2,
-  "Dipendente": 1,
-  "Volontario": 0.5,
+  "Volontario": 1.5,
+
+  // 5 Ruoli CDA (Foto 3)
+  "Consigliere Finale CDA": 98,
+  "Presidente CDA": 97,
+  "Vice Presidente CDA": 96,
+  "Segretario CDA": 95,
+  "Consiglio D'Amministrazione": 94,
 };
 
 const ROLE_GRADE_MAP_SERVER: Record<string, number> = {
-  // Proprietà EMS
+  // Proprietà EMS (Photo 1)
+  "proprietario ems": 100,
   "proprietario": 100,
   "vice proprietario": 99,
   "v. proprietario": 99,
+  "v proprietario": 99,
 
-  // Dirigenza & Gerarchia EMS
+  // Dirigenza Generale & Sanitaria (Photo 1 & 2)
   "responsabile generale ems": 21,
   "responsabile generale": 21,
-  "responsabile generale r.e.s.": 21,
-  "responsabile generale res": 21,
   "direttore generale": 20,
-  "v. direttore generale": 19,
-  "vice direttore generale": 19,
   "direttore sanitario": 18,
   "v. direttore sanitario": 17,
   "vice direttore sanitario": 17,
+  "v direttore sanitario": 17,
   "segretario direzione": 16.5,
+
+  // Supervisione & Funzionari & Operativi (Photo 4)
   "supervisore generale": 16,
   "supervisore": 15,
   "v. supervisore": 14,
   "vice supervisore": 14,
+  "v supervisore": 14,
   "assistente supervisore": 13,
-  "aiuto supervisore": 13,
   "responsabile del presidio": 12,
   "responsabile presidio": 12,
   "v. responsabile del presidio": 11,
   "vice responsabile del presidio": 11,
-  "v. responsabile presidio": 11,
-  "vice responsabile presidio": 11,
-  "primario di reparto": 10,
+  "v responsabile del presidio": 11,
+  "primario di reparto": 10.5,
+  "v. primario di reparto": 9.5,
+  "vice primario di reparto": 9.5,
+  "v primario di reparto": 9.5,
   "primario": 10,
-  "v. primario di reparto": 9,
-  "vice primario di reparto": 9,
   "v. primario": 9,
   "vice primario": 9,
-  "medico capo": 8,
-  "medico specialista": 7,
-  "specialista": 7,
+  "v primario": 9,
   "medico esperto": 6,
   "medico": 5,
-  "paramedico": 4,
-  "soccorritore": 3,
   "infermiere": 2.5,
-  "infermiera": 2.5,
   "tirocinante": 2,
-  "allievo": 2,
-  "volontario": 0.5,
-  "volontaria": 0.5,
-  "dipendente": 1,
+  "volontario": 1.5,
 };
 
 // Helper to resolve numerical role grade for hierarchy sorting
 function getRoleGrade(roleName: string): number {
   if (!roleName) return 0;
-  const clean = roleName.trim().toLowerCase().replace(/[.'’®™┃]/g, "");
+  const clean = roleName.trim().toLowerCase().replace(/[.'’®™┃-]/g, " ").replace(/\s+/g, " ").trim();
   
   // CDA roles must NEVER be graded as EMS hospital hierarchy roles
   if (
@@ -899,41 +889,13 @@ function getRoleGrade(roleName: string): number {
     return ROLE_GRADE_MAP_SERVER[clean];
   }
 
+  // Canonical matcher for main hierarchy
+  const match = matchCanonicalMainHierarchyRole(roleName);
+  if (match) {
+    return match.grade;
+  }
+
   if (clean.includes("master")) return 100;
-  if (clean.includes("proprietario") && !clean.includes("vice") && !clean.includes("v")) return 100;
-  if (clean.includes("vice proprietario") || clean.includes("v proprietario")) return 99;
-
-  if (clean.includes("responsabile generale")) return 21;
-
-  if (clean.includes("direttore generale")) {
-    if (clean.includes("v") || clean.includes("vice")) return 19;
-    return 20;
-  }
-  if (clean.includes("v direttore") || clean.includes("vice direttore")) return 17;
-  if (clean.includes("direttore sanitario") || clean.includes("direttore")) return 18;
-  if (clean.includes("segretario")) {
-    if (clean.includes("cda") || clean.includes("consiglio")) return 0;
-    return 16.5;
-  }
-  if (clean.includes("supervisore generale")) return 16;
-  if (clean.includes("v supervisore") || clean.includes("vice supervisore")) return 14;
-  if (clean.includes("assistente supervisore") || clean.includes("aiuto supervisore")) return 13;
-  if (clean.includes("supervisore")) return 15;
-  if (clean.includes("v responsabile") || clean.includes("vice responsabile")) return 11;
-  if (clean.includes("responsabile del presidio") || clean.includes("responsabile presidio") || clean.includes("responsabile")) return 12;
-  if (clean.includes("v primario") || clean.includes("vice primario")) return 9;
-  if (clean.includes("primario di reparto") || clean.includes("primario")) return 10;
-  if (clean.includes("medico capo")) return 8;
-  if (clean.includes("specialista")) return 7;
-  if (clean.includes("medico esperto")) return 6;
-  if (clean.includes("medico")) return 5;
-  if (clean.includes("paramedico")) return 4;
-  if (clean.includes("soccorritore")) return 3;
-  if (clean.includes("infermier")) return 2.5;
-  if (clean.includes("tirocinante") || clean.includes("allievo")) return 2;
-  if (clean.includes("volontario") || clean.includes("volontaria")) return 0.5;
-  if (clean.includes("dipendente")) return 1;
-
   return 0;
 }
 
@@ -1144,15 +1106,15 @@ function ensureTokensForCandidates() {
   saveRegisteredDiscordUsers(REGISTERED_DISCORD_USERS);
 }
 
-// Check if role is allowed
+// Check if role is allowed (strictly based on the official roles from the photos)
 function isRoleAllowed(roleName: string): boolean {
   if (!roleName) return false;
-  const cleanRole = roleName.trim().toLowerCase().replace(/[.'’®™┃]/g, "");
-  if (Object.keys(AUTHORIZED_ROLE_GRADES).some(allowed => allowed.toLowerCase() === cleanRole)) return true;
-  if (getRoleGrade(roleName) > 0) return true;
-  return Object.keys(AUTHORIZED_ROLE_GRADES).some(
-    allowed => cleanRole.includes(allowed.toLowerCase()) || allowed.toLowerCase().includes(cleanRole)
-  );
+  if (isCdaOnlyRoleName(roleName)) return true;
+  const mainMatch = matchCanonicalMainHierarchyRole(roleName);
+  if (mainMatch && mainMatch.grade > 0) return true;
+  const cdaMatch = matchCanonicalCdaRole(roleName);
+  if (cdaMatch) return true;
+  return false;
 }
 
 // Check if caller is high-level owner (Master token, Admin password, Proprietario, or Vice Proprietario with grade >= 99)
@@ -1511,6 +1473,8 @@ app.get("/api/discord/auth-url", (req, res) => {
     suggested.add(redirectUri);
     suggested.add(devUrl);
     suggested.add(preUrl);
+    suggested.add("http://localhost:3000/auth/callback/discord");
+    suggested.add("http://127.0.0.1:3000/auth/callback/discord");
 
     if (canonicalBase) {
       suggested.add(`${canonicalBase}/auth/callback/discord`);
@@ -1751,7 +1715,7 @@ app.get(["/auth/callback/discord", "/auth/callback/discord/", "/api/auth/discord
 
     // 4. Match roles against EMS hierarchy and check Owner permissions
     const match = matchDiscordMemberRoles(roleNames, cfg.ownerRoleName, guildMember?.roles);
-    if (!match.isAllowed || !match.highestEmsRole) {
+    if (!match.isAllowed || (!match.highestEmsRole && !match.cdaRole)) {
       return renderResult(
         false,
         null,
@@ -1777,11 +1741,13 @@ app.get(["/auth/callback/discord", "/auth/callback/discord/", "/api/auth/discord
       }
     }
 
+    const assignedHierarchyRole = match.highestEmsRole || (match.cdaRole ? match.cdaRole : "");
+
     const sessionData: DiscordSession = {
       token: sessionToken,
       username: cleanName,
-      roleName: match.highestEmsRole,
-      gradeName: match.highestEmsRole,
+      roleName: assignedHierarchyRole,
+      gradeName: assignedHierarchyRole,
       grade: match.highestGrade,
       isAllowed: true,
       isMaster: match.isOwner,
@@ -1804,26 +1770,20 @@ app.get(["/auth/callback/discord", "/auth/callback/discord/", "/api/auth/discord
       lastSeen: Date.now(),
       employeeToken: sessionToken,
       employeeUsername: cleanName,
-      employeeRoleName: match.highestEmsRole,
+      employeeRoleName: assignedHierarchyRole,
     });
     saveActiveSessions(ACTIVE_SESSIONS);
-
-    // Refresh hierarchy cache
-    HIERARCHY_MEMBERS = buildAutoHierarchyMembers();
-    saveAllHierarchyMembersFirestore(HIERARCHY_MEMBERS).catch((e) =>
-      console.error("Firestore saveHierarchy error:", e)
-    );
 
     addAccessLog(
       req,
       cleanName,
-      match.highestEmsRole,
+      assignedHierarchyRole,
       sessionToken,
       "Accesso Discord",
       "SUCCESS",
-      `Accesso autorizzato tramite Discord Bot. Ruolo: ${match.highestEmsRole} (Grado ${match.highestGrade})${
+      `Accesso autorizzato tramite Discord Bot. Ruolo: ${assignedHierarchyRole} (Grado ${match.highestGrade})${
         match.isOwner ? " [PROPRIETARIO]" : ""
-      }`
+      }${match.cdaRole ? ` [CDA: ${match.cdaRole}]` : ""}`
     );
 
     return renderResult(true, sessionData);
@@ -1896,12 +1856,8 @@ app.post("/api/discord/sync-guild-members", requireAdmin, async (req, res) => {
       }
     }
 
-    // Save and rebuild hierarchy
+    // Save registered discord users without overwriting hierarchy
     saveRegisteredDiscordUsers(REGISTERED_DISCORD_USERS);
-    HIERARCHY_MEMBERS = buildAutoHierarchyMembers();
-    saveAllHierarchyMembersFirestore(HIERARCHY_MEMBERS).catch((e) =>
-      console.error("Firestore saveHierarchy error:", e)
-    );
 
     saveDiscordConfig({
       lastSyncAt: new Date().toISOString(),
@@ -3284,10 +3240,6 @@ app.put("/api/admin/employee-tokens/:token", requireAdmin, async (req, res) => {
     await saveTokenFirestore({ ...updatedSession, isDev: cleanIsDev ? true : false });
     saveRegisteredDiscordUsers(REGISTERED_DISCORD_USERS);
 
-    // Refresh hierarchy cache
-    HIERARCHY_MEMBERS = buildAutoHierarchyMembers();
-    saveAllHierarchyMembersFirestore(HIERARCHY_MEMBERS);
-
     addAccessLog(
       req,
       caller.username,
@@ -3482,14 +3434,10 @@ app.post("/api/admin/employee-tokens/import-excel", requireAdmin, async (req, re
     saveRevokedTokens(REVOKED_TOKENS);
     savePurgedTokens(PURGED_TOKENS);
     ensureTokensForCandidates();
-    HIERARCHY_MEMBERS = buildAutoHierarchyMembers();
 
     // Sync to Cloud Firestore efficiently in a single batch without blocking response
     batchSyncTokensFirestore(tokensToDelete, processedSessions, tokensToUnrevoke).catch((e) =>
       console.error("Firestore batchSyncTokens error:", e)
-    );
-    saveAllHierarchyMembersFirestore(HIERARCHY_MEMBERS).catch((e) =>
-      console.error("Firestore saveHierarchyMembers error:", e)
     );
 
     addAccessLog(
@@ -3572,10 +3520,6 @@ app.post("/api/admin/employee-tokens/:token/reset", requireAdmin, async (req, re
     await saveTokenFirestore(updatedSession);
     saveRegisteredDiscordUsers(REGISTERED_DISCORD_USERS);
 
-    // Rebuild hierarchy
-    HIERARCHY_MEMBERS = buildAutoHierarchyMembers();
-    saveAllHierarchyMembersFirestore(HIERARCHY_MEMBERS);
-
     addAccessLog(
       req,
       caller.username,
@@ -3652,9 +3596,6 @@ app.post("/api/admin/employee-tokens/reset-all-except-master", requireAdmin, asy
     }
 
     saveRegisteredDiscordUsers(REGISTERED_DISCORD_USERS);
-
-    HIERARCHY_MEMBERS = buildAutoHierarchyMembers();
-    saveAllHierarchyMembersFirestore(HIERARCHY_MEMBERS);
 
     addAccessLog(
       req,
@@ -3889,10 +3830,6 @@ app.delete("/api/admin/employee-tokens/:token", requireAdmin, async (req, res) =
     }
     saveActiveSessions(ACTIVE_SESSIONS);
 
-    // Refresh hierarchy cache
-    HIERARCHY_MEMBERS = buildAutoHierarchyMembers();
-    saveAllHierarchyMembersFirestore(HIERARCHY_MEMBERS).catch((e) => console.error("Firestore saveHierarchyMembers error:", e));
-
     const reviewerName = req.body?.reviewer || (caller.username !== "Sconosciuto" ? caller.username : caller.roleName);
 
     addAccessLog(
@@ -4024,8 +3961,6 @@ app.delete("/api/admin/revoked-tokens/:token", requireAdmin, async (req, res) =>
 
     // Re-generate / sync candidate tokens
     ensureTokensForCandidates();
-    HIERARCHY_MEMBERS = buildAutoHierarchyMembers();
-    saveAllHierarchyMembersFirestore(HIERARCHY_MEMBERS);
 
     addAccessLog(
       req,
@@ -4144,10 +4079,6 @@ async function handlePermanentTokenDelete(req: express.Request, res: express.Res
       deleteActiveSessionFirestore(tKey);
     }
     saveActiveSessions(ACTIVE_SESSIONS);
-
-    // Refresh hierarchy cache
-    HIERARCHY_MEMBERS = buildAutoHierarchyMembers();
-    saveAllHierarchyMembersFirestore(HIERARCHY_MEMBERS);
 
     const reviewerName = req.body?.reviewer || (caller.username !== "Sconosciuto" ? caller.username : caller.roleName);
 
@@ -4998,7 +4929,7 @@ function buildAndSyncExcelGerarchia(
   return EXCEL_GERARCHIA_ENTRIES;
 }
 
-// Middleware: restrict Excel Gerarchia access to Direttore Generale key or Master/Proprietario
+// Middleware: restrict Excel Gerarchia access to Direttore Generale key or Master/Proprietario (Grade >= 20)
 function requireDirettoreGeneraleOrAdmin(req: express.Request, res: express.Response, next: express.NextFunction) {
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -5017,23 +4948,22 @@ function requireDirettoreGeneraleOrAdmin(req: express.Request, res: express.Resp
   const caller = getCallerGradeAndRole(req);
   const cleanRole = (caller.roleName || "").toLowerCase();
 
-  if (
+  // Strictly dal Direttore Generale in su (Direttore Generale [20], Responsabile Generale EMS [21], Proprietario [100])
+  const isAuthorized =
     caller.isMaster ||
+    caller.isAdminPassword ||
+    caller.grade >= 20 ||
     cleanRole.includes("proprietario") ||
     cleanRole.includes("vice proprietario") ||
-    cleanRole.includes("direttore") ||
-    caller.grade >= 10 ||
-    caller.isAdminPassword
-  ) {
-    return next();
-  }
+    cleanRole.includes("responsabile generale") ||
+    cleanRole.includes("direttore generale");
 
-  if (ACTIVE_SESSIONS.has(token) || REGISTERED_DISCORD_USERS.has(token.toUpperCase())) {
+  if (isAuthorized) {
     return next();
   }
 
   return res.status(403).json({
-    error: "Accesso Riservato: La sezione Excel Gerarchia è accessibile dal personale autorizzato.",
+    error: "Accesso Riservato: La sezione Excel Gerarchia è accessibile esclusivamente dal personale con grado dal Direttore Generale in su.",
   });
 }
 
@@ -8924,12 +8854,14 @@ export async function syncAllDataWithFirestore(force = false) {
       });
     }
 
-    // 5. Ensure official hierarchy members
-    HIERARCHY_MEMBERS = buildAutoHierarchyMembers();
-    if (!isFirestoreQuotaExhausted()) {
-      saveAllHierarchyMembersFirestore(HIERARCHY_MEMBERS).catch((e) =>
-        console.error("Error saving hierarchy members to Firestore:", e)
-      );
+    // 5. Ensure official hierarchy members (load from Firestore or disk without auto-overwriting)
+    const cloudHierarchy = await syncHierarchyMembersFirestore();
+    if (cloudHierarchy && cloudHierarchy.length > 0) {
+      HIERARCHY_MEMBERS = cloudHierarchy as HierarchyMember[];
+      sortHierarchyMembers(HIERARCHY_MEMBERS);
+      fs.writeFileSync(HIERARCHY_FILE, JSON.stringify(HIERARCHY_MEMBERS, null, 2), "utf-8");
+    } else {
+      ensureHierarchyLoaded();
     }
 
     lastGlobalSyncTimestamp = Date.now();
@@ -8947,7 +8879,7 @@ async function startServer() {
     purgeAllTokensExceptMaster(false).catch((e) => console.warn("Memory token purge warning:", e));
 
     if (!HIERARCHY_MEMBERS || HIERARCHY_MEMBERS.length === 0) {
-      HIERARCHY_MEMBERS = buildAutoHierarchyMembers();
+      HIERARCHY_MEMBERS = loadHierarchyFromFile();
     }
 
     if (process.env.NODE_ENV !== "production") {
@@ -9051,14 +8983,8 @@ async function syncDiscordMembersInternal() {
     }
     if (count > 0) {
       saveRegisteredDiscordUsers(REGISTERED_DISCORD_USERS);
-      HIERARCHY_MEMBERS = buildAutoHierarchyMembers();
-      if (!isFirestoreQuotaExhausted()) {
-        saveAllHierarchyMembersFirestore(HIERARCHY_MEMBERS).catch((e) =>
-          console.error("Firestore sync error:", e)
-        );
-      }
       saveDiscordConfig({ lastSyncAt: new Date().toISOString(), lastSyncCount: count });
-      console.log(`[BOT DISCORD] Sincronizzati automaticamente ${count} membri nella gerarchia EMS.`);
+      console.log(`[BOT DISCORD] Sincronizzati automaticamente ${count} account Discord per l'accesso.`);
     }
   } catch (err) {
     console.error("[BOT DISCORD] Errore sincronizzazione automatica:", err);

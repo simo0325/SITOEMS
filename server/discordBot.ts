@@ -1,6 +1,12 @@
 import fs from "fs";
 import path from "path";
-import { getSingleRoleGrade, isCdaOnlyRoleName } from "../src/types.js";
+import {
+  getSingleRoleGrade,
+  isCdaOnlyRoleName,
+  matchCanonicalMainHierarchyRole,
+  matchCanonicalCdaRole,
+  DISCORD_MAIN_HIERARCHY_ROLE_IDS,
+} from "../src/types.js";
 
 export interface DiscordBotConfig {
   clientId: string;
@@ -19,7 +25,7 @@ const CONFIG_FILE = path.join(process.cwd(), "discord_bot_config.json");
 
 function getDefaultConfig(): DiscordBotConfig {
   return {
-    clientId: (process.env.DISCORD_CLIENT_ID || "").trim(),
+    clientId: (process.env.DISCORD_CLIENT_ID || "1529792010603466883").trim(),
     clientSecret: (process.env.DISCORD_CLIENT_SECRET || "").trim(),
     botToken: (process.env.DISCORD_BOT_TOKEN || "").trim(),
     guildId: (process.env.DISCORD_GUILD_ID || "").trim(),
@@ -32,11 +38,7 @@ function getDefaultConfig(): DiscordBotConfig {
   };
 }
 
-let cachedConfig: DiscordBotConfig | null = null;
-
 export function getDiscordConfig(): DiscordBotConfig {
-  if (cachedConfig) return cachedConfig;
-
   let cfg = getDefaultConfig();
   try {
     if (fs.existsSync(CONFIG_FILE)) {
@@ -58,7 +60,6 @@ export function getDiscordConfig(): DiscordBotConfig {
     console.error("Errore lettura discord_bot_config.json:", err);
   }
 
-  cachedConfig = cfg;
   return cfg;
 }
 
@@ -71,7 +72,6 @@ export function saveDiscordConfig(updates: Partial<DiscordBotConfig>): DiscordBo
 
   try {
     fs.writeFileSync(CONFIG_FILE, JSON.stringify(updated, null, 2), "utf-8");
-    cachedConfig = updated;
   } catch (err) {
     console.error("Errore salvataggio discord_bot_config.json:", err);
   }
@@ -101,7 +101,7 @@ export function isDiscordBotConfigured(): boolean {
 // Builds the Discord OAuth2 URL for the popup
 export function buildDiscordAuthUrl(redirectUri: string, state?: string): string {
   const cfg = getDiscordConfig();
-  const clientId = cfg.clientId || "1234567890";
+  const clientId = cfg.clientId || "1529792010603466883";
   const params = new URLSearchParams({
     client_id: clientId,
     response_type: "code",
@@ -378,84 +378,78 @@ export function matchDiscordMemberRoles(
   let cdaRole: string | null = null;
   let highestCdaRank = 0;
 
-  // 1. If roleIds are passed, check directly against Discord CDA Role IDs
-  if (roleIds && Array.isArray(roleIds)) {
+  const targetOwnerName = (ownerRoleNameConfig || "Proprietario").trim().toLowerCase().replace(/[.'’®™┃]/g, "");
+
+  // 1. PRIMARY MATCHING: Using exact Discord Role IDs
+  let matchedMainById = false;
+  if (roleIds && Array.isArray(roleIds) && roleIds.length > 0) {
     for (const rId of roleIds) {
-      const match = DISCORD_CDA_ROLE_IDS[rId];
-      if (match && match.rank > highestCdaRank) {
-        highestCdaRank = match.rank;
-        cdaRole = match.roleName;
+      // Check CDA Role IDs
+      const cdaMatch = DISCORD_CDA_ROLE_IDS[rId];
+      if (cdaMatch && cdaMatch.rank > highestCdaRank) {
+        highestCdaRank = cdaMatch.rank;
+        cdaRole = cdaMatch.roleName;
+      }
+
+      // Check EMS Main Hierarchy Role IDs (Strictly the 21 IDs specified)
+      const mainMatch = DISCORD_MAIN_HIERARCHY_ROLE_IDS[rId];
+      if (mainMatch) {
+        matchedMainById = true;
+        if (mainMatch.grade > highestGrade) {
+          highestGrade = mainMatch.grade;
+          highestEmsRole = mainMatch.name;
+        }
+        if (rId === "1244676788672659517" || mainMatch.name === "Proprietario EMS") {
+          isOwner = true;
+        }
       }
     }
   }
 
-  const targetOwnerName = (ownerRoleNameConfig || "Proprietario").trim().toLowerCase().replace(/[.'’®™┃]/g, "");
+  // 2. FALLBACK ONLY: If roleIds were not provided or no main hierarchy role was found by ID
+  if (!matchedMainById) {
+    for (const rawRole of roleNames) {
+      if (!rawRole) continue;
+      const r = rawRole.trim();
+      const rClean = r.toLowerCase().replace(/[.'’®™┃]/g, "").trim();
 
-  for (const rawRole of roleNames) {
-    const r = rawRole.trim();
-    const rClean = r.toLowerCase().replace(/[.'’®™┃]/g, "").trim();
-
-    // Check Owner / Proprietario
-    if (
-      rClean === targetOwnerName ||
-      rClean.includes("proprietario") ||
-      rClean.includes("owner") ||
-      rClean.includes("master ems")
-    ) {
-      isOwner = true;
-      if (highestGrade < 100) {
-        highestGrade = 100;
-        highestEmsRole = "Proprietario";
+      // Check Owner / Proprietario
+      if (
+        rClean === targetOwnerName ||
+        rClean.includes("proprietario") ||
+        rClean.includes("owner") ||
+        rClean.includes("master ems")
+      ) {
+        isOwner = true;
+        if (highestGrade < 100) {
+          highestGrade = 100;
+          highestEmsRole = "Proprietario EMS";
+        }
       }
-    }
 
-    // Check CDA by Role Name (handles emojis, decorations, dots like C.D.A., apostrophes)
-    const norm = rClean.replace(/[-]/g, " ");
-    let foundCdaRole: string | null = null;
-    let foundCdaRank = 0;
-
-    if (norm.includes("consigliere finale")) {
-      foundCdaRole = "Consigliere Finale CDA";
-      foundCdaRank = 5;
-    } else if (norm.includes("presidente") && !norm.includes("vice") && !norm.includes("v")) {
-      if (norm.includes("cda") || norm.includes("consiglio")) {
-        foundCdaRole = "Presidente CDA";
-        foundCdaRank = 4;
+      // Check CDA by Role Name if not found by ID
+      if (!cdaRole) {
+        const cdaMatch = matchCanonicalCdaRole(r);
+        if (cdaMatch && cdaMatch.rank > highestCdaRank) {
+          highestCdaRank = cdaMatch.rank;
+          cdaRole = cdaMatch.name;
+        }
       }
-    } else if (norm.includes("vice presidente") || norm.includes("v presidente") || norm.includes("vicepresidente")) {
-      if (norm.includes("cda") || norm.includes("consiglio")) {
-        foundCdaRole = "Vice Presidente CDA";
-        foundCdaRank = 3;
-      }
-    } else if (norm.includes("segretario")) {
-      if (norm.includes("cda") || norm.includes("consiglio")) {
-        foundCdaRole = "Segretario CDA";
-        foundCdaRank = 2;
-      }
-    } else if (norm.includes("membro cda") || norm.includes("consiglio damministrazione") || norm.includes("consiglio amministrazione") || norm === "cda") {
-      foundCdaRole = "Membro CDA";
-      foundCdaRank = 1;
-    }
 
-    if (foundCdaRank > highestCdaRank) {
-      highestCdaRank = foundCdaRank;
-      cdaRole = foundCdaRole;
-    }
-
-    // Check EMS Role Grade ONLY for main hierarchy roles (CDA roles must NEVER be counted as hierarchy roles)
-    const isCdaRole = Boolean(foundCdaRole) || isCdaOnlyRoleName(r) || norm.includes("cda") || norm.includes("consiglio");
-    if (!isCdaRole) {
-      const grade = getSingleRoleGrade(r);
-      if (grade > highestGrade) {
-        highestGrade = grade;
-        highestEmsRole = r;
+      // Check EMS Role Grade ONLY for the 21 official main hierarchy roles
+      const hierarchyMatch = matchCanonicalMainHierarchyRole(r);
+      if (hierarchyMatch) {
+        if (hierarchyMatch.grade > highestGrade) {
+          highestGrade = hierarchyMatch.grade;
+          highestEmsRole = hierarchyMatch.name;
+        }
       }
     }
   }
 
   // Normalize highestEmsRole if user has Owner role
   if (isOwner && (!highestEmsRole || highestGrade < 100)) {
-    highestEmsRole = "Proprietario";
+    highestEmsRole = "Proprietario EMS";
     highestGrade = 100;
   }
 

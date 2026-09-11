@@ -1,0 +1,249 @@
+[
+  {
+    "id": "HIER-MANUAL-1789154234670-0-6E6D",
+    "name": "Antony Romano",
+    "roleName": "Proprietario",
+    "categoryKey": "PROPRIETARI",
+    "badge": "Consigliere Finale CDA",
+    "discordTag": "@anto.romano",
+    "updatedAt": "2026-09-11T19:17:14.670Z"
+  },
+  {
+    "id": "HIER-MANUAL-1789154234670-1-96E2",
+    "name": "Giovanni Manzo",
+    "roleName": "Proprietario",
+    "categoryKey": "PROPRIETARI",
+    "badge": "Consigliere Finale CDA",
+    "discordTag": "@smokafps",
+    "updatedAt": "2026-09-11T19:17:14.670Z"
+  },
+  {
+    "id": "HIER-MANUAL-1789154234670-2-5016",
+    "name": "Simone Rizzus",
+    "roleName": "Proprietario",
+    "categoryKey": "PROPRIETARI",
+    "badge": "Consigliere Finale CDA",
+    "discordTag": "@simolmao",
+    "updatedAt": "2026-09-11T19:17:14.670Z"
+  },
+  {
+    "id": "HIER-MANUAL-1789154234670-3-88FC",
+    "name": "Matias Corleone",
+    "roleName": "Responsabile Generale EMS",
+    "categoryKey": "DIRIGENZA_GENERALE",
+    "discordTag": "@_matiascorleone_",
+    "updatedAt": "2026-09-11T19:17:14.670Z"
+  },
+  {
+    "id": "HIER-MANUAL-1789154234670-5-85B7",
+    "name": "Dutch Esposito",
+    "roleName": "Direttore Generale",
+    "categoryKey": "DIRIGENZA_GENERALE",
+    "badge": "Vice Presidente CDA",
+    "discordTag": "@espanico10",
+    "updatedAt": "2026-09-11T19:17:14.670Z"
+  },
+  {
+    "id": "HIER-MANUAL-1789154234670-4-1E3C",
+    "name": "Theo Smith",
+    "roleName": "Direttore Generale",
+    "categoryKey": "DIRIGENZA_GENERALE",
+    "badge": "Presidente CDA",
+    "discordTag": "@b3nzy_",
+    "updatedAt": "2026-09-11T19:17:14.670Z"
+  },
+  {
+    "id": "HIER-MANUAL-1789154234670-6-D509",
+    "name": "Filippo Ciro",
+    "roleName": "Direttore Sanitario",
+    "categoryKey": "DIRIGENZA_SANITARIA",
+    "badge": "Vice Presidente CDA",
+    "discordTag": "@stellar9345",
+    "updatedAt": "2026-09-11T19:17:14.670Z"
+  },
+  {
+    "id": "HIER-MANUAL-1789154234670-7-B3B7",
+    "name": "Luca Brizzante",
+    "roleName": "Direttore Sanitario",
+    "categoryKey": "DIRIGENZA_SANITARIA",
+    "badge": "Segretario CDA",
+    "discordTag": "@ildivinoita",
+    "updatedAt": "2026-09-11T19:17:14.670Z"
+  },
+  {
+    "id": "HIER-MANUAL-1789154234670-8-1191",
+    "name": "Ares Migliorni",
+    "roleName": "V. Direttore Sanitario",
+    "categoryKey": "DIRIGENZA_SANITARIA",
+    "badge": "Membro CDA",
+    "discordTag": "@aresvxy",
+    "updatedAt": "2026-09-11T19:17:14.670Z"
+  },
+  {
+    "id": "HIER-MANUAL-1789154234670-9-D559",
+    "name": "Igor Lestrenge",
+    "roleName": "V. Direttore Sanitario",
+    "categoryKey": "DIRIGENZA_SANITARIA",
+    "badge": "Membro CDA",
+    "discordTag": "@tr3m0r_92",
+    "updatedAt": "2026-09-11T19:17:14.670Z"
+  },
+  {
+    "id": "HIER-MANUAL-1789154234670-10-9013",
+    "name": "Ciccio Losavio",
+    "roleName": "Segretario Direzione",
+    "categoryKey": "DIRIGENZA_SANITARIA",
+    "badge": "Membro CDA",
+    "discordTag": "@cicciotheboss",
+    "updatedAt": "2026-09-11T19:17:14.670Z"
+  },
+  {
+    "id": "HIER-MANUAL-1789154234670-11-2CC2",
+    "name": "Jonathan Giacomarra",
+    "roleName": "Segretario Direzione",
+    "categoryKey": "DIRIGENZA_SANITARIA",
+    "badge": "Membro CDA",
+    "discordTag": "@peppe7662",
+    "updatedAt": "2026-09-11T19:17:14.670Z"
+  },
+  {
+    "id": "HIER-MANUAL-1789154234670-12-CAC8",
+    "name": "Giuseppe Politics",
+    "roleName": "Supervisore Generale",
+    "categoryKey": "SUPERVISIONE",
+    "badge": "Membro CDA",
+    "discordTag": "@peppe_politico",
+    "updatedAt": "2026-09-11T19:17:14.670Z"
+  },
+  {
+    "id": "HIER-MANUAL-1789154234670-13-D997",
+    "name": "Diego Trombini",
+    "roleName": "Supervisore",
+    "categoryKey": "SUPERVISIONE",
+    "badge": "Membro CDA",
+    "discordTag": "@ilprodiego",
+    "updatedAt": "2026-09-11T19:17:14.670Z"
+  },
+  {
+    "id": "HIER-MANUAL-1789154234670-14-18F5",
+    "name": "Rocco Ali",
+    "roleName": "Supervisore",
+    "categoryKey": "SUPERVISIONE",
+    "badge": "Membro CDA",
+    "discordTag": "@gius_00",
+    "updatedAt": "2026-09-11T19:17:14.670Z"
+  },
+  {
+    "id": "HIER-MANUAL-1789154234670-15-3754",
+    "name": "Raffaele Bravi",
+    "roleName": "V. Supervisore",
+    "categoryKey": "SUPERVISIONE",
+    "badge": "Membro CDA",
+    "discordTag": "@loster2040_",
+    "updatedAt": "2026-09-11T19:17:14.670Z"
+  },
+  {
+    "id": "HIER-MANUAL-1789154234670-16-62BA",
+    "name": "Alex De Santis",
+    "roleName": "Assistente Supervisore",
+    "categoryKey": "SUPERVISIONE",
+    "discordTag": "@ss_alex",
+    "updatedAt": "2026-09-11T19:17:14.670Z"
+  },
+  {
+    "id": "HIER-MANUAL-1789154234670-17-D1D9",
+    "name": "Giangi Leanza",
+    "roleName": "Assistente Supervisore",
+    "categoryKey": "SUPERVISIONE",
+    "discordTag": "@giangixcomeback",
+    "updatedAt": "2026-09-11T19:17:14.670Z"
+  },
+  {
+    "id": "HIER-MANUAL-1789154234670-18-CDD6",
+    "name": "Antonio Palermo",
+    "roleName": "Responsabile Del Presidio",
+    "categoryKey": "FUNZIONARI",
+    "discordTag": "@antonio83_",
+    "updatedAt": "2026-09-11T19:17:14.670Z"
+  },
+  {
+    "id": "HIER-MANUAL-1789154234670-19-2749",
+    "name": "Kevin Panetto",
+    "roleName": "Responsabile Del Presidio",
+    "categoryKey": "FUNZIONARI",
+    "discordTag": "@fcim1988995_69767",
+    "updatedAt": "2026-09-11T19:17:14.670Z"
+  },
+  {
+    "id": "HIER-MANUAL-1789154234670-20-99D6",
+    "name": "Mirko Leone",
+    "roleName": "Responsabile Del Presidio",
+    "categoryKey": "FUNZIONARI",
+    "discordTag": "@mirkomirror",
+    "updatedAt": "2026-09-11T19:17:14.670Z"
+  },
+  {
+    "id": "HIER-MANUAL-1789154234670-21-08B2",
+    "name": "Nick Larson",
+    "roleName": "V. Responsabile Del Presidio",
+    "categoryKey": "FUNZIONARI",
+    "discordTag": "@norsk_scl",
+    "updatedAt": "2026-09-11T19:17:14.670Z"
+  },
+  {
+    "id": "HIER-MANUAL-1789154234670-22-C159",
+    "name": "Rick Maltese",
+    "roleName": "V. Responsabile Del Presidio",
+    "categoryKey": "FUNZIONARI",
+    "discordTag": "@synce7747",
+    "updatedAt": "2026-09-11T19:17:14.670Z"
+  },
+  {
+    "id": "HIER-MANUAL-1789154234670-23-1BBD",
+    "name": "Yuki Cross",
+    "roleName": "V. Responsabile Del Presidio",
+    "categoryKey": "FUNZIONARI",
+    "discordTag": "@yuki4488",
+    "updatedAt": "2026-09-11T19:17:14.670Z"
+  },
+  {
+    "id": "HIER-MANUAL-1789154234670-24-2448",
+    "name": "Massimo Arresto",
+    "roleName": "Primario di Reparto",
+    "categoryKey": "FUNZIONARI",
+    "discordTag": "@elguapo7207",
+    "updatedAt": "2026-09-11T19:17:14.670Z"
+  },
+  {
+    "id": "HIER-MANUAL-1789154234670-25-2BE4",
+    "name": "Matteo Piscitelli",
+    "roleName": "V. Primario di Reparto",
+    "categoryKey": "FUNZIONARI",
+    "discordTag": "@12flxppy",
+    "updatedAt": "2026-09-11T19:17:14.670Z"
+  },
+  {
+    "id": "HIER-MANUAL-1789154234670-26-454A",
+    "name": "Vincenzo Escobar",
+    "roleName": "V. Primario di Reparto",
+    "categoryKey": "FUNZIONARI",
+    "discordTag": "@xxvincy99xx",
+    "updatedAt": "2026-09-11T19:17:14.670Z"
+  },
+  {
+    "id": "HIER-MANUAL-1789154234670-27-6554",
+    "name": "Jolyne Kujo",
+    "roleName": "Volontario",
+    "categoryKey": "VOLONTARI",
+    "discordTag": "@gabri17._.",
+    "updatedAt": "2026-09-11T19:17:14.670Z"
+  },
+  {
+    "id": "HIER-MANUAL-1789154234670-28-AAE2",
+    "name": "Londra",
+    "roleName": "Volontario",
+    "categoryKey": "VOLONTARI",
+    "discordTag": "@darkettino",
+    "updatedAt": "2026-09-11T19:17:14.670Z"
+  }
+]

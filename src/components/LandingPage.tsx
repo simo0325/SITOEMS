@@ -39,9 +39,10 @@ import {
 interface LandingPageProps {
   onNavigate: (mode: "voter" | "admin" | "hierarchy" | "candidatura" | "cda" | "excel_gerarchia" | "role_election") => void;
   canAccessCda?: boolean;
+  canAccessExcel?: boolean;
 }
 
-export default function LandingPage({ onNavigate, canAccessCda = false }: LandingPageProps) {
+export default function LandingPage({ onNavigate, canAccessCda = false, canAccessExcel = false }: LandingPageProps) {
   const [copiedHandle, setCopiedHandle] = useState<string | null>(null);
   const [activeModal, setActiveModal] = useState<"regolamento" | "contatti" | "discord" | null>(null);
   const [selectedFounder, setSelectedFounder] = useState<{
@@ -253,21 +254,23 @@ export default function LandingPage({ onNavigate, canAccessCda = false }: Landin
               </button>
             )}
 
+            {canAccessExcel && (
+              <button
+                onClick={() => onNavigate("excel_gerarchia")}
+                className="px-6 py-3.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-sm font-bold tracking-wide shadow-lg shadow-emerald-950/60 border border-emerald-400/30 flex items-center gap-2.5 cursor-pointer transition-all hover:scale-102 active:scale-98"
+              >
+                <FileSpreadsheet size={18} />
+                <span>Excel Gerarchia (≥ Direttore Gen.)</span>
+                <ArrowRight size={16} />
+              </button>
+            )}
+
             <button
               onClick={() => onNavigate("hierarchy")}
               className="px-6 py-3.5 rounded-xl bg-gradient-to-r from-amber-600 to-red-600 hover:from-amber-500 hover:to-red-500 text-white text-sm font-bold tracking-wide shadow-lg shadow-amber-950/60 border border-amber-400/30 flex items-center gap-2.5 cursor-pointer transition-all hover:scale-102 active:scale-98"
             >
               <Award size={18} />
               <span>Gerarchia EMS</span>
-              <ArrowRight size={16} />
-            </button>
-
-            <button
-              onClick={() => onNavigate("excel_gerarchia")}
-              className="px-6 py-3.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-sm font-bold tracking-wide shadow-lg shadow-emerald-950/60 border border-emerald-400/30 flex items-center gap-2.5 cursor-pointer transition-all hover:scale-102 active:scale-98"
-            >
-              <FileSpreadsheet size={18} />
-              <span>Excel Gerarchia</span>
               <ArrowRight size={16} />
             </button>
 

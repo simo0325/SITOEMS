@@ -189,56 +189,97 @@ export interface DiscordUserSession {
 }
 
 const ROLE_GRADE_MAP: Record<string, number> = {
-  // Proprietà EMS
+  // Proprietà EMS (Photo 1)
+  "proprietario ems": 100,
   "proprietario": 100,
   "vice proprietario": 99,
   "v. proprietario": 99,
+  "v proprietario": 99,
 
-  // Dirigenza & Gerarchia EMS
+  // Dirigenza Generale & Sanitaria (Photo 1 & 2)
   "responsabile generale ems": 21,
   "responsabile generale": 21,
-  "responsabile generale r.e.s.": 21,
-  "responsabile generale res": 21,
   "direttore generale": 20,
-  "v. direttore generale": 19,
-  "vice direttore generale": 19,
   "direttore sanitario": 18,
   "v. direttore sanitario": 17,
   "vice direttore sanitario": 17,
+  "v direttore sanitario": 17,
   "segretario direzione": 16.5,
+
+  // Supervisione & Funzionari & Operativi (Photo 4)
   "supervisore generale": 16,
   "supervisore": 15,
   "v. supervisore": 14,
   "vice supervisore": 14,
+  "v supervisore": 14,
   "assistente supervisore": 13,
-  "aiuto supervisore": 13,
   "responsabile del presidio": 12,
   "responsabile presidio": 12,
   "v. responsabile del presidio": 11,
   "vice responsabile del presidio": 11,
-  "v. responsabile presidio": 11,
-  "vice responsabile presidio": 11,
-  "primario di reparto": 10,
+  "v responsabile del presidio": 11,
+  "primario di reparto": 10.5,
+  "v. primario di reparto": 9.5,
+  "vice primario di reparto": 9.5,
+  "v primario di reparto": 9.5,
   "primario": 10,
-  "v. primario di reparto": 9,
-  "vice primario di reparto": 9,
   "v. primario": 9,
   "vice primario": 9,
-  "medico capo": 8,
-  "medico specialista": 7,
-  "specialista": 7,
+  "v primario": 9,
   "medico esperto": 6,
   "medico": 5,
-  "paramedico": 4,
-  "soccorritore": 3,
   "infermiere": 2.5,
-  "infermiera": 2.5,
   "tirocinante": 2,
-  "allievo": 2,
   "volontario": 1.5,
-  "volontaria": 1.5,
-  "dipendente": 1,
 };
+
+export const DISCORD_MAIN_HIERARCHY_ROLE_IDS: Record<string, { name: string; grade: number }> = {
+  "1244676788672659517": { name: "Proprietario EMS", grade: 100 },
+  "1546500255640461403": { name: "Responsabile Generale EMS", grade: 21 },
+  "1418722531741012098": { name: "Direttore Generale", grade: 20 },
+  "987239642501898311": { name: "Direttore Sanitario", grade: 18 },
+  "1001145705433399336": { name: "V. Direttore Sanitario", grade: 17 },
+  "1409477684618203196": { name: "Segretario Direzione", grade: 16.5 },
+  "1492096452774592562": { name: "Supervisore Generale", grade: 16 },
+  "1140226385588273172": { name: "Supervisore", grade: 15 },
+  "1156900897675280425": { name: "V. Supervisore", grade: 14 },
+  "1492095948162338826": { name: "Assistente Supervisore", grade: 13 },
+  "1108482881510195322": { name: "Responsabile Del Presidio", grade: 12 },
+  "1091808520652992572": { name: "V. Responsabile Del Presidio", grade: 11 },
+  "1114126741351432294": { name: "Primario di Reparto", grade: 10.5 },
+  "1091807343597072515": { name: "V. Primario di Reparto", grade: 9.5 },
+  "987106477217021954": { name: "Primario", grade: 10 },
+  "1031477641640935424": { name: "V. Primario", grade: 9 },
+  "1031477565635973210": { name: "Medico Esperto", grade: 6 },
+  "987106479163203614": { name: "Medico", grade: 5 },
+  "1147818541928677426": { name: "Infermiere", grade: 2.5 },
+  "1000816226710323301": { name: "Tirocinante", grade: 2 },
+  "1539619731592450058": { name: "Volontario", grade: 1.5 },
+};
+
+export const MAIN_HIERARCHY_ROLE_NAMES = [
+  "Proprietario EMS",
+  "Responsabile Generale EMS",
+  "Direttore Generale",
+  "Direttore Sanitario",
+  "V. Direttore Sanitario",
+  "Segretario Direzione",
+  "Supervisore Generale",
+  "Supervisore",
+  "V. Supervisore",
+  "Assistente Supervisore",
+  "Responsabile Del Presidio",
+  "V. Responsabile Del Presidio",
+  "Primario di Reparto",
+  "V. Primario di Reparto",
+  "Primario",
+  "V. Primario",
+  "Medico Esperto",
+  "Medico",
+  "Infermiere",
+  "Tirocinante",
+  "Volontario",
+] as const;
 
 export function isCdaOnlyRoleName(roleName?: string): boolean {
   if (!roleName) return false;
@@ -253,11 +294,8 @@ export function isCdaOnlyRoleName(roleName?: string): boolean {
     r.includes("primario") ||
     r.includes("medico") ||
     r.includes("infermier") ||
-    r.includes("soccorritore") ||
-    r.includes("paramedico") ||
     r.includes("tirocinante") ||
     r.includes("volontario") ||
-    r.includes("dipendente") ||
     r.includes("presidio") ||
     r.includes("supervisore")
   ) {
@@ -266,9 +304,155 @@ export function isCdaOnlyRoleName(roleName?: string): boolean {
   return isCdaRoleName(roleName) || r.includes("cda") || r.includes("consiglio");
 }
 
+export function isMainHierarchyRole(roleName?: string): boolean {
+  if (!roleName) return false;
+  const clean = roleName.trim().toLowerCase().replace(/[.'’®™┃-]/g, " ").replace(/\s+/g, " ").trim();
+  if (
+    clean.includes("dgs") ||
+    clean.includes("format") ||
+    clean.includes("alliev") ||
+    clean.includes("soccorrit") ||
+    clean.includes("specialist") ||
+    clean.includes("capo") ||
+    clean.includes("paramedic") ||
+    clean.includes("dipendente")
+  ) {
+    return false;
+  }
+  if (isCdaOnlyRoleName(roleName)) return false;
+  const grade = getSingleRoleGrade(roleName);
+  return grade > 0;
+}
+
+export function matchCanonicalMainHierarchyRole(rawRole?: string): { name: string; grade: number } | null {
+  if (!rawRole) return null;
+  const clean = rawRole.trim().toLowerCase().replace(/[.'’®™┃-]/g, " ").replace(/\s+/g, " ").trim();
+
+  // EXPLICIT BLACKLIST: DGS, Formatori, and other external roles must NEVER match EMS main hierarchy!
+  if (
+    clean.includes("dgs") ||
+    clean.includes("format") ||
+    clean.includes("alliev") ||
+    clean.includes("soccorrit") ||
+    clean.includes("specialist") ||
+    clean.includes("capo") ||
+    clean.includes("paramedic") ||
+    clean.includes("dipendente")
+  ) {
+    return null;
+  }
+
+  // Must not be a CDA only role
+  if (isCdaOnlyRoleName(rawRole) || ((clean.includes("cda") || clean.includes("consiglio")) && !clean.includes("proprietario"))) {
+    return null;
+  }
+
+  // Exact ordered matches for the 21 main hierarchy roles
+  if (clean.includes("proprietario")) {
+    if (clean.includes("vice") || clean.includes("v ")) return { name: "Vice Proprietario", grade: 99 };
+    return { name: "Proprietario EMS", grade: 100 };
+  }
+  if (clean.includes("responsabile generale")) {
+    return { name: "Responsabile Generale EMS", grade: 21 };
+  }
+  if (clean.includes("direttore generale")) {
+    return { name: "Direttore Generale", grade: 20 };
+  }
+  if (clean.includes("v direttore sanitario") || clean.includes("vice direttore sanitario") || (clean.includes("direttore sanitario") && (clean.includes("vice") || clean.includes("v ")))) {
+    return { name: "V. Direttore Sanitario", grade: 17 };
+  }
+  if (clean.includes("direttore sanitario")) {
+    return { name: "Direttore Sanitario", grade: 18 };
+  }
+  if (clean.includes("segretario direzione") || (clean.includes("segretario") && clean.includes("direzione"))) {
+    return { name: "Segretario Direzione", grade: 16.5 };
+  }
+  if (clean.includes("supervisore generale")) {
+    return { name: "Supervisore Generale", grade: 16 };
+  }
+  if (clean.includes("assistente supervisore") || clean.includes("aiuto supervisore")) {
+    return { name: "Assistente Supervisore", grade: 13 };
+  }
+  if (clean.includes("v supervisore") || clean.includes("vice supervisore") || (clean.includes("supervisore") && (clean.includes("vice") || clean.includes("v ")))) {
+    return { name: "V. Supervisore", grade: 14 };
+  }
+  // Only standard Supervisore (without other words)
+  if (clean === "supervisore" || clean.endsWith(" supervisore") || clean.startsWith("supervisore ")) {
+    if (!clean.includes("dgs")) {
+      return { name: "Supervisore", grade: 15 };
+    }
+  }
+  if (clean.includes("v responsabile") || clean.includes("vice responsabile") || clean.includes("v responsabile del presidio")) {
+    return { name: "V. Responsabile Del Presidio", grade: 11 };
+  }
+  if (clean.includes("responsabile del presidio") || clean.includes("responsabile presidio")) {
+    return { name: "Responsabile Del Presidio", grade: 12 };
+  }
+  if (clean.includes("v primario di reparto") || clean.includes("vice primario di reparto") || (clean.includes("primario di reparto") && (clean.includes("vice") || clean.includes("v ")))) {
+    return { name: "V. Primario di Reparto", grade: 9.5 };
+  }
+  if (clean.includes("primario di reparto")) {
+    return { name: "Primario di Reparto", grade: 10.5 };
+  }
+  if (clean.includes("v primario") || clean.includes("vice primario") || (clean.includes("primario") && (clean.includes("vice") || clean.includes("v ")))) {
+    return { name: "V. Primario", grade: 9 };
+  }
+  if (clean === "primario" || clean.endsWith(" primario") || clean.startsWith("primario ")) {
+    return { name: "Primario", grade: 10 };
+  }
+  if (clean.includes("medico esperto")) {
+    return { name: "Medico Esperto", grade: 6 };
+  }
+  if (clean === "medico" || clean.endsWith(" medico") || clean.startsWith("medico ")) {
+    return { name: "Medico", grade: 5 };
+  }
+  if (clean.includes("infermier")) {
+    return { name: "Infermiere", grade: 2.5 };
+  }
+  if (clean.includes("tirocinante")) {
+    return { name: "Tirocinante", grade: 2 };
+  }
+  if (clean.includes("volontari")) {
+    return { name: "Volontario", grade: 1.5 };
+  }
+
+  return null;
+}
+
+export function matchCanonicalCdaRole(rawRole?: string): { name: string; rank: number } | null {
+  if (!rawRole) return null;
+  const clean = rawRole.trim().toLowerCase().replace(/[.'’®™┃-]/g, " ").replace(/\s+/g, " ").trim();
+
+  // Reject hospital direction roles
+  if (clean.includes("segretario direzione") || (clean.includes("segretario") && clean.includes("direzione"))) {
+    return null;
+  }
+
+  if (clean.includes("consigliere finale")) {
+    return { name: "Consigliere Finale CDA", rank: 5 };
+  }
+  if (clean.includes("presidente") && !clean.includes("vice") && !clean.includes("v ") && (clean.includes("cda") || clean.includes("c d a") || clean.includes("consiglio"))) {
+    return { name: "Presidente CDA", rank: 4 };
+  }
+  if ((clean.includes("vice presidente") || clean.includes("v presidente") || clean.includes("vicepresidente") || clean.includes("v-presidente")) && (clean.includes("cda") || clean.includes("c d a") || clean.includes("consiglio"))) {
+    return { name: "Vice Presidente CDA", rank: 3 };
+  }
+  if (clean.includes("segretario") && (clean.includes("cda") || clean.includes("c d a") || clean.includes("consiglio"))) {
+    return { name: "Segretario CDA", rank: 2 };
+  }
+  if (clean.includes("consiglio") && (clean.includes("amministrazione") || clean.includes("damministrazione") || clean.includes("d amministrazione") || clean.includes("cda") || clean.includes("c d a"))) {
+    return { name: "Consiglio D'Amministrazione", rank: 1 };
+  }
+  if (clean === "cda" || clean === "c d a" || clean === "membro cda") {
+    return { name: "Consiglio D'Amministrazione", rank: 1 };
+  }
+
+  return null;
+}
+
 export function getSingleRoleGrade(roleName?: string): number {
   if (!roleName) return 0;
-  const clean = roleName.trim().toLowerCase().replace(/[.'’®™┃]/g, "");
+  const clean = roleName.trim().toLowerCase().replace(/[.'’®™┃-]/g, " ").replace(/\s+/g, " ").trim();
 
   // CDA roles must NEVER be graded as EMS hospital hierarchy roles
   if (
@@ -282,37 +466,13 @@ export function getSingleRoleGrade(roleName?: string): number {
     return ROLE_GRADE_MAP[clean];
   }
 
-  if (clean.includes("master")) return 100;
-  if (clean.includes("proprietario") && !clean.includes("vice") && !clean.includes("v")) return 100;
-  if (clean.includes("vice proprietario") || clean.includes("v proprietario")) return 99;
-
-  if (clean.includes("responsabile generale")) return 21;
-
-  if (clean.includes("direttore generale")) {
-    if (clean.includes("v") || clean.includes("vice")) return 19;
-    return 20;
+  // Use the canonical matcher to evaluate grade strictly
+  const match = matchCanonicalMainHierarchyRole(roleName);
+  if (match) {
+    return match.grade;
   }
-  if (clean.includes("v direttore") || clean.includes("vice direttore")) return 17;
-  if (clean.includes("direttore sanitario") || clean.includes("direttore")) return 18;
-  if (clean.includes("segretario")) return 16.5;
-  if (clean.includes("supervisore generale")) return 16;
-  if (clean.includes("v supervisore") || clean.includes("vice supervisore")) return 14;
-  if (clean.includes("assistente supervisore") || clean.includes("aiuto supervisore")) return 13;
-  if (clean.includes("supervisore")) return 15;
-  if (clean.includes("v responsabile") || clean.includes("vice responsabile")) return 11;
-  if (clean.includes("responsabile del presidio") || clean.includes("responsabile presidio") || clean.includes("responsabile")) return 12;
-  if (clean.includes("v primario") || clean.includes("vice primario")) return 9;
-  if (clean.includes("primario di reparto") || clean.includes("primario")) return 10;
-  if (clean.includes("medico capo")) return 8;
-  if (clean.includes("specialista")) return 7;
-  if (clean.includes("medico esperto")) return 6;
-  if (clean.includes("medico")) return 5;
-  if (clean.includes("paramedico")) return 4;
-  if (clean.includes("soccorritore")) return 3;
-  if (clean.includes("infermier")) return 2.5;
-  if (clean.includes("tirocinante") || clean.includes("allievo")) return 2;
-  if (clean.includes("dipendente")) return 1;
 
+  if (clean.includes("master")) return 100;
   return 0;
 }
 
@@ -340,6 +500,8 @@ export interface AccessLog {
 }
 
 export const ALLOWED_DISCORD_ROLES = [
+  // 21 Ruoli Gerarchia Principale (Foto 1, 2, 4)
+  "Proprietario EMS",
   "Proprietario",
   "Vice Proprietario",
   "Responsabile Generale EMS",
@@ -357,24 +519,18 @@ export const ALLOWED_DISCORD_ROLES = [
   "V. Primario di Reparto",
   "Primario",
   "V. Primario",
-  "Medico Capo",
-  "Medico Specialista",
-  "Specialista",
   "Medico Esperto",
   "Medico",
-  "Paramedico",
-  "Soccorritore",
   "Infermiere",
-  "Infermiera",
   "Tirocinante",
-  "Allievo",
   "Volontario",
-  "Dipendente",
+
+  // 5 Ruoli CDA (Foto 3)
   "Consigliere Finale CDA",
   "Presidente CDA",
   "Vice Presidente CDA",
   "Segretario CDA",
-  "Membro CDA",
+  "Consiglio D'Amministrazione",
 ];
 
 export type HierarchyCategoryKey =

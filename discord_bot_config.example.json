@@ -1,0 +1,12 @@
+{
+  "clientId": "YOUR_CLIENT_ID",
+  "clientSecret": "YOUR_CLIENT_SECRET",
+  "botToken": "YOUR_BOT_TOKEN",
+  "guildId": "YOUR_GUILD_ID",
+  "ownerRoleName": "Proprietario",
+  "ownerRoleId": "",
+  "autoSyncEnabled": true,
+  "canonicalUrl": "",
+  "lastSyncAt": "",
+  "lastSyncCount": 0
+}

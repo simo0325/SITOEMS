@@ -14,8 +14,8 @@
   {
     "token": "DISCORD_178899190519300096",
     "username": "Matthew Nicholas Prate",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -23,13 +23,13 @@
     "discordTag": "@.prowerfox",
     "avatar": "https://cdn.discordapp.com/avatars/178899190519300096/330ea3e429617d9a97fd1751e859892e.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.672Z"
+    "verifiedAt": "2026-09-11T20:13:14.098Z"
   },
   {
     "token": "DISCORD_184283783803961344",
     "username": "Xenot",
-    "roleName": "Proprietario",
-    "gradeName": "Proprietario",
+    "roleName": "Proprietario EMS",
+    "gradeName": "Proprietario EMS",
     "grade": 100,
     "isAllowed": true,
     "isMaster": true,
@@ -37,13 +37,13 @@
     "discordTag": "@xenot00",
     "avatar": "https://cdn.discordapp.com/avatars/184283783803961344/a76030daf140b4ce445613da764ce449.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.672Z"
+    "verifiedAt": "2026-09-11T20:13:14.098Z"
   },
   {
     "token": "DISCORD_201370715847393280",
     "username": "Federico Savastano",
-    "roleName": "🥼┃Infermiere®",
-    "gradeName": "🥼┃Infermiere®",
+    "roleName": "Infermiere",
+    "gradeName": "Infermiere",
     "grade": 2.5,
     "isAllowed": true,
     "isMaster": false,
@@ -51,27 +51,13 @@
     "discordTag": "@fede14",
     "avatar": "https://cdn.discordapp.com/avatars/201370715847393280/3cb59c9a0ee1da6d5d6a29003407982a.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.672Z"
-  },
-  {
-    "token": "DISCORD_206407887554084865",
-    "username": "Thore Hezb Olah",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
-    "grade": 2,
-    "isAllowed": true,
-    "isMaster": false,
-    "discordId": "206407887554084865",
-    "discordTag": "@t0re1",
-    "avatar": "https://cdn.discordapp.com/avatars/206407887554084865/858a458579b93192b3126cf9c01db531.png",
-    "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.672Z"
+    "verifiedAt": "2026-09-11T20:13:14.098Z"
   },
   {
     "token": "DISCORD_214475574297624597",
     "username": "Morfologico",
-    "roleName": "Proprietario",
-    "gradeName": "Proprietario",
+    "roleName": "Proprietario EMS",
+    "gradeName": "Proprietario EMS",
     "grade": 100,
     "isAllowed": true,
     "isMaster": true,
@@ -79,13 +65,13 @@
     "discordTag": "@morfologico",
     "avatar": "https://cdn.discordapp.com/avatars/214475574297624597/a_76f6d14f0012d3034ed67528ce1fd3c5.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.672Z"
+    "verifiedAt": "2026-09-11T20:13:14.099Z"
   },
   {
     "token": "DISCORD_217696248583421952",
     "username": "Cosimio Esposito",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -93,13 +79,13 @@
     "discordTag": "@cosiminotwitch",
     "avatar": "https://cdn.discordapp.com/avatars/217696248583421952/43d09a42197c754fc8f85eb468b1be20.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.672Z"
+    "verifiedAt": "2026-09-11T20:13:14.099Z"
   },
   {
     "token": "DISCORD_253167967854919680",
     "username": "Python Sh",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -107,13 +93,13 @@
     "discordTag": "@a.i.94",
     "avatar": "https://cdn.discordapp.com/avatars/253167967854919680/632adb44c3ffe136e6ec68aeeacf5495.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.673Z"
+    "verifiedAt": "2026-09-11T20:13:14.099Z"
   },
   {
     "token": "DISCORD_255881007255912449",
     "username": "Patrizia Pepe",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -121,13 +107,13 @@
     "discordTag": "@haribo4078",
     "avatar": "https://cdn.discordapp.com/avatars/255881007255912449/fd8dd582e486ce70f0ac54e173d574a4.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.673Z"
+    "verifiedAt": "2026-09-11T20:13:14.099Z"
   },
   {
     "token": "DISCORD_257255758352220172",
     "username": "Ioctl Sosa",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -135,13 +121,13 @@
     "discordTag": "@puttaniere",
     "avatar": "https://cdn.discordapp.com/avatars/257255758352220172/ac4b723c5afb1259af64e447d862eae8.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.673Z"
+    "verifiedAt": "2026-09-11T20:13:14.099Z"
   },
   {
     "token": "DISCORD_259407824860217344",
     "username": "Gabriel Maranzano",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -149,13 +135,13 @@
     "discordTag": "@gaetano3467",
     "avatar": "https://cdn.discordapp.com/avatars/259407824860217344/2e8bc3990dccee34de157ce218a2d7a7.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.673Z"
+    "verifiedAt": "2026-09-11T20:13:14.099Z"
   },
   {
     "token": "DISCORD_270544490299785216",
     "username": "Mirko Leone",
-    "roleName": "👨‍🏫┃Responsabile Formatori DGS®",
-    "gradeName": "👨‍🏫┃Responsabile Formatori DGS®",
+    "roleName": "Responsabile Del Presidio",
+    "gradeName": "Responsabile Del Presidio",
     "grade": 12,
     "isAllowed": true,
     "isMaster": false,
@@ -163,13 +149,13 @@
     "discordTag": "@mirkomirror",
     "avatar": "https://cdn.discordapp.com/avatars/270544490299785216/e679052c6ebca5d2512e14339631a823.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.673Z"
+    "verifiedAt": "2026-09-11T20:13:14.099Z"
   },
   {
     "token": "DISCORD_286873394711101440",
     "username": "Rocco Ali",
-    "roleName": "🥼┃Supervisore®",
-    "gradeName": "🥼┃Supervisore®",
+    "roleName": "Supervisore",
+    "gradeName": "Supervisore",
     "grade": 15,
     "isAllowed": true,
     "isMaster": false,
@@ -178,13 +164,13 @@
     "avatar": "https://cdn.discordapp.com/avatars/286873394711101440/8f1d52d3d52a7ca6f5e5ad3e0f865f50.png",
     "cdaRoleName": "Membro CDA",
     "hasCdaAccess": true,
-    "verifiedAt": "2026-09-11T10:57:42.674Z"
+    "verifiedAt": "2026-09-11T20:13:14.099Z"
   },
   {
     "token": "DISCORD_292314804973076480",
     "username": "Antony Spring",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -192,13 +178,13 @@
     "discordTag": "@thequattro95",
     "avatar": "https://cdn.discordapp.com/avatars/292314804973076480/1b1482e3087e55997a77f1039697f6e6.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.674Z"
+    "verifiedAt": "2026-09-11T20:13:14.099Z"
   },
   {
     "token": "DISCORD_295984273096179724",
     "username": "Francesco Saverio De Vito",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -206,14 +192,14 @@
     "discordTag": "@god_monkey88",
     "avatar": "https://cdn.discordapp.com/avatars/295984273096179724/7a2fc1c669874f4adffdb8fd86cd2ffe.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.674Z"
+    "verifiedAt": "2026-09-11T20:13:14.099Z"
   },
   {
     "token": "DISCORD_301784737188544514",
     "username": "Theo Smith",
-    "roleName": "👔 ┃Responsabile Generale R.E.S.®",
-    "gradeName": "👔 ┃Responsabile Generale R.E.S.®",
-    "grade": 21,
+    "roleName": "Direttore Generale",
+    "gradeName": "Direttore Generale",
+    "grade": 20,
     "isAllowed": true,
     "isMaster": false,
     "discordId": "301784737188544514",
@@ -221,27 +207,27 @@
     "avatar": "https://cdn.discordapp.com/avatars/301784737188544514/69a5e63e55ae22614d628e2f85234afa.png",
     "cdaRoleName": "Presidente CDA",
     "hasCdaAccess": true,
-    "verifiedAt": "2026-09-11T10:57:42.675Z"
+    "verifiedAt": "2026-09-11T20:13:14.099Z"
   },
   {
     "token": "DISCORD_309752063242403850",
     "username": "Alex Giusti",
-    "roleName": "🧬  |  Ginecologo Specialista®",
-    "gradeName": "🧬  |  Ginecologo Specialista®",
-    "grade": 7,
+    "roleName": "Medico Esperto",
+    "gradeName": "Medico Esperto",
+    "grade": 6,
     "isAllowed": true,
     "isMaster": false,
     "discordId": "309752063242403850",
     "discordTag": "@riccardo1770",
     "avatar": "https://cdn.discordapp.com/avatars/309752063242403850/9abf8584d12ed55686b12e3ec4086e33.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.675Z"
+    "verifiedAt": "2026-09-11T20:13:14.099Z"
   },
   {
     "token": "DISCORD_320535371802738698",
     "username": "Luca Brizzante",
-    "roleName": "🥼┃Direttore Sanitario®",
-    "gradeName": "🥼┃Direttore Sanitario®",
+    "roleName": "Direttore Sanitario",
+    "gradeName": "Direttore Sanitario",
     "grade": 18,
     "isAllowed": true,
     "isMaster": false,
@@ -250,26 +236,26 @@
     "avatar": "https://cdn.discordapp.com/avatars/320535371802738698/70e33709d3303c8bbde19d5462430c71.png",
     "cdaRoleName": "Segretario CDA",
     "hasCdaAccess": true,
-    "verifiedAt": "2026-09-11T10:57:42.676Z"
+    "verifiedAt": "2026-09-11T20:13:14.100Z"
   },
   {
     "token": "DISCORD_336470009666863105",
     "username": "Fabio Bortoluz",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
     "discordId": "336470009666863105",
     "discordTag": "@fabbiett",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.676Z"
+    "verifiedAt": "2026-09-11T20:13:14.100Z"
   },
   {
     "token": "DISCORD_350951524882448385",
     "username": "Emily hayes",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -277,13 +263,13 @@
     "discordTag": "@valee_mvp",
     "avatar": "https://cdn.discordapp.com/avatars/350951524882448385/070fec8fbd1e67ea5eff7ab5dab51772.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.676Z"
+    "verifiedAt": "2026-09-11T20:13:14.100Z"
   },
   {
     "token": "DISCORD_373480908679938048",
     "username": "Lily Flores",
-    "roleName": "🥼┃Primario®",
-    "gradeName": "🥼┃Primario®",
+    "roleName": "Primario",
+    "gradeName": "Primario",
     "grade": 10,
     "isAllowed": true,
     "isMaster": false,
@@ -291,13 +277,13 @@
     "discordTag": "@_ilovejapan_",
     "avatar": "https://cdn.discordapp.com/avatars/373480908679938048/3c505159e7742c81f6cba37c7c8b4712.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.677Z"
+    "verifiedAt": "2026-09-11T20:13:14.100Z"
   },
   {
     "token": "DISCORD_382564900037459968",
     "username": "Giuseppe Stallone",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -305,13 +291,13 @@
     "discordTag": "@matteo01sa",
     "avatar": "https://cdn.discordapp.com/avatars/382564900037459968/a_5be46ed333738234ec3e5c36819a907c.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.677Z"
+    "verifiedAt": "2026-09-11T20:13:14.100Z"
   },
   {
     "token": "DISCORD_388386532412620802",
     "username": "! Baku",
-    "roleName": "Proprietario",
-    "gradeName": "Proprietario",
+    "roleName": "Proprietario EMS",
+    "gradeName": "Proprietario EMS",
     "grade": 100,
     "isAllowed": true,
     "isMaster": true,
@@ -319,13 +305,13 @@
     "discordTag": "@baku._.",
     "avatar": "https://cdn.discordapp.com/avatars/388386532412620802/eb4c61a566cc73c9c5a3ef3a4120a3bb.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.677Z"
+    "verifiedAt": "2026-09-11T20:13:14.100Z"
   },
   {
     "token": "DISCORD_388790998584524810",
     "username": "Cremenzio Rhemo",
-    "roleName": "🥼┃Medico®",
-    "gradeName": "🥼┃Medico®",
+    "roleName": "Medico",
+    "gradeName": "Medico",
     "grade": 5,
     "isAllowed": true,
     "isMaster": false,
@@ -333,26 +319,26 @@
     "discordTag": "@atonno",
     "avatar": "https://cdn.discordapp.com/avatars/388790998584524810/ffff61d430595876cd78ba7a8ecb4ac3.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.677Z"
+    "verifiedAt": "2026-09-11T20:13:14.100Z"
   },
   {
     "token": "DISCORD_406862508167790612",
     "username": "Bernardo Provenzano",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
     "discordId": "406862508167790612",
     "discordTag": "@robertoformisano",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.677Z"
+    "verifiedAt": "2026-09-11T20:13:14.100Z"
   },
   {
     "token": "DISCORD_415849291039637515",
     "username": "Jonathan Giacomarra",
-    "roleName": "🥼 ┃Segretario Direzione®",
-    "gradeName": "🥼 ┃Segretario Direzione®",
+    "roleName": "Segretario Direzione",
+    "gradeName": "Segretario Direzione",
     "grade": 16.5,
     "isAllowed": true,
     "isMaster": false,
@@ -361,13 +347,13 @@
     "avatar": "https://cdn.discordapp.com/avatars/415849291039637515/823c06debac8ecaa6506ea9e04640c25.png",
     "cdaRoleName": "Membro CDA",
     "hasCdaAccess": true,
-    "verifiedAt": "2026-09-11T10:57:42.678Z"
+    "verifiedAt": "2026-09-11T20:13:14.100Z"
   },
   {
     "token": "DISCORD_436958374245040138",
     "username": "Freddy Montana",
-    "roleName": "🥼┃Infermiere®",
-    "gradeName": "🥼┃Infermiere®",
+    "roleName": "Infermiere",
+    "gradeName": "Infermiere",
     "grade": 2.5,
     "isAllowed": true,
     "isMaster": false,
@@ -375,13 +361,13 @@
     "discordTag": "@golddrake9180",
     "avatar": "https://cdn.discordapp.com/avatars/436958374245040138/0d4d675c050d9169e8c2198c17ca83d9.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.678Z"
+    "verifiedAt": "2026-09-11T20:13:14.101Z"
   },
   {
     "token": "DISCORD_437260420085055490",
     "username": "Celine Riley",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -389,13 +375,13 @@
     "discordTag": "@lilithdemon",
     "avatar": "https://cdn.discordapp.com/avatars/437260420085055490/33628387e99202fd56240820a4bc8176.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.678Z"
+    "verifiedAt": "2026-09-11T20:13:14.101Z"
   },
   {
     "token": "DISCORD_443066756391632897",
     "username": "Sburrino Palladino",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -403,13 +389,13 @@
     "discordTag": "@.risorgere",
     "avatar": "https://cdn.discordapp.com/avatars/443066756391632897/84e0ce24822c1382ef175e3718a2f4a5.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.678Z"
+    "verifiedAt": "2026-09-11T20:13:14.101Z"
   },
   {
     "token": "DISCORD_456457815041769473",
     "username": "Claudio Torres",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -417,13 +403,13 @@
     "discordTag": "@centrostella",
     "avatar": "https://cdn.discordapp.com/avatars/456457815041769473/2a639fc8023085ab52a80363f22fe3ee.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.678Z"
+    "verifiedAt": "2026-09-11T20:13:14.101Z"
   },
   {
     "token": "DISCORD_462705301381185546",
     "username": "Salvatore Esposito",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -431,13 +417,13 @@
     "discordTag": "@xxsatellitexx",
     "avatar": "https://cdn.discordapp.com/avatars/462705301381185546/3579168648da53e803bd78c0e40ab95c.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.679Z"
+    "verifiedAt": "2026-09-11T20:13:14.101Z"
   },
   {
     "token": "DISCORD_467283921651105822",
     "username": "! Kun",
-    "roleName": "Proprietario",
-    "gradeName": "Proprietario",
+    "roleName": "Proprietario EMS",
+    "gradeName": "Proprietario EMS",
     "grade": 100,
     "isAllowed": true,
     "isMaster": true,
@@ -445,27 +431,27 @@
     "discordTag": "@kun.",
     "avatar": "https://cdn.discordapp.com/avatars/467283921651105822/a_d88df951a5110cc1c754888021777d11.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.679Z"
+    "verifiedAt": "2026-09-11T20:13:14.101Z"
   },
   {
     "token": "DISCORD_489429913145704448",
     "username": "Abbondanzio Rhemo",
-    "roleName": "⚕️┃Chirurgo Specialista®",
-    "gradeName": "⚕️┃Chirurgo Specialista®",
-    "grade": 7,
+    "roleName": "Medico Esperto",
+    "gradeName": "Medico Esperto",
+    "grade": 6,
     "isAllowed": true,
     "isMaster": false,
     "discordId": "489429913145704448",
     "discordTag": "@nonnocanna",
     "avatar": "https://cdn.discordapp.com/avatars/489429913145704448/a_e8cf0927275db76f0e3b070353f07a6b.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.679Z"
+    "verifiedAt": "2026-09-11T20:13:14.102Z"
   },
   {
     "token": "DISCORD_508065660060827649",
     "username": "Lex Danher",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -473,14 +459,14 @@
     "discordTag": "@jake23_",
     "avatar": "https://cdn.discordapp.com/avatars/508065660060827649/51292fb8b9e09bbcdc26eef2dc9e3f6c.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.679Z"
+    "verifiedAt": "2026-09-11T20:13:14.102Z"
   },
   {
     "token": "DISCORD_514170913571340290",
     "username": "Raffaele Bravi",
-    "roleName": "👨‍🏫┃Supervisore DGS®",
-    "gradeName": "👨‍🏫┃Supervisore DGS®",
-    "grade": 15,
+    "roleName": "V. Supervisore",
+    "gradeName": "V. Supervisore",
+    "grade": 14,
     "isAllowed": true,
     "isMaster": false,
     "discordId": "514170913571340290",
@@ -488,13 +474,13 @@
     "avatar": "https://cdn.discordapp.com/avatars/514170913571340290/255ba436160b0dd6923b985811de05a1.png",
     "cdaRoleName": "Membro CDA",
     "hasCdaAccess": true,
-    "verifiedAt": "2026-09-11T10:57:42.680Z"
+    "verifiedAt": "2026-09-11T20:13:14.102Z"
   },
   {
     "token": "DISCORD_530123576305647637",
     "username": "Cristian Gerges",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -502,13 +488,13 @@
     "discordTag": "@black11gerges",
     "avatar": "https://cdn.discordapp.com/avatars/530123576305647637/b17f3367da54f21f08e6d44ceefe3f11.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.680Z"
+    "verifiedAt": "2026-09-11T20:13:14.102Z"
   },
   {
     "token": "DISCORD_531601311909675020",
     "username": "Juann Cavastano",
-    "roleName": "🥼┃Infermiere®",
-    "gradeName": "🥼┃Infermiere®",
+    "roleName": "Infermiere",
+    "gradeName": "Infermiere",
     "grade": 2.5,
     "isAllowed": true,
     "isMaster": false,
@@ -516,13 +502,13 @@
     "discordTag": "@dinoz2383",
     "avatar": "https://cdn.discordapp.com/avatars/531601311909675020/9164bfddb11e6bcccbafcdecc76af404.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.680Z"
+    "verifiedAt": "2026-09-11T20:13:14.102Z"
   },
   {
     "token": "DISCORD_536262125618724864",
     "username": "Andrea Abruzzese",
-    "roleName": "🥼┃Infermiere®",
-    "gradeName": "🥼┃Infermiere®",
+    "roleName": "Infermiere",
+    "gradeName": "Infermiere",
     "grade": 2.5,
     "isAllowed": true,
     "isMaster": false,
@@ -530,13 +516,13 @@
     "discordTag": "@savifank",
     "avatar": "https://cdn.discordapp.com/avatars/536262125618724864/539d7cc6198ff36689307c00d88ce513.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.680Z"
+    "verifiedAt": "2026-09-11T20:13:14.102Z"
   },
   {
     "token": "DISCORD_546660696432312322",
     "username": "Nonno Rizzus",
-    "roleName": "Proprietario",
-    "gradeName": "Proprietario",
+    "roleName": "Proprietario EMS",
+    "gradeName": "Proprietario EMS",
     "grade": 100,
     "isAllowed": true,
     "isMaster": true,
@@ -545,13 +531,13 @@
     "avatar": "https://cdn.discordapp.com/avatars/546660696432312322/6d367bd02c66b92189317206caf19540.png",
     "cdaRoleName": "Consigliere Finale CDA",
     "hasCdaAccess": true,
-    "verifiedAt": "2026-09-11T10:57:42.681Z"
+    "verifiedAt": "2026-09-11T20:13:14.103Z"
   },
   {
     "token": "DISCORD_548604104189149184",
     "username": "Claudio Pozzo",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -559,13 +545,13 @@
     "discordTag": "@tuaziapelata",
     "avatar": "https://cdn.discordapp.com/avatars/548604104189149184/a2802c13ab284224d57132aee33ecee2.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.681Z"
+    "verifiedAt": "2026-09-11T20:13:14.103Z"
   },
   {
     "token": "DISCORD_560934897791926283",
     "username": "Gianni Piantamore",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -573,27 +559,27 @@
     "discordTag": "@renatino17",
     "avatar": "https://cdn.discordapp.com/avatars/560934897791926283/9a4ec0df405287647f219aa585b2c193.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.681Z"
+    "verifiedAt": "2026-09-11T20:13:14.103Z"
   },
   {
     "token": "DISCORD_567637237160869898",
     "username": "Vincenzo Escobar",
-    "roleName": "🥼┃V. Primario di Reparto®",
-    "gradeName": "🥼┃V. Primario di Reparto®",
-    "grade": 9,
+    "roleName": "V. Primario di Reparto",
+    "gradeName": "V. Primario di Reparto",
+    "grade": 9.5,
     "isAllowed": true,
     "isMaster": false,
     "discordId": "567637237160869898",
     "discordTag": "@xxvincy99xx",
     "avatar": "https://cdn.discordapp.com/avatars/567637237160869898/7379988822ce0c13ebe92c947229e0fe.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.682Z"
+    "verifiedAt": "2026-09-11T20:13:14.104Z"
   },
   {
     "token": "DISCORD_572810354703466506",
     "username": "Giorgio Pastrocchio",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -601,13 +587,13 @@
     "discordTag": "@bonfiret",
     "avatar": "https://cdn.discordapp.com/avatars/572810354703466506/753e0425092e6cbca1443be85070a3e2.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.682Z"
+    "verifiedAt": "2026-09-11T20:13:14.104Z"
   },
   {
     "token": "DISCORD_581552973570637919",
     "username": "Frodo Baglio",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -615,13 +601,13 @@
     "discordTag": "@fuze2707",
     "avatar": "https://cdn.discordapp.com/avatars/581552973570637919/e354a127256414d212baf0e6e2e71c41.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.682Z"
+    "verifiedAt": "2026-09-11T20:13:14.104Z"
   },
   {
     "token": "DISCORD_587718236087517186",
     "username": "Tonino Bava",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -629,13 +615,13 @@
     "discordTag": "@ggmatte",
     "avatar": "https://cdn.discordapp.com/avatars/587718236087517186/7d697c6b9dfa338ec01cc62b6f16c92a.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.682Z"
+    "verifiedAt": "2026-09-11T20:13:14.104Z"
   },
   {
     "token": "DISCORD_599646161363664916",
     "username": "Pietro De Cleva",
-    "roleName": "🥼┃Infermiere®",
-    "gradeName": "🥼┃Infermiere®",
+    "roleName": "Infermiere",
+    "gradeName": "Infermiere",
     "grade": 2.5,
     "isAllowed": true,
     "isMaster": false,
@@ -643,13 +629,13 @@
     "discordTag": "@pietrro_",
     "avatar": "https://cdn.discordapp.com/avatars/599646161363664916/c374f28d248cc6068a1852b16dbd3f15.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.682Z"
+    "verifiedAt": "2026-09-11T20:13:14.104Z"
   },
   {
     "token": "DISCORD_602479780499030016",
     "username": "Ayden Smith",
-    "roleName": "🥼┃Medico Esperto®",
-    "gradeName": "🥼┃Medico Esperto®",
+    "roleName": "Medico Esperto",
+    "gradeName": "Medico Esperto",
     "grade": 6,
     "isAllowed": true,
     "isMaster": false,
@@ -657,27 +643,13 @@
     "discordTag": "@enry.pilot",
     "avatar": "https://cdn.discordapp.com/avatars/602479780499030016/e33fcbd229d0c6ce159194c95c588b4d.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.682Z"
-  },
-  {
-    "token": "DISCORD_612249178390659092",
-    "username": "> ninjaz'",
-    "roleName": "🔍┃Supervisore EMS",
-    "gradeName": "🔍┃Supervisore EMS",
-    "grade": 15,
-    "isAllowed": true,
-    "isMaster": false,
-    "discordId": "612249178390659092",
-    "discordTag": "@ninjaz.",
-    "avatar": "https://cdn.discordapp.com/avatars/612249178390659092/61b336b578caba4f0651c799e9bc7ee5.png",
-    "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.683Z"
+    "verifiedAt": "2026-09-11T20:13:14.104Z"
   },
   {
     "token": "DISCORD_613373961966845952",
     "username": "Vincenzo Puca",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -685,13 +657,13 @@
     "discordTag": "@exe_zens",
     "avatar": "https://cdn.discordapp.com/avatars/613373961966845952/a10af402cd4bcc0bdf130c81769622ba.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.683Z"
+    "verifiedAt": "2026-09-11T20:13:14.105Z"
   },
   {
     "token": "DISCORD_628661371126677564",
     "username": "Jay Montana",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -699,13 +671,13 @@
     "discordTag": "@sanciopancio_",
     "avatar": "https://cdn.discordapp.com/avatars/628661371126677564/b8b79b24693eeaee1d9f81f779e607c5.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.683Z"
+    "verifiedAt": "2026-09-11T20:13:14.105Z"
   },
   {
     "token": "DISCORD_638089688724537367",
     "username": "Xavier Doue",
-    "roleName": "🥼┃Infermiere®",
-    "gradeName": "🥼┃Infermiere®",
+    "roleName": "Infermiere",
+    "gradeName": "Infermiere",
     "grade": 2.5,
     "isAllowed": true,
     "isMaster": false,
@@ -713,13 +685,27 @@
     "discordTag": "@zannabianca8888",
     "avatar": "https://cdn.discordapp.com/avatars/638089688724537367/f44aa36d9a1dd568f0d2f857be5469a8.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.683Z"
+    "verifiedAt": "2026-09-11T20:13:14.105Z"
+  },
+  {
+    "token": "DISCORD_645562193953161227",
+    "username": "Andrea Ceri",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
+    "grade": 2,
+    "isAllowed": true,
+    "isMaster": false,
+    "discordId": "645562193953161227",
+    "discordTag": "@lucemia89",
+    "avatar": "https://cdn.discordapp.com/avatars/645562193953161227/411bb6db0ba72e5c17cf049ce5227e26.png",
+    "hasCdaAccess": false,
+    "verifiedAt": "2026-09-11T20:13:14.105Z"
   },
   {
     "token": "DISCORD_659347544245010462",
     "username": "Mario Rugito",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -727,13 +713,13 @@
     "discordTag": "@solopaco.",
     "avatar": "https://cdn.discordapp.com/avatars/659347544245010462/05a3c666ec17356ed51c99385493bd00.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.683Z"
+    "verifiedAt": "2026-09-11T20:13:14.105Z"
   },
   {
     "token": "DISCORD_673557082129301514",
     "username": "Scido",
-    "roleName": "🥼┃Infermiere®",
-    "gradeName": "🥼┃Infermiere®",
+    "roleName": "Infermiere",
+    "gradeName": "Infermiere",
     "grade": 2.5,
     "isAllowed": true,
     "isMaster": false,
@@ -741,13 +727,13 @@
     "discordTag": "@scido",
     "avatar": "https://cdn.discordapp.com/avatars/673557082129301514/a_7aa5853a518ec3a082d60f148f1b24e8.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.685Z"
+    "verifiedAt": "2026-09-11T20:13:14.106Z"
   },
   {
     "token": "DISCORD_681864507383087179",
     "username": "Luigi Gargiulo",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -755,13 +741,13 @@
     "discordTag": "@xavier0849",
     "avatar": "https://cdn.discordapp.com/avatars/681864507383087179/ee70a0e421d63d04330e2196c27cedc5.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.685Z"
+    "verifiedAt": "2026-09-11T20:13:14.106Z"
   },
   {
     "token": "DISCORD_687351079070859490",
     "username": "parmex 4.0",
-    "roleName": "Proprietario",
-    "gradeName": "Proprietario",
+    "roleName": "Proprietario EMS",
+    "gradeName": "Proprietario EMS",
     "grade": 100,
     "isAllowed": true,
     "isMaster": true,
@@ -769,13 +755,13 @@
     "discordTag": "@parmex",
     "avatar": "https://cdn.discordapp.com/avatars/687351079070859490/a_9ba3248917723a0c508a8ed530e00688.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.685Z"
+    "verifiedAt": "2026-09-11T20:13:14.106Z"
   },
   {
     "token": "DISCORD_690039822714535968",
     "username": "Franck Albanese",
-    "roleName": "🥼┃Infermiere®",
-    "gradeName": "🥼┃Infermiere®",
+    "roleName": "Infermiere",
+    "gradeName": "Infermiere",
     "grade": 2.5,
     "isAllowed": true,
     "isMaster": false,
@@ -783,13 +769,13 @@
     "discordTag": "@cuz420",
     "avatar": "https://cdn.discordapp.com/avatars/690039822714535968/dbac296a52d8c5e3a0e44571d9f51f46.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.686Z"
+    "verifiedAt": "2026-09-11T20:13:14.106Z"
   },
   {
     "token": "DISCORD_692099743098077234",
     "username": "Dennis Scala",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -797,13 +783,13 @@
     "discordTag": "@lu_piccione_",
     "avatar": "https://cdn.discordapp.com/avatars/692099743098077234/da50e9835d31ee369e5e8eb0d9581f7f.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.686Z"
+    "verifiedAt": "2026-09-11T20:13:14.107Z"
   },
   {
     "token": "DISCORD_692359324139257856",
     "username": "Umbo Il biondo",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -811,13 +797,13 @@
     "discordTag": "@umbotop",
     "avatar": "https://cdn.discordapp.com/avatars/692359324139257856/5d32224f5fc0cf973f2a6f232c9fe43d.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.686Z"
+    "verifiedAt": "2026-09-11T20:13:14.107Z"
   },
   {
     "token": "DISCORD_693511525855658086",
     "username": "Massimo Scapocchietti",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -825,13 +811,13 @@
     "discordTag": "@lore272o",
     "avatar": "https://cdn.discordapp.com/avatars/693511525855658086/41ac59e5a79a5265554de95fe51becc8.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.686Z"
+    "verifiedAt": "2026-09-11T20:13:14.107Z"
   },
   {
     "token": "DISCORD_694247849352757299",
     "username": "Travis Sosa",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -839,13 +825,13 @@
     "discordTag": "@d4rk_2.0_",
     "avatar": "https://cdn.discordapp.com/avatars/694247849352757299/959fa3ae9740ab74c016629125780690.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.686Z"
+    "verifiedAt": "2026-09-11T20:13:14.107Z"
   },
   {
     "token": "DISCORD_702831642120683520",
     "username": "Zero Rinata",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -853,13 +839,13 @@
     "discordTag": "@aiuouole",
     "avatar": "https://cdn.discordapp.com/avatars/702831642120683520/289365336ae9a6cbd7632346960ddfbc.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.686Z"
+    "verifiedAt": "2026-09-11T20:13:14.107Z"
   },
   {
     "token": "DISCORD_705358072264130590",
     "username": "Matteo Neroni",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -867,13 +853,13 @@
     "discordTag": "@renato5242",
     "avatar": "https://cdn.discordapp.com/avatars/705358072264130590/dafa715b116ebca96c297c2f79ba38a5.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.686Z"
+    "verifiedAt": "2026-09-11T20:13:14.107Z"
   },
   {
     "token": "DISCORD_706896306928353320",
     "username": "Gustavo La Topa",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -881,13 +867,13 @@
     "discordTag": "@mario_official33",
     "avatar": "https://cdn.discordapp.com/avatars/706896306928353320/a_3c91c7ddb696d4a56c234ff44844d9ab.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.686Z"
+    "verifiedAt": "2026-09-11T20:13:14.108Z"
   },
   {
     "token": "DISCORD_707639722880663701",
     "username": "Vinnie Gognitti",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -895,13 +881,13 @@
     "discordTag": "@emagrandi17",
     "avatar": "https://cdn.discordapp.com/avatars/707639722880663701/05422b9203cacb722f94bc8e9b679469.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.686Z"
+    "verifiedAt": "2026-09-11T20:13:14.108Z"
   },
   {
     "token": "DISCORD_708988779729256508",
     "username": "Carlo Delpiero",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -909,13 +895,13 @@
     "discordTag": "@.luis_03.",
     "avatar": "https://cdn.discordapp.com/avatars/708988779729256508/b4eeb66d0a747cda1f2e449327c05657.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.686Z"
+    "verifiedAt": "2026-09-11T20:13:14.108Z"
   },
   {
     "token": "DISCORD_709395338284236860",
     "username": "Ale Mil",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -923,27 +909,13 @@
     "discordTag": "@.ale102",
     "avatar": "https://cdn.discordapp.com/avatars/709395338284236860/a_d0ee052448775d6bdcef817573fb1379.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.686Z"
-  },
-  {
-    "token": "DISCORD_710414372975018056",
-    "username": "Yolo Palazzoli",
-    "roleName": "🔍┃Supervisore EMS",
-    "gradeName": "🔍┃Supervisore EMS",
-    "grade": 15,
-    "isAllowed": true,
-    "isMaster": false,
-    "discordId": "710414372975018056",
-    "discordTag": "@2.00422",
-    "avatar": "https://cdn.discordapp.com/avatars/710414372975018056/469583033edc62a74f56b8112cf3b553.png",
-    "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.687Z"
+    "verifiedAt": "2026-09-11T20:13:14.108Z"
   },
   {
     "token": "DISCORD_713160615148912710",
     "username": "Kitty Emmuort",
-    "roleName": "🥼┃Infermiere®",
-    "gradeName": "🥼┃Infermiere®",
+    "roleName": "Infermiere",
+    "gradeName": "Infermiere",
     "grade": 2.5,
     "isAllowed": true,
     "isMaster": false,
@@ -951,27 +923,13 @@
     "discordTag": "@cacmocazz",
     "avatar": "https://cdn.discordapp.com/avatars/713160615148912710/0e5343d59b4002177029cffda89682ff.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.687Z"
-  },
-  {
-    "token": "DISCORD_714058056299970604",
-    "username": "Ŧrαccιησ",
-    "roleName": "🔍┃Supervisore EMS",
-    "gradeName": "🔍┃Supervisore EMS",
-    "grade": 15,
-    "isAllowed": true,
-    "isMaster": false,
-    "discordId": "714058056299970604",
-    "discordTag": "@.fraccino",
-    "avatar": "https://cdn.discordapp.com/avatars/714058056299970604/dd47b10a3e783600c060ef4c66fa1593.png",
-    "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.739Z"
+    "verifiedAt": "2026-09-11T20:13:14.108Z"
   },
   {
     "token": "DISCORD_715468417905459201",
     "username": "Layla Russo",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -979,13 +937,13 @@
     "discordTag": "@layla4439",
     "avatar": "https://cdn.discordapp.com/avatars/715468417905459201/e09b7ea39ba563bdab347744a31169ae.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.739Z"
+    "verifiedAt": "2026-09-11T20:13:14.108Z"
   },
   {
     "token": "DISCORD_717126371138338857",
     "username": "Adriano De Santis",
-    "roleName": "🥼┃Medico®",
-    "gradeName": "🥼┃Medico®",
+    "roleName": "Medico",
+    "gradeName": "Medico",
     "grade": 5,
     "isAllowed": true,
     "isMaster": false,
@@ -993,13 +951,13 @@
     "discordTag": "@montosi.exe",
     "avatar": "https://cdn.discordapp.com/avatars/717126371138338857/57d16de0f5ec183c05c997b67038b988.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.740Z"
+    "verifiedAt": "2026-09-11T20:13:14.108Z"
   },
   {
     "token": "DISCORD_719279438688419890",
     "username": "Alicya Valenti",
-    "roleName": "🥼┃Infermiere®",
-    "gradeName": "🥼┃Infermiere®",
+    "roleName": "Infermiere",
+    "gradeName": "Infermiere",
     "grade": 2.5,
     "isAllowed": true,
     "isMaster": false,
@@ -1007,13 +965,13 @@
     "discordTag": "@ilikecherries_",
     "avatar": "https://cdn.discordapp.com/avatars/719279438688419890/d9c75a545da7b86868b909b828aeb169.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.740Z"
+    "verifiedAt": "2026-09-11T20:13:14.108Z"
   },
   {
     "token": "DISCORD_724713136401285200",
     "username": "Antonio Esposito",
-    "roleName": "🥼┃Infermiere®",
-    "gradeName": "🥼┃Infermiere®",
+    "roleName": "Infermiere",
+    "gradeName": "Infermiere",
     "grade": 2.5,
     "isAllowed": true,
     "isMaster": false,
@@ -1021,14 +979,14 @@
     "discordTag": "@antonio0147_",
     "avatar": "https://cdn.discordapp.com/avatars/724713136401285200/61cb89330f7461801ea623521e8b2d67.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.740Z"
+    "verifiedAt": "2026-09-11T20:13:14.108Z"
   },
   {
     "token": "DISCORD_726083456857014303",
     "username": "Ares Migliorini",
-    "roleName": "👨‍🏫┃Direttore DGS®",
-    "gradeName": "👨‍🏫┃Direttore DGS®",
-    "grade": 18,
+    "roleName": "V. Direttore Sanitario",
+    "gradeName": "V. Direttore Sanitario",
+    "grade": 17,
     "isAllowed": true,
     "isMaster": false,
     "discordId": "726083456857014303",
@@ -1036,13 +994,13 @@
     "avatar": "https://cdn.discordapp.com/avatars/726083456857014303/01a8c7d060d6d21396bcab83cc68d30b.png",
     "cdaRoleName": "Membro CDA",
     "hasCdaAccess": true,
-    "verifiedAt": "2026-09-11T10:57:42.741Z"
+    "verifiedAt": "2026-09-11T20:13:14.108Z"
   },
   {
     "token": "DISCORD_734366329376866384",
     "username": "Micheal Purple",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -1050,13 +1008,13 @@
     "discordTag": "@anonimabile",
     "avatar": "https://cdn.discordapp.com/avatars/734366329376866384/95cd6a35a1d8ce8be2e4a6cc0bd02d53.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.741Z"
+    "verifiedAt": "2026-09-11T20:13:14.109Z"
   },
   {
     "token": "DISCORD_736600291356573768",
     "username": "Matteo Gentile",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -1064,13 +1022,13 @@
     "discordTag": "@currano",
     "avatar": "https://cdn.discordapp.com/avatars/736600291356573768/b1e5271d177edd66c87d19a2e1b3d640.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.741Z"
+    "verifiedAt": "2026-09-11T20:13:14.109Z"
   },
   {
     "token": "DISCORD_737371283687211008",
     "username": "Lil Simo Antoci",
-    "roleName": "🥼┃Infermiere®",
-    "gradeName": "🥼┃Infermiere®",
+    "roleName": "Infermiere",
+    "gradeName": "Infermiere",
     "grade": 2.5,
     "isAllowed": true,
     "isMaster": false,
@@ -1078,13 +1036,13 @@
     "discordTag": "@evangelsimo",
     "avatar": "https://cdn.discordapp.com/avatars/737371283687211008/ec342815d07ea84fbb448ec3c925edfb.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.741Z"
+    "verifiedAt": "2026-09-11T20:13:14.109Z"
   },
   {
     "token": "DISCORD_744627261126344816",
     "username": "Justin Kross",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -1092,26 +1050,26 @@
     "discordTag": "@darkside3484",
     "avatar": "https://cdn.discordapp.com/avatars/744627261126344816/61712f3fa6573f9de7d39570aeec3c94.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.741Z"
+    "verifiedAt": "2026-09-11T20:13:14.109Z"
   },
   {
     "token": "DISCORD_745955243082383362",
     "username": "Raccichi Jr",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
     "discordId": "745955243082383362",
     "discordTag": "@heatzy8612",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.741Z"
+    "verifiedAt": "2026-09-11T20:13:14.109Z"
   },
   {
     "token": "DISCORD_750293377337262183",
     "username": "Franco Liberi",
-    "roleName": "🥼┃Infermiere®",
-    "gradeName": "🥼┃Infermiere®",
+    "roleName": "Infermiere",
+    "gradeName": "Infermiere",
     "grade": 2.5,
     "isAllowed": true,
     "isMaster": false,
@@ -1119,27 +1077,13 @@
     "discordTag": "@superfagio95",
     "avatar": "https://cdn.discordapp.com/avatars/750293377337262183/01961497dea2238fedc0329a2684071e.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.742Z"
-  },
-  {
-    "token": "DISCORD_751053245891215370",
-    "username": "👑🔱 Τ Ξ ℂ Ν Ο 🔱👑",
-    "roleName": "🔍┃Supervisore EMS",
-    "gradeName": "🔍┃Supervisore EMS",
-    "grade": 15,
-    "isAllowed": true,
-    "isMaster": false,
-    "discordId": "751053245891215370",
-    "discordTag": "@tecnomic",
-    "avatar": "https://cdn.discordapp.com/avatars/751053245891215370/5785027b7f06c81da91267b7f4983992.png",
-    "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.742Z"
+    "verifiedAt": "2026-09-11T20:13:14.109Z"
   },
   {
     "token": "DISCORD_760827740076113920",
     "username": "Matt Pancas",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -1147,13 +1091,13 @@
     "discordTag": "@cassapanca2",
     "avatar": "https://cdn.discordapp.com/avatars/760827740076113920/2aa820430021ff9ac6b0a4aa8c68be84.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.742Z"
+    "verifiedAt": "2026-09-11T20:13:14.110Z"
   },
   {
     "token": "DISCORD_761496387929243649",
     "username": "Giovanni Porcu",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -1161,13 +1105,13 @@
     "discordTag": "@lollom05",
     "avatar": "https://cdn.discordapp.com/avatars/761496387929243649/a50f7d42faaa1b1cdef09ec31f52dc3a.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.742Z"
+    "verifiedAt": "2026-09-11T20:13:14.110Z"
   },
   {
     "token": "DISCORD_761663573952561213",
     "username": "Cristian Ferrari",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -1175,13 +1119,13 @@
     "discordTag": "@cristian.3480",
     "avatar": "https://cdn.discordapp.com/avatars/761663573952561213/99e60f51e8471a8a300605dee125959e.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.742Z"
+    "verifiedAt": "2026-09-11T20:13:14.110Z"
   },
   {
     "token": "DISCORD_764118640307863582",
     "username": "Fro Sinone",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -1189,13 +1133,13 @@
     "discordTag": "@er_mejoderoma",
     "avatar": "https://cdn.discordapp.com/avatars/764118640307863582/21e7b8b43880fc794008c26543a640d0.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.742Z"
+    "verifiedAt": "2026-09-11T20:13:14.110Z"
   },
   {
     "token": "DISCORD_768197536052805653",
     "username": "Luca Smith",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -1203,13 +1147,13 @@
     "discordTag": "@marylinn03",
     "avatar": "https://cdn.discordapp.com/avatars/768197536052805653/18fed1cfe3a866bac6223ea6c67c81ff.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.742Z"
+    "verifiedAt": "2026-09-11T20:13:14.110Z"
   },
   {
     "token": "DISCORD_775694454106619914",
     "username": "Kristel Pereira",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -1217,13 +1161,13 @@
     "discordTag": "@.fvmvins",
     "avatar": "https://cdn.discordapp.com/avatars/775694454106619914/52ea42a50b2cee487d95d3e9b646d78b.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.742Z"
+    "verifiedAt": "2026-09-11T20:13:14.110Z"
   },
   {
     "token": "DISCORD_779239519177801758",
     "username": "Nico Sosa",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -1231,13 +1175,13 @@
     "discordTag": "@ermo26",
     "avatar": "https://cdn.discordapp.com/avatars/779239519177801758/10c420deda477fb88ab90dae35b54f11.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.742Z"
+    "verifiedAt": "2026-09-11T20:13:14.110Z"
   },
   {
     "token": "DISCORD_791689320783282197",
     "username": "Joe Goldberg",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -1245,13 +1189,13 @@
     "discordTag": "@giuzz007",
     "avatar": "https://cdn.discordapp.com/avatars/791689320783282197/9738241cb78d9615c7eabf40a74ddbed.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.743Z"
+    "verifiedAt": "2026-09-11T20:13:14.111Z"
   },
   {
     "token": "DISCORD_792766978023882783",
     "username": "Ryan Scapocchietti",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -1259,13 +1203,13 @@
     "discordTag": "@spid766",
     "avatar": "https://cdn.discordapp.com/avatars/792766978023882783/3459d2b7ea1c415e75beb3eae62a0666.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.743Z"
+    "verifiedAt": "2026-09-11T20:13:14.111Z"
   },
   {
     "token": "DISCORD_795311167559958559",
     "username": "Simba Zimbauer",
-    "roleName": "🥼┃Medico®",
-    "gradeName": "🥼┃Medico®",
+    "roleName": "Medico",
+    "gradeName": "Medico",
     "grade": 5,
     "isAllowed": true,
     "isMaster": false,
@@ -1273,13 +1217,13 @@
     "discordTag": "@utentesconoscito",
     "avatar": "https://cdn.discordapp.com/avatars/795311167559958559/921edfff24b7ee176e62c6c11848e2ca.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.743Z"
+    "verifiedAt": "2026-09-11T20:13:14.111Z"
   },
   {
     "token": "DISCORD_799032882382241812",
     "username": "Fabrizio Turbato",
-    "roleName": "🥼┃Infermiere®",
-    "gradeName": "🥼┃Infermiere®",
+    "roleName": "Infermiere",
+    "gradeName": "Infermiere",
     "grade": 2.5,
     "isAllowed": true,
     "isMaster": false,
@@ -1287,13 +1231,13 @@
     "discordTag": "@_k4rmaa",
     "avatar": "https://cdn.discordapp.com/avatars/799032882382241812/b78dc0edbdb105d290e26363cc68b3df.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.743Z"
+    "verifiedAt": "2026-09-11T20:13:14.111Z"
   },
   {
     "token": "DISCORD_812094943140511796",
     "username": "Daniele Passarelli",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -1301,13 +1245,13 @@
     "discordTag": "@pomodoro0476",
     "avatar": "https://cdn.discordapp.com/avatars/812094943140511796/37e909fa2c0d812ab2f0ee9c857f1186.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.744Z"
+    "verifiedAt": "2026-09-11T20:13:14.111Z"
   },
   {
     "token": "DISCORD_816708427186176041",
     "username": "Patrizio Aulin",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -1315,13 +1259,13 @@
     "discordTag": "@davidneres7_",
     "avatar": "https://cdn.discordapp.com/avatars/816708427186176041/cb56bbc485d30dcf51faaaabc2b04430.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.744Z"
+    "verifiedAt": "2026-09-11T20:13:14.111Z"
   },
   {
     "token": "DISCORD_819676119049306144",
     "username": "Giovanni Furla",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -1329,13 +1273,13 @@
     "discordTag": "@michele90210",
     "avatar": "https://cdn.discordapp.com/avatars/819676119049306144/a17cfcfbd6ae95b717fb7a983381b2ea.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.744Z"
+    "verifiedAt": "2026-09-11T20:13:14.111Z"
   },
   {
     "token": "DISCORD_822824307377569792",
     "username": "Antonio Pantofola",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -1343,13 +1287,13 @@
     "discordTag": "@bassany.",
     "avatar": "https://cdn.discordapp.com/avatars/822824307377569792/76a723d634f08d0e1f1ba68e1065b4d0.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.744Z"
+    "verifiedAt": "2026-09-11T20:13:14.111Z"
   },
   {
     "token": "DISCORD_826157381683642400",
     "username": "Michael Romano",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -1357,27 +1301,13 @@
     "discordTag": "@nonno19",
     "avatar": "https://cdn.discordapp.com/avatars/826157381683642400/ef2ce445a54d916ca131477302a321ee.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.744Z"
-  },
-  {
-    "token": "DISCORD_830172908163956796",
-    "username": "! Alby Caff",
-    "roleName": "🔍┃Supervisore EMS",
-    "gradeName": "🔍┃Supervisore EMS",
-    "grade": 15,
-    "isAllowed": true,
-    "isMaster": false,
-    "discordId": "830172908163956796",
-    "discordTag": "@alberto_caffetteria",
-    "avatar": "https://cdn.discordapp.com/avatars/830172908163956796/8bcd5515ef6fdb38aed37937cb17bbb5.png",
-    "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.744Z"
+    "verifiedAt": "2026-09-11T20:13:14.112Z"
   },
   {
     "token": "DISCORD_835203175459455026",
     "username": "Damiano Primavera",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -1385,13 +1315,13 @@
     "discordTag": "@marekkkkkk_",
     "avatar": "https://cdn.discordapp.com/avatars/835203175459455026/ba879a2b80c9cd65bb06ebcbd09a48bf.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.744Z"
+    "verifiedAt": "2026-09-11T20:13:14.112Z"
   },
   {
     "token": "DISCORD_837683014384353281",
     "username": "Remo Scatena",
-    "roleName": "🥼┃Medico®",
-    "gradeName": "🥼┃Medico®",
+    "roleName": "Medico",
+    "gradeName": "Medico",
     "grade": 5,
     "isAllowed": true,
     "isMaster": false,
@@ -1399,13 +1329,13 @@
     "discordTag": "@max823_",
     "avatar": "https://cdn.discordapp.com/avatars/837683014384353281/214acb8cfc60f944b67e18ed016803c8.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.745Z"
+    "verifiedAt": "2026-09-11T20:13:14.112Z"
   },
   {
     "token": "DISCORD_840547929281527849",
     "username": "Francesco Dino",
-    "roleName": "🥼┃Medico®",
-    "gradeName": "🥼┃Medico®",
+    "roleName": "Medico",
+    "gradeName": "Medico",
     "grade": 5,
     "isAllowed": true,
     "isMaster": false,
@@ -1413,13 +1343,13 @@
     "discordTag": "@capitan_frix",
     "avatar": "https://cdn.discordapp.com/avatars/840547929281527849/1cb10830e7695815150ab874b80ae704.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.745Z"
+    "verifiedAt": "2026-09-11T20:13:14.112Z"
   },
   {
     "token": "DISCORD_843501000157298728",
     "username": "Ozzy Darrel",
-    "roleName": "🥼┃Primario®",
-    "gradeName": "🥼┃Primario®",
+    "roleName": "Primario",
+    "gradeName": "Primario",
     "grade": 10,
     "isAllowed": true,
     "isMaster": false,
@@ -1427,26 +1357,26 @@
     "discordTag": "@mithma",
     "avatar": "https://cdn.discordapp.com/avatars/843501000157298728/bba343183b688b98a70a0c296a48eb42.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.745Z"
+    "verifiedAt": "2026-09-11T20:13:14.112Z"
   },
   {
     "token": "DISCORD_858519993540411393",
     "username": "Alessandro Mazzurco",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
     "discordId": "858519993540411393",
     "discordTag": "@mikisup98",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.745Z"
+    "verifiedAt": "2026-09-11T20:13:14.113Z"
   },
   {
     "token": "DISCORD_866661609552085024",
     "username": "Kekko Eskabaro",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -1454,13 +1384,13 @@
     "discordTag": "@romaniapio",
     "avatar": "https://cdn.discordapp.com/avatars/866661609552085024/0c292390b7652eeddc62d7e798c7ddd9.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.745Z"
+    "verifiedAt": "2026-09-11T20:13:14.113Z"
   },
   {
     "token": "DISCORD_879421069352656966",
     "username": "Andrea Miti",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -1468,13 +1398,13 @@
     "discordTag": "@serpente_creeper",
     "avatar": "https://cdn.discordapp.com/avatars/879421069352656966/6cd1502150256818bd958fadf5b3d29e.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.746Z"
+    "verifiedAt": "2026-09-11T20:13:14.113Z"
   },
   {
     "token": "DISCORD_889891408931061791",
     "username": "Bryan Bianchi",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -1482,13 +1412,13 @@
     "discordTag": "@axel_casadei_77",
     "avatar": "https://cdn.discordapp.com/avatars/889891408931061791/4e03e09b46d5ab5b2983b5397a9cc8d8.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.746Z"
+    "verifiedAt": "2026-09-11T20:13:14.113Z"
   },
   {
     "token": "DISCORD_896722362052010014",
     "username": "Chad Best",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -1496,13 +1426,13 @@
     "discordTag": "@_realchad_",
     "avatar": "https://cdn.discordapp.com/avatars/896722362052010014/40a359115160c4fb08ec1d90831180d7.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.746Z"
+    "verifiedAt": "2026-09-11T20:13:14.113Z"
   },
   {
     "token": "DISCORD_906473947053322281",
     "username": "Armando Sborrone",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -1510,27 +1440,27 @@
     "discordTag": "@stalloneperscelta",
     "avatar": "https://cdn.discordapp.com/avatars/906473947053322281/8d71ca27f75c69e6af2df6cf423a43b7.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.746Z"
+    "verifiedAt": "2026-09-11T20:13:14.113Z"
   },
   {
     "token": "DISCORD_910658791635296286",
     "username": "Massimo Arresto",
-    "roleName": "👨‍🏫┃Responsabile Formatori DGS®",
-    "gradeName": "👨‍🏫┃Responsabile Formatori DGS®",
-    "grade": 12,
+    "roleName": "Primario di Reparto",
+    "gradeName": "Primario di Reparto",
+    "grade": 10.5,
     "isAllowed": true,
     "isMaster": false,
     "discordId": "910658791635296286",
     "discordTag": "@elguapo7207",
     "avatar": "https://cdn.discordapp.com/avatars/910658791635296286/f4436788e336f27f5143b265102d425d.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.747Z"
+    "verifiedAt": "2026-09-11T20:13:14.113Z"
   },
   {
     "token": "DISCORD_911142786403815475",
     "username": "Jhon Abbate",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -1538,13 +1468,13 @@
     "discordTag": "@giams04",
     "avatar": "https://cdn.discordapp.com/avatars/911142786403815475/cacf6205ad1e8e76cd3d9c46c57dc330.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.747Z"
+    "verifiedAt": "2026-09-11T20:13:14.114Z"
   },
   {
     "token": "DISCORD_915205037104451634",
     "username": "Samir Miller",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -1552,13 +1482,13 @@
     "discordTag": "@gionny7364",
     "avatar": "https://cdn.discordapp.com/avatars/915205037104451634/8380d8eb243743931a1e2fc8a2a3f97d.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.747Z"
+    "verifiedAt": "2026-09-11T20:13:14.114Z"
   },
   {
     "token": "DISCORD_917480076453507112",
     "username": "Kevin Falck",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -1566,13 +1496,13 @@
     "discordTag": "@solarrr1",
     "avatar": "https://cdn.discordapp.com/avatars/917480076453507112/150ab4464ca25081d9e6b8f3dd4ce21f.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.747Z"
+    "verifiedAt": "2026-09-11T20:13:14.114Z"
   },
   {
     "token": "DISCORD_923280104833052706",
     "username": "Cocco Bello",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -1580,13 +1510,13 @@
     "discordTag": "@eldiablo_10",
     "avatar": "https://cdn.discordapp.com/avatars/923280104833052706/f065889eaaa0ca638cb9f92473abe0fe.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.747Z"
+    "verifiedAt": "2026-09-11T20:13:14.114Z"
   },
   {
     "token": "DISCORD_923334006815203329",
     "username": "Giacomo De Longhi",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -1594,13 +1524,13 @@
     "discordTag": "@jack_6662",
     "avatar": "https://cdn.discordapp.com/avatars/923334006815203329/a7ff5c9c9cb606d9c04a04c12499709a.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.747Z"
+    "verifiedAt": "2026-09-11T20:13:14.114Z"
   },
   {
     "token": "DISCORD_928372588722397194",
     "username": "Nathan Duke",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -1608,13 +1538,13 @@
     "discordTag": "@r4pt0or_",
     "avatar": "https://cdn.discordapp.com/avatars/928372588722397194/605854c4d71fa5d960d5e4bcb06f3f21.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.747Z"
+    "verifiedAt": "2026-09-11T20:13:14.114Z"
   },
   {
     "token": "DISCORD_943192830690607134",
     "username": "Alex Fabbri",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -1622,13 +1552,13 @@
     "discordTag": "@luca_129",
     "avatar": "https://cdn.discordapp.com/avatars/943192830690607134/bca0117e07e2d2472f3a49f12f8d1368.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.747Z"
+    "verifiedAt": "2026-09-11T20:13:14.114Z"
   },
   {
     "token": "DISCORD_948286965617410099",
     "username": "Alice Kennedy",
-    "roleName": "🥼┃Infermiere®",
-    "gradeName": "🥼┃Infermiere®",
+    "roleName": "Infermiere",
+    "gradeName": "Infermiere",
     "grade": 2.5,
     "isAllowed": true,
     "isMaster": false,
@@ -1636,13 +1566,13 @@
     "discordTag": "@qw_koneko_chan",
     "avatar": "https://cdn.discordapp.com/avatars/948286965617410099/7b043f95a4fa8f62cd407ff8b83c29a9.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.748Z"
+    "verifiedAt": "2026-09-11T20:13:14.115Z"
   },
   {
     "token": "DISCORD_948608772639686756",
     "username": "Mohamed Lamine Saida",
-    "roleName": "🥼┃Infermiere®",
-    "gradeName": "🥼┃Infermiere®",
+    "roleName": "Infermiere",
+    "gradeName": "Infermiere",
     "grade": 2.5,
     "isAllowed": true,
     "isMaster": false,
@@ -1650,13 +1580,13 @@
     "discordTag": "@n3rvax",
     "avatar": "https://cdn.discordapp.com/avatars/948608772639686756/9731a651e328c98ff1bb88e64689803f.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.748Z"
+    "verifiedAt": "2026-09-11T20:13:14.115Z"
   },
   {
     "token": "DISCORD_952741292121686056",
     "username": "James Hunter",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -1664,26 +1594,26 @@
     "discordTag": "@_swammy_",
     "avatar": "https://cdn.discordapp.com/avatars/952741292121686056/c0c3efa3c9c92e82ffd61e79070aef84.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.748Z"
+    "verifiedAt": "2026-09-11T20:13:14.115Z"
   },
   {
     "token": "DISCORD_953464931263586336",
     "username": "Ice Fraletta",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
     "discordId": "953464931263586336",
     "discordTag": "@vicefra",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.748Z"
+    "verifiedAt": "2026-09-11T20:13:14.115Z"
   },
   {
     "token": "DISCORD_962424357584502864",
     "username": "Tomas Turbato",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -1691,27 +1621,27 @@
     "discordTag": "@tekabega11",
     "avatar": "https://cdn.discordapp.com/avatars/962424357584502864/0c9188ef47a6b56ce8d9a7d9661191d5.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.748Z"
+    "verifiedAt": "2026-09-11T20:13:14.115Z"
   },
   {
     "token": "DISCORD_967473741615472670",
     "username": "Alex De Santis",
-    "roleName": "👨‍🏫┃Supervisore DGS®",
-    "gradeName": "👨‍🏫┃Supervisore DGS®",
-    "grade": 15,
+    "roleName": "Assistente Supervisore",
+    "gradeName": "Assistente Supervisore",
+    "grade": 13,
     "isAllowed": true,
     "isMaster": false,
     "discordId": "967473741615472670",
     "discordTag": "@ss_alex",
     "avatar": "https://cdn.discordapp.com/avatars/967473741615472670/07c6359a3990d470164b45a4db8e9764.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.749Z"
+    "verifiedAt": "2026-09-11T20:13:14.115Z"
   },
   {
     "token": "DISCORD_969999398727729182",
     "username": "Sbirri Infami",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -1719,13 +1649,13 @@
     "discordTag": "@lollo_aquto",
     "avatar": "https://cdn.discordapp.com/avatars/969999398727729182/528d5aa6f14c201e1c79c9eb0a59673a.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.749Z"
+    "verifiedAt": "2026-09-11T20:13:14.115Z"
   },
   {
     "token": "DISCORD_973000884143403038",
     "username": "Locoss Bianchi",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -1733,13 +1663,13 @@
     "discordTag": "@itz.mauroo",
     "avatar": "https://cdn.discordapp.com/avatars/973000884143403038/f9839618ef538e596a3909ce9b67ccb2.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.749Z"
+    "verifiedAt": "2026-09-11T20:13:14.115Z"
   },
   {
     "token": "DISCORD_978352397694931005",
     "username": "Giangi Leanza",
-    "roleName": "🥼┃Assistente Supervisore®",
-    "gradeName": "🥼┃Assistente Supervisore®",
+    "roleName": "Assistente Supervisore",
+    "gradeName": "Assistente Supervisore",
     "grade": 13,
     "isAllowed": true,
     "isMaster": false,
@@ -1747,13 +1677,13 @@
     "discordTag": "@giangixcomeback",
     "avatar": "https://cdn.discordapp.com/avatars/978352397694931005/205a10d05dd4bdebd7d75fa7a57f91a4.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.750Z"
+    "verifiedAt": "2026-09-11T20:13:14.116Z"
   },
   {
     "token": "DISCORD_988443125074784317",
     "username": "Armando Verdini",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -1761,13 +1691,13 @@
     "discordTag": "@alevalleo29",
     "avatar": "https://cdn.discordapp.com/avatars/988443125074784317/be7058532079a7d848cf90d2fc108fdd.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.750Z"
+    "verifiedAt": "2026-09-11T20:13:14.116Z"
   },
   {
     "token": "DISCORD_994001720470409347",
     "username": "Kratos Digiorgio",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -1775,13 +1705,13 @@
     "discordTag": "@babygang_.1",
     "avatar": "https://cdn.discordapp.com/avatars/994001720470409347/a81d90becf3042a53cea9c5261bfe139.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.750Z"
+    "verifiedAt": "2026-09-11T20:13:14.116Z"
   },
   {
     "token": "DISCORD_997458083666215002",
     "username": "Arturo Miti",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -1789,13 +1719,13 @@
     "discordTag": "@_buzzardo_",
     "avatar": "https://cdn.discordapp.com/avatars/997458083666215002/6b1f2f27468a8ce840d06048cd82c951.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.750Z"
+    "verifiedAt": "2026-09-11T20:13:14.116Z"
   },
   {
     "token": "DISCORD_997968887767375903",
     "username": "Frango Penombra",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -1803,13 +1733,13 @@
     "discordTag": "@filo.brochito",
     "avatar": "https://cdn.discordapp.com/avatars/997968887767375903/d960ee974ef492d04bfcd4107c8d3a6e.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.750Z"
+    "verifiedAt": "2026-09-11T20:13:14.116Z"
   },
   {
     "token": "DISCORD_998508264465645668",
     "username": "Matteo Scarpini",
-    "roleName": "🥼┃Medico Esperto®",
-    "gradeName": "🥼┃Medico Esperto®",
+    "roleName": "Medico Esperto",
+    "gradeName": "Medico Esperto",
     "grade": 6,
     "isAllowed": true,
     "isMaster": false,
@@ -1817,14 +1747,14 @@
     "discordTag": "@matteo_06101990",
     "avatar": "https://cdn.discordapp.com/avatars/998508264465645668/54d12a5a5413d7c50586175129d95a6a.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.750Z"
+    "verifiedAt": "2026-09-11T20:13:14.116Z"
   },
   {
     "token": "DISCORD_1016034521021431838",
     "username": "Igor Lestrenge",
-    "roleName": "🧠┃Direttore Clinico Psichiatrico®",
-    "gradeName": "🧠┃Direttore Clinico Psichiatrico®",
-    "grade": 18,
+    "roleName": "V. Direttore Sanitario",
+    "gradeName": "V. Direttore Sanitario",
+    "grade": 17,
     "isAllowed": true,
     "isMaster": false,
     "discordId": "1016034521021431838",
@@ -1832,13 +1762,13 @@
     "avatar": "https://cdn.discordapp.com/avatars/1016034521021431838/a_bf9a7e719510e81448e42ba7fb45129f.png",
     "cdaRoleName": "Membro CDA",
     "hasCdaAccess": true,
-    "verifiedAt": "2026-09-11T10:57:42.751Z"
+    "verifiedAt": "2026-09-11T20:13:14.116Z"
   },
   {
     "token": "DISCORD_1026630167738724392",
     "username": "Ciccio Jkr",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -1846,13 +1776,13 @@
     "discordTag": "@ciccio_23.",
     "avatar": "https://cdn.discordapp.com/avatars/1026630167738724392/bc5d24cfffd6952250e937a129fc0c62.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.751Z"
+    "verifiedAt": "2026-09-11T20:13:14.116Z"
   },
   {
     "token": "DISCORD_1033735888376709140",
     "username": "Andrea Cobra",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -1860,13 +1790,13 @@
     "discordTag": "@.andrea91",
     "avatar": "https://cdn.discordapp.com/avatars/1033735888376709140/644acd45d8988dea52c7bb35ac15f17e.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.751Z"
+    "verifiedAt": "2026-09-11T20:13:14.117Z"
   },
   {
     "token": "DISCORD_1038153926308008016",
     "username": "Juan Piripollo",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -1874,13 +1804,13 @@
     "discordTag": "@hexrtlxss_",
     "avatar": "https://cdn.discordapp.com/avatars/1038153926308008016/866c79bdd28aeb90564efb1d52ef7a39.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.751Z"
+    "verifiedAt": "2026-09-11T20:13:14.117Z"
   },
   {
     "token": "DISCORD_1041268830653141024",
     "username": "Matteo Festa",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -1888,13 +1818,27 @@
     "discordTag": "@.23mattee",
     "avatar": "https://cdn.discordapp.com/avatars/1041268830653141024/23335880dd28a96c9da181ee63f4229a.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.752Z"
+    "verifiedAt": "2026-09-11T20:13:14.117Z"
+  },
+  {
+    "token": "DISCORD_1042541127930224691",
+    "username": "Pino daniele",
+    "roleName": "Volontario",
+    "gradeName": "Volontario",
+    "grade": 1.5,
+    "isAllowed": true,
+    "isMaster": false,
+    "discordId": "1042541127930224691",
+    "discordTag": "@darkettino",
+    "avatar": "https://cdn.discordapp.com/avatars/1042541127930224691/6672a4a745a0f3e9835def3f311d632e.png",
+    "hasCdaAccess": false,
+    "verifiedAt": "2026-09-11T20:13:14.117Z"
   },
   {
     "token": "DISCORD_1050327841910300703",
     "username": "Diego Rossi",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -1902,13 +1846,13 @@
     "discordTag": "@diego1209.",
     "avatar": "https://cdn.discordapp.com/avatars/1050327841910300703/6dafaf33d1d81d45ca34456534ff7023.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.752Z"
+    "verifiedAt": "2026-09-11T20:13:14.117Z"
   },
   {
     "token": "DISCORD_1050691757479841823",
     "username": "Rick Grimes",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -1916,13 +1860,13 @@
     "discordTag": "@marco232444",
     "avatar": "https://cdn.discordapp.com/avatars/1050691757479841823/3b48204d3453dce1adb48765767b6fca.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.752Z"
+    "verifiedAt": "2026-09-11T20:13:14.117Z"
   },
   {
     "token": "DISCORD_1053603846217285742",
     "username": "Reals Rubio",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -1930,14 +1874,14 @@
     "discordTag": "@reals59",
     "avatar": "https://cdn.discordapp.com/avatars/1053603846217285742/241ff8e7ecc7fd7bcc2eadbc57301091.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.752Z"
+    "verifiedAt": "2026-09-11T20:13:14.117Z"
   },
   {
     "token": "DISCORD_1061224499669913630",
     "username": "Ciccio Losavio",
-    "roleName": "👔 ┃Responsabile Generale R.E.S.®",
-    "gradeName": "👔 ┃Responsabile Generale R.E.S.®",
-    "grade": 21,
+    "roleName": "Segretario Direzione",
+    "gradeName": "Segretario Direzione",
+    "grade": 16.5,
     "isAllowed": true,
     "isMaster": false,
     "discordId": "1061224499669913630",
@@ -1945,13 +1889,13 @@
     "avatar": "https://cdn.discordapp.com/avatars/1061224499669913630/c6fdfe0243500871e761a30cedc70116.png",
     "cdaRoleName": "Membro CDA",
     "hasCdaAccess": true,
-    "verifiedAt": "2026-09-11T10:57:42.752Z"
+    "verifiedAt": "2026-09-11T20:13:14.118Z"
   },
   {
     "token": "DISCORD_1063135369471733851",
     "username": "Nik Cvs",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -1959,13 +1903,13 @@
     "discordTag": "@solo_nik09",
     "avatar": "https://cdn.discordapp.com/avatars/1063135369471733851/2978078f0bca21a4f08d41ef24fc31f1.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.752Z"
+    "verifiedAt": "2026-09-11T20:13:14.118Z"
   },
   {
     "token": "DISCORD_1064567584764211251",
     "username": "Alessandro Enna",
-    "roleName": "🥼┃Medico Esperto®",
-    "gradeName": "🥼┃Medico Esperto®",
+    "roleName": "Medico Esperto",
+    "gradeName": "Medico Esperto",
     "grade": 6,
     "isAllowed": true,
     "isMaster": false,
@@ -1973,27 +1917,27 @@
     "discordTag": "@ale22andr0.",
     "avatar": "https://cdn.discordapp.com/avatars/1064567584764211251/33fa26060977e0f857d55bfbf792a332.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.756Z"
+    "verifiedAt": "2026-09-11T20:13:14.118Z"
   },
   {
     "token": "DISCORD_1068177363034189954",
     "username": "Rick Maltese",
-    "roleName": "👨‍🏫┃Responsabile Formatori DGS®",
-    "gradeName": "👨‍🏫┃Responsabile Formatori DGS®",
-    "grade": 12,
+    "roleName": "V. Responsabile Del Presidio",
+    "gradeName": "V. Responsabile Del Presidio",
+    "grade": 11,
     "isAllowed": true,
     "isMaster": false,
     "discordId": "1068177363034189954",
     "discordTag": "@synce7747",
     "avatar": "https://cdn.discordapp.com/avatars/1068177363034189954/b57d98c6143045f81af929ce561017e8.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.757Z"
+    "verifiedAt": "2026-09-11T20:13:14.118Z"
   },
   {
     "token": "DISCORD_1068699606931738734",
     "username": "Zaccaria Sina",
-    "roleName": "🥼┃Infermiere®",
-    "gradeName": "🥼┃Infermiere®",
+    "roleName": "Infermiere",
+    "gradeName": "Infermiere",
     "grade": 2.5,
     "isAllowed": true,
     "isMaster": false,
@@ -2001,13 +1945,13 @@
     "discordTag": "@aarrmmaannddoo_",
     "avatar": "https://cdn.discordapp.com/avatars/1068699606931738734/317972014404fa049f5ff2fe7abebc90.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.758Z"
+    "verifiedAt": "2026-09-11T20:13:14.118Z"
   },
   {
     "token": "DISCORD_1069265104996147230",
     "username": "Roberto Materasso",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -2015,27 +1959,13 @@
     "discordTag": "@furyoshii",
     "avatar": "https://cdn.discordapp.com/avatars/1069265104996147230/807dd6caf6b73eb6aac48f95400509c8.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.758Z"
-  },
-  {
-    "token": "DISCORD_1083382891985244251",
-    "username": "Tecanix",
-    "roleName": "🔍┃Supervisore EMS",
-    "gradeName": "🔍┃Supervisore EMS",
-    "grade": 15,
-    "isAllowed": true,
-    "isMaster": false,
-    "discordId": "1083382891985244251",
-    "discordTag": "@f4z3_geppetto",
-    "avatar": "https://cdn.discordapp.com/avatars/1083382891985244251/3505bf6f312f9a73d82911c6dfb1e320.png",
-    "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.758Z"
+    "verifiedAt": "2026-09-11T20:13:14.118Z"
   },
   {
     "token": "DISCORD_1088692580402868234",
     "username": "Eden Swit",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -2043,13 +1973,13 @@
     "discordTag": "@eden_of_stocazzo",
     "avatar": "https://cdn.discordapp.com/avatars/1088692580402868234/10734b388773be6b4f373cf4160d9e68.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.758Z"
+    "verifiedAt": "2026-09-11T20:13:14.119Z"
   },
   {
     "token": "DISCORD_1092456886844018779",
     "username": "Giacomo Romano",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -2057,26 +1987,26 @@
     "discordTag": "@nevus097",
     "avatar": "https://cdn.discordapp.com/avatars/1092456886844018779/48fca53c015ad626b5cee1af881a175d.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.758Z"
+    "verifiedAt": "2026-09-11T20:13:14.119Z"
   },
   {
     "token": "DISCORD_1093976077724024883",
     "username": "Aniello Cobrass",
-    "roleName": "🥼┃Infermiere®",
-    "gradeName": "🥼┃Infermiere®",
+    "roleName": "Infermiere",
+    "gradeName": "Infermiere",
     "grade": 2.5,
     "isAllowed": true,
     "isMaster": false,
     "discordId": "1093976077724024883",
     "discordTag": "@aniello7002",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.758Z"
+    "verifiedAt": "2026-09-11T20:13:14.119Z"
   },
   {
     "token": "DISCORD_1095430423317852221",
     "username": "Kalash Nikov",
-    "roleName": "🥼┃Medico Esperto®",
-    "gradeName": "🥼┃Medico Esperto®",
+    "roleName": "Medico Esperto",
+    "gradeName": "Medico Esperto",
     "grade": 6,
     "isAllowed": true,
     "isMaster": false,
@@ -2084,13 +2014,13 @@
     "discordTag": "@monfrevendecoca",
     "avatar": "https://cdn.discordapp.com/avatars/1095430423317852221/b5d27f2d2751c94dbf180a6f23f10e3d.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.758Z"
+    "verifiedAt": "2026-09-11T20:13:14.119Z"
   },
   {
     "token": "DISCORD_1101919833739776152",
     "username": "Antonio Palermo",
-    "roleName": "👨‍🏫┃Responsabile Formatori DGS®",
-    "gradeName": "👨‍🏫┃Responsabile Formatori DGS®",
+    "roleName": "Responsabile Del Presidio",
+    "gradeName": "Responsabile Del Presidio",
     "grade": 12,
     "isAllowed": true,
     "isMaster": false,
@@ -2098,28 +2028,27 @@
     "discordTag": "@antonio83_",
     "avatar": "https://cdn.discordapp.com/avatars/1101919833739776152/d7aff232b4bb78ef268b77317eee7183.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.759Z"
+    "verifiedAt": "2026-09-11T20:13:14.120Z"
   },
   {
     "token": "DISCORD_1118856017195827310",
     "username": "Salvatore De Gasperi",
-    "roleName": "🥼 ┃Segretario Direzione®",
-    "gradeName": "🥼 ┃Segretario Direzione®",
-    "grade": 16.5,
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
+    "grade": 2,
     "isAllowed": true,
     "isMaster": false,
     "discordId": "1118856017195827310",
     "discordTag": "@lestdoit__",
     "avatar": "https://cdn.discordapp.com/avatars/1118856017195827310/10399b1b35160cf402c1cc14ea445f0e.png",
-    "cdaRoleName": "Segretario CDA",
-    "hasCdaAccess": true,
-    "verifiedAt": "2026-09-11T10:58:59.161Z"
+    "hasCdaAccess": false,
+    "verifiedAt": "2026-09-11T20:13:14.121Z"
   },
   {
     "token": "DISCORD_1125523912801910816",
     "username": "Giuseppe Fv",
-    "roleName": "🥼┃Infermiere®",
-    "gradeName": "🥼┃Infermiere®",
+    "roleName": "Infermiere",
+    "gradeName": "Infermiere",
     "grade": 2.5,
     "isAllowed": true,
     "isMaster": false,
@@ -2127,13 +2056,13 @@
     "discordTag": "@akyronfv",
     "avatar": "https://cdn.discordapp.com/avatars/1125523912801910816/b56a14a907c4e151bb6a086f7dc064e0.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.759Z"
+    "verifiedAt": "2026-09-11T20:13:14.121Z"
   },
   {
     "token": "DISCORD_1126132448267358318",
     "username": "Roberto kinder",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -2141,13 +2070,13 @@
     "discordTag": "@mr.shark_real_",
     "avatar": "https://cdn.discordapp.com/avatars/1126132448267358318/714ae2acfbbdde4ed0142e1bbb4dc7ba.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.759Z"
+    "verifiedAt": "2026-09-11T20:13:14.121Z"
   },
   {
     "token": "DISCORD_1131892703890772030",
     "username": "Bilal El idrissi",
-    "roleName": "🥼┃Infermiere®",
-    "gradeName": "🥼┃Infermiere®",
+    "roleName": "Infermiere",
+    "gradeName": "Infermiere",
     "grade": 2.5,
     "isAllowed": true,
     "isMaster": false,
@@ -2155,13 +2084,13 @@
     "discordTag": "@bipi04",
     "avatar": "https://cdn.discordapp.com/avatars/1131892703890772030/060a74149c401149394f55945660b138.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.759Z"
+    "verifiedAt": "2026-09-11T20:13:14.122Z"
   },
   {
     "token": "DISCORD_1134088508273864777",
     "username": "Rick Wilson",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -2169,13 +2098,13 @@
     "discordTag": "@rickyfvxk_",
     "avatar": "https://cdn.discordapp.com/avatars/1134088508273864777/637237e4af63b58f8adf4efad1dd1ced.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.760Z"
+    "verifiedAt": "2026-09-11T20:13:14.122Z"
   },
   {
     "token": "DISCORD_1135525815782739998",
     "username": "Blake Sborradin",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -2183,13 +2112,13 @@
     "discordTag": "@4shoo.ac",
     "avatar": "https://cdn.discordapp.com/avatars/1135525815782739998/18fa8e6a603fd2ee23f3209152650fe0.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.760Z"
+    "verifiedAt": "2026-09-11T20:13:14.122Z"
   },
   {
     "token": "DISCORD_1145779353905533079",
     "username": "Shefa Shooteri",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -2197,13 +2126,13 @@
     "discordTag": "@veelyx7",
     "avatar": "https://cdn.discordapp.com/avatars/1145779353905533079/8f73c60e4f34b941aedad4ea36aae790.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.760Z"
+    "verifiedAt": "2026-09-11T20:13:14.122Z"
   },
   {
     "token": "DISCORD_1147549864562003989",
     "username": "Cangeij Sam",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -2211,13 +2140,13 @@
     "discordTag": "@ciccionapoli91_39058",
     "avatar": "https://cdn.discordapp.com/avatars/1147549864562003989/ad2904f30590487e64f72a78ac70c0ae.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.760Z"
+    "verifiedAt": "2026-09-11T20:13:14.122Z"
   },
   {
     "token": "DISCORD_1147555929554944141",
     "username": "Angi Vegas",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -2225,13 +2154,13 @@
     "discordTag": "@angy1994",
     "avatar": "https://cdn.discordapp.com/avatars/1147555929554944141/1796abffa33cd8a13a49387c50609cb8.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.760Z"
+    "verifiedAt": "2026-09-11T20:13:14.122Z"
   },
   {
     "token": "DISCORD_1154046342524567592",
     "username": "Pippo Piu",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -2239,13 +2168,13 @@
     "discordTag": "@dmafps",
     "avatar": "https://cdn.discordapp.com/avatars/1154046342524567592/f2650e6d4bb4a01814b84f99949a9d0c.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.760Z"
+    "verifiedAt": "2026-09-11T20:13:14.123Z"
   },
   {
     "token": "DISCORD_1159808964486242304",
     "username": "Natale Sperandeo",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -2253,13 +2182,13 @@
     "discordTag": "@skyron1498",
     "avatar": "https://cdn.discordapp.com/avatars/1159808964486242304/d32d5c7a1e77091599eb2c717b66577c.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.760Z"
+    "verifiedAt": "2026-09-11T20:13:14.123Z"
   },
   {
     "token": "DISCORD_1168156156796076032",
     "username": "Connor Miller",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -2267,13 +2196,13 @@
     "discordTag": "@imperonero.",
     "avatar": "https://cdn.discordapp.com/avatars/1168156156796076032/034358e3c60d2f7c8c0ab94e62cd24e8.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.760Z"
+    "verifiedAt": "2026-09-11T20:13:14.123Z"
   },
   {
     "token": "DISCORD_1182021641774059580",
     "username": "Luigi Rossi",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -2281,13 +2210,13 @@
     "discordTag": "@grextv1_",
     "avatar": "https://cdn.discordapp.com/avatars/1182021641774059580/9274abbe57bd64c6928db9b073fce7db.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.760Z"
+    "verifiedAt": "2026-09-11T20:13:14.124Z"
   },
   {
     "token": "DISCORD_1182466350782890036",
     "username": "Vito Locapo",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -2295,13 +2224,13 @@
     "discordTag": "@.kryss_.",
     "avatar": "https://cdn.discordapp.com/avatars/1182466350782890036/a_34e939ec4513c3a35c4f4ba22ccfc4e5.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.760Z"
+    "verifiedAt": "2026-09-11T20:13:14.124Z"
   },
   {
     "token": "DISCORD_1182681428840943636",
     "username": "Mike Fabri",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -2309,13 +2238,13 @@
     "discordTag": "@randag99_56375",
     "avatar": "https://cdn.discordapp.com/avatars/1182681428840943636/cf632435b6138239833d45ca69170e86.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.760Z"
+    "verifiedAt": "2026-09-11T20:13:14.125Z"
   },
   {
     "token": "DISCORD_1189955037347201109",
     "username": "Alex MIller",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -2323,14 +2252,14 @@
     "discordTag": "@j4zz1111",
     "avatar": "https://cdn.discordapp.com/avatars/1189955037347201109/0f4a84caedbdf8f5c44e4105efdd8830.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.760Z"
+    "verifiedAt": "2026-09-11T20:13:14.125Z"
   },
   {
     "token": "DISCORD_1193249410637910107",
     "username": "Giuseppe Politics",
-    "roleName": "👨‍🏫┃Direttore DGS®",
-    "gradeName": "👨‍🏫┃Direttore DGS®",
-    "grade": 18,
+    "roleName": "Supervisore Generale",
+    "gradeName": "Supervisore Generale",
+    "grade": 16,
     "isAllowed": true,
     "isMaster": false,
     "discordId": "1193249410637910107",
@@ -2338,13 +2267,13 @@
     "avatar": "https://cdn.discordapp.com/avatars/1193249410637910107/7766e975b9a3ccef38e8af1fc8e0a866.png",
     "cdaRoleName": "Membro CDA",
     "hasCdaAccess": true,
-    "verifiedAt": "2026-09-11T10:57:42.761Z"
+    "verifiedAt": "2026-09-11T20:13:14.125Z"
   },
   {
     "token": "DISCORD_1199056294947070002",
     "username": "Riccardo Mufloni",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -2352,13 +2281,13 @@
     "discordTag": "@pro100_lol",
     "avatar": "https://cdn.discordapp.com/avatars/1199056294947070002/ef9ef3666b7c54b39020213c1823ec13.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.761Z"
+    "verifiedAt": "2026-09-11T20:13:14.125Z"
   },
   {
     "token": "DISCORD_1204116719715749959",
     "username": "Clevio Serbiano",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -2366,13 +2295,13 @@
     "discordTag": "@piidha",
     "avatar": "https://cdn.discordapp.com/avatars/1204116719715749959/cac690ff124e0142bfb7b1d90cf35fe5.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.772Z"
+    "verifiedAt": "2026-09-11T20:13:14.125Z"
   },
   {
     "token": "DISCORD_1204526548279889990",
     "username": "Quinto Piri",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -2380,26 +2309,26 @@
     "discordTag": "@piri99_",
     "avatar": "https://cdn.discordapp.com/avatars/1204526548279889990/184bda88c5d55fc0e2955680bc025dda.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.772Z"
+    "verifiedAt": "2026-09-11T20:13:14.125Z"
   },
   {
     "token": "DISCORD_1205883883002929173",
     "username": "Matttia Carro",
-    "roleName": "🥼┃Infermiere®",
-    "gradeName": "🥼┃Infermiere®",
+    "roleName": "Infermiere",
+    "gradeName": "Infermiere",
     "grade": 2.5,
     "isAllowed": true,
     "isMaster": false,
     "discordId": "1205883883002929173",
     "discordTag": "@mattia_91958",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.772Z"
+    "verifiedAt": "2026-09-11T20:13:14.125Z"
   },
   {
     "token": "DISCORD_1209243187076661322",
     "username": "Karlo Miller",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -2407,13 +2336,13 @@
     "discordTag": "@mk_karlo.",
     "avatar": "https://cdn.discordapp.com/avatars/1209243187076661322/43c89b7d085683b5fbb9a23e502b9509.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.772Z"
+    "verifiedAt": "2026-09-11T20:13:14.125Z"
   },
   {
     "token": "DISCORD_1223368611578511394",
     "username": "Nicola Rinaldi",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -2421,13 +2350,13 @@
     "discordTag": "@_sneax9707tv__13751",
     "avatar": "https://cdn.discordapp.com/avatars/1223368611578511394/103bb3365135de5cbeea657db0dedf35.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.772Z"
+    "verifiedAt": "2026-09-11T20:13:14.126Z"
   },
   {
     "token": "DISCORD_1224718702239547444",
     "username": "Dutch Esposito",
-    "roleName": "💎┃Direttore Generale®",
-    "gradeName": "💎┃Direttore Generale®",
+    "roleName": "Direttore Generale",
+    "gradeName": "Direttore Generale",
     "grade": 20,
     "isAllowed": true,
     "isMaster": false,
@@ -2436,26 +2365,26 @@
     "avatar": "https://cdn.discordapp.com/avatars/1224718702239547444/c4122f969f062f286c7e76728aa692e9.png",
     "cdaRoleName": "Vice Presidente CDA",
     "hasCdaAccess": true,
-    "verifiedAt": "2026-09-11T10:57:42.773Z"
+    "verifiedAt": "2026-09-11T20:13:14.126Z"
   },
   {
     "token": "DISCORD_1234116218248495265",
     "username": "Pol Montana",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
     "discordId": "1234116218248495265",
     "discordTag": "@tarabra.69",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.773Z"
+    "verifiedAt": "2026-09-11T20:13:14.126Z"
   },
   {
     "token": "DISCORD_1236427197380558940",
     "username": "France Niutt",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -2463,13 +2392,13 @@
     "discordTag": "@alesvsjs",
     "avatar": "https://cdn.discordapp.com/avatars/1236427197380558940/79ee349b6511e2000af8a32fb8a6974e.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.774Z"
+    "verifiedAt": "2026-09-11T20:13:14.126Z"
   },
   {
     "token": "DISCORD_1236631484287422557",
     "username": "Alessandro Esposito",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -2477,13 +2406,13 @@
     "discordTag": "@pantom_quello_figo",
     "avatar": "https://cdn.discordapp.com/avatars/1236631484287422557/21794c464f866a887a35d0722e426806.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.774Z"
+    "verifiedAt": "2026-09-11T20:13:14.126Z"
   },
   {
     "token": "DISCORD_1237177802999070790",
     "username": "Kevin Panetto",
-    "roleName": "👨‍🏫┃Responsabile Formatori DGS®",
-    "gradeName": "👨‍🏫┃Responsabile Formatori DGS®",
+    "roleName": "Responsabile Del Presidio",
+    "gradeName": "Responsabile Del Presidio",
     "grade": 12,
     "isAllowed": true,
     "isMaster": false,
@@ -2491,13 +2420,13 @@
     "discordTag": "@fcim1908995_69767",
     "avatar": "https://cdn.discordapp.com/avatars/1237177802999070790/547f02c9a9d0e2829db19f5044f25f5b.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.774Z"
+    "verifiedAt": "2026-09-11T20:13:14.126Z"
   },
   {
     "token": "DISCORD_1244031956338081956",
     "username": "Vincenzo Rossi",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -2505,13 +2434,13 @@
     "discordTag": "@napoletano0478",
     "avatar": "https://cdn.discordapp.com/avatars/1244031956338081956/f717c0eefc4bc3846b27fc1fde6f9b21.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.775Z"
+    "verifiedAt": "2026-09-11T20:13:14.127Z"
   },
   {
     "token": "DISCORD_1258752570634145802",
     "username": "Don Panuozzo Bruschetta",
-    "roleName": "🥼┃Infermiere®",
-    "gradeName": "🥼┃Infermiere®",
+    "roleName": "Infermiere",
+    "gradeName": "Infermiere",
     "grade": 2.5,
     "isAllowed": true,
     "isMaster": false,
@@ -2519,13 +2448,13 @@
     "discordTag": "@xdeath95",
     "avatar": "https://cdn.discordapp.com/avatars/1258752570634145802/e7c6eda1c403dd6b42fa7dce199fd443.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.775Z"
+    "verifiedAt": "2026-09-11T20:13:14.127Z"
   },
   {
     "token": "DISCORD_1266779262908629146",
     "username": "Sakai West",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -2533,13 +2462,27 @@
     "discordTag": "@justin025447",
     "avatar": "https://cdn.discordapp.com/avatars/1266779262908629146/3fe09a3c4d86b04b622fd8d184e0d4c5.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.775Z"
+    "verifiedAt": "2026-09-11T20:13:14.127Z"
+  },
+  {
+    "token": "DISCORD_1267154727146356748",
+    "username": "Jolyne Kujo",
+    "roleName": "Volontario",
+    "gradeName": "Volontario",
+    "grade": 1.5,
+    "isAllowed": true,
+    "isMaster": false,
+    "discordId": "1267154727146356748",
+    "discordTag": "@gabri17._.",
+    "avatar": "https://cdn.discordapp.com/avatars/1267154727146356748/44b474bfcc5c1685ffbc5501d28e31d3.png",
+    "hasCdaAccess": false,
+    "verifiedAt": "2026-09-11T20:13:14.127Z"
   },
   {
     "token": "DISCORD_1272165762844463135",
     "username": "Tyler Miller",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -2547,13 +2490,13 @@
     "discordTag": "@tim3.xm",
     "avatar": "https://cdn.discordapp.com/avatars/1272165762844463135/a_96d248bab862a9659e31fb6f12966020.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.776Z"
+    "verifiedAt": "2026-09-11T20:13:14.127Z"
   },
   {
     "token": "DISCORD_1274874952532889640",
     "username": "Scartar Parkas",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -2561,40 +2504,40 @@
     "discordTag": "@tanderx7",
     "avatar": "https://cdn.discordapp.com/avatars/1274874952532889640/5b9c8d6c5e36dc1080fb569ecd81679f.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.776Z"
+    "verifiedAt": "2026-09-11T20:13:14.127Z"
   },
   {
     "token": "DISCORD_1278373922298925057",
     "username": "Spacchiu Uaddi",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
     "discordId": "1278373922298925057",
     "discordTag": "@peppinot._20569",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.776Z"
+    "verifiedAt": "2026-09-11T20:13:14.128Z"
   },
   {
     "token": "DISCORD_1280202612582387746",
     "username": "Yuki Cross",
-    "roleName": "👨‍🏫┃Responsabile Formatori DGS®",
-    "gradeName": "👨‍🏫┃Responsabile Formatori DGS®",
-    "grade": 12,
+    "roleName": "V. Responsabile Del Presidio",
+    "gradeName": "V. Responsabile Del Presidio",
+    "grade": 11,
     "isAllowed": true,
     "isMaster": false,
     "discordId": "1280202612582387746",
     "discordTag": "@yuki4488",
     "avatar": "https://cdn.discordapp.com/avatars/1280202612582387746/aff5e5faac778a417c84f5749a7db504.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.777Z"
+    "verifiedAt": "2026-09-11T20:13:14.128Z"
   },
   {
     "token": "DISCORD_1288485066523021396",
     "username": "Padre Crown",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -2602,13 +2545,13 @@
     "discordTag": "@ale_fivem",
     "avatar": "https://cdn.discordapp.com/avatars/1288485066523021396/17a3ec68cf0d2ad0542df0de1fa3f95d.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.777Z"
+    "verifiedAt": "2026-09-11T20:13:14.128Z"
   },
   {
     "token": "DISCORD_1293551270421991455",
     "username": "Drago Emera",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -2616,13 +2559,13 @@
     "discordTag": "@a410n",
     "avatar": "https://cdn.discordapp.com/avatars/1293551270421991455/0f7d7387d1e0d9ca0386cf9813f5bea7.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.777Z"
+    "verifiedAt": "2026-09-11T20:13:14.128Z"
   },
   {
     "token": "DISCORD_1299706659827875911",
     "username": "Dave Primo",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -2630,13 +2573,13 @@
     "discordTag": "@dave_tok21",
     "avatar": "https://cdn.discordapp.com/avatars/1299706659827875911/7cb6d87263d5869776538af0cecf8efa.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.777Z"
+    "verifiedAt": "2026-09-11T20:13:14.128Z"
   },
   {
     "token": "DISCORD_1300543698634801244",
     "username": "Jordy B",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -2644,13 +2587,13 @@
     "discordTag": "@zcocco209",
     "avatar": "https://cdn.discordapp.com/avatars/1300543698634801244/1940cda7eb35e34a5c20d8bfda4990b9.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.777Z"
+    "verifiedAt": "2026-09-11T20:13:14.128Z"
   },
   {
     "token": "DISCORD_1306956766948626476",
     "username": "Marzio Fazzio",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -2658,39 +2601,39 @@
     "discordTag": "@ergabbians",
     "avatar": "https://cdn.discordapp.com/avatars/1306956766948626476/ef7fcf87fb5e982442eb5f163ec68dd9.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.777Z"
+    "verifiedAt": "2026-09-11T20:13:14.128Z"
   },
   {
     "token": "DISCORD_1307043996354478145",
     "username": "Tonino Corleone",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
     "discordId": "1307043996354478145",
     "discordTag": "@tonino_u_tedesc",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.778Z"
+    "verifiedAt": "2026-09-11T20:13:14.129Z"
   },
   {
     "token": "DISCORD_1308003576907563061",
     "username": "Giovanni Panda 2",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
     "discordId": "1308003576907563061",
     "discordTag": "@simone04748",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.778Z"
+    "verifiedAt": "2026-09-11T20:13:14.129Z"
   },
   {
     "token": "DISCORD_1311040319969562647",
     "username": "David Hayes",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -2698,13 +2641,13 @@
     "discordTag": "@rainola_mvp",
     "avatar": "https://cdn.discordapp.com/avatars/1311040319969562647/e659bc38a944810ef658b94f17d03ec5.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.778Z"
+    "verifiedAt": "2026-09-11T20:13:14.129Z"
   },
   {
     "token": "DISCORD_1317872487022727211",
     "username": "Michele Il Magnifico",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -2712,13 +2655,13 @@
     "discordTag": "@one_person21",
     "avatar": "https://cdn.discordapp.com/avatars/1317872487022727211/e47ec7cc2d1c3a62df97466a5ee2e16d.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.778Z"
+    "verifiedAt": "2026-09-11T20:13:14.129Z"
   },
   {
     "token": "DISCORD_1320368548710842409",
     "username": "Christian Montana",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -2726,27 +2669,27 @@
     "discordTag": "@chriz_proz_04626",
     "avatar": "https://cdn.discordapp.com/avatars/1320368548710842409/6550001f6c6dad0bd5c4ea1a008d8b7d.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.778Z"
+    "verifiedAt": "2026-09-11T20:13:14.129Z"
   },
   {
     "token": "DISCORD_1321602128309125170",
     "username": "Matteo Piscitelli",
-    "roleName": "👨‍🏫┃Responsabile Formatori DGS®",
-    "gradeName": "👨‍🏫┃Responsabile Formatori DGS®",
-    "grade": 12,
+    "roleName": "V. Primario di Reparto",
+    "gradeName": "V. Primario di Reparto",
+    "grade": 9.5,
     "isAllowed": true,
     "isMaster": false,
     "discordId": "1321602128309125170",
     "discordTag": "@12flxppy",
     "avatar": "https://cdn.discordapp.com/avatars/1321602128309125170/92c134f5a67c34f9df19c3d711d0ea9a.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.779Z"
+    "verifiedAt": "2026-09-11T20:13:14.129Z"
   },
   {
     "token": "DISCORD_1326154030162116630",
     "username": "Giovanni Manzo",
-    "roleName": "Proprietario",
-    "gradeName": "Proprietario",
+    "roleName": "Proprietario EMS",
+    "gradeName": "Proprietario EMS",
     "grade": 100,
     "isAllowed": true,
     "isMaster": true,
@@ -2755,13 +2698,13 @@
     "avatar": "https://cdn.discordapp.com/avatars/1326154030162116630/3fd7193edcc1b06ca6692e8d8c21d7ef.png",
     "cdaRoleName": "Consigliere Finale CDA",
     "hasCdaAccess": true,
-    "verifiedAt": "2026-09-11T10:57:42.780Z"
+    "verifiedAt": "2026-09-11T20:13:14.129Z"
   },
   {
     "token": "DISCORD_1327283458032144447",
     "username": "Andrea Toto",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -2769,13 +2712,13 @@
     "discordTag": "@ad37_52",
     "avatar": "https://cdn.discordapp.com/avatars/1327283458032144447/7b874996b3d6814a5018c58fedd992bb.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.781Z"
+    "verifiedAt": "2026-09-11T20:13:14.130Z"
   },
   {
     "token": "DISCORD_1330669366072578200",
     "username": "Lorenzo Rossi",
-    "roleName": "🥼┃Medico Esperto®",
-    "gradeName": "🥼┃Medico Esperto®",
+    "roleName": "Medico Esperto",
+    "gradeName": "Medico Esperto",
     "grade": 6,
     "isAllowed": true,
     "isMaster": false,
@@ -2783,13 +2726,13 @@
     "discordTag": "@ultrasvirtusentella",
     "avatar": "https://cdn.discordapp.com/avatars/1330669366072578200/b6bf75b8ed706aab3155e22944d2320a.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.782Z"
+    "verifiedAt": "2026-09-11T20:13:14.130Z"
   },
   {
     "token": "DISCORD_1333873431837413396",
     "username": "Alessandro Fabbrino",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -2797,13 +2740,13 @@
     "discordTag": "@dadadagz_",
     "avatar": "https://cdn.discordapp.com/avatars/1333873431837413396/a60128ab102fee46e2d8eaf7dce91005.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.783Z"
+    "verifiedAt": "2026-09-11T20:13:14.130Z"
   },
   {
     "token": "DISCORD_1333891185676128347",
     "username": "Andrea Belcamino",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -2811,13 +2754,13 @@
     "discordTag": "@andreailcalabrese",
     "avatar": "https://cdn.discordapp.com/avatars/1333891185676128347/a0b9cd834f723779dea4d9a042187e5e.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.783Z"
+    "verifiedAt": "2026-09-11T20:13:14.130Z"
   },
   {
     "token": "DISCORD_1337787624244641813",
     "username": "Carlo Baschirotto",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -2825,13 +2768,13 @@
     "discordTag": "@itsd4n_",
     "avatar": "https://cdn.discordapp.com/avatars/1337787624244641813/cd0b85e9d20e8d0305c7282b634f081f.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.783Z"
+    "verifiedAt": "2026-09-11T20:13:14.130Z"
   },
   {
     "token": "DISCORD_1341894965860634644",
     "username": "Antony Romano",
-    "roleName": "Proprietario",
-    "gradeName": "Proprietario",
+    "roleName": "Proprietario EMS",
+    "gradeName": "Proprietario EMS",
     "grade": 100,
     "isAllowed": true,
     "isMaster": true,
@@ -2840,13 +2783,13 @@
     "avatar": "https://cdn.discordapp.com/avatars/1341894965860634644/23e1f9b1d0155dbcece60f4deda7692d.png",
     "cdaRoleName": "Consigliere Finale CDA",
     "hasCdaAccess": true,
-    "verifiedAt": "2026-09-11T10:57:42.783Z"
+    "verifiedAt": "2026-09-11T20:13:14.130Z"
   },
   {
     "token": "DISCORD_1345329459296997467",
     "username": "NicoRX! Rax",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -2854,13 +2797,13 @@
     "discordTag": "@nicorx",
     "avatar": "https://cdn.discordapp.com/avatars/1345329459296997467/5ee5764a4d116c57f598a3ade9a73d65.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.783Z"
+    "verifiedAt": "2026-09-11T20:13:14.131Z"
   },
   {
     "token": "DISCORD_1346440286087286867",
     "username": "Algero Corretini",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -2868,13 +2811,13 @@
     "discordTag": "@oklazz_",
     "avatar": "https://cdn.discordapp.com/avatars/1346440286087286867/d4e6ae46f3da3c1751fe76f73bf2e072.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.784Z"
+    "verifiedAt": "2026-09-11T20:13:14.131Z"
   },
   {
     "token": "DISCORD_1349103719614120017",
     "username": "Massimo Free",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -2882,13 +2825,13 @@
     "discordTag": "@mattia240569",
     "avatar": "https://cdn.discordapp.com/avatars/1349103719614120017/3b7d96f7fb692368572dfad5a5d977d2.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.784Z"
+    "verifiedAt": "2026-09-11T20:13:14.131Z"
   },
   {
     "token": "DISCORD_1351584966236049408",
     "username": "Fabrizio Denaro",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -2896,13 +2839,13 @@
     "discordTag": "@faveloso",
     "avatar": "https://cdn.discordapp.com/avatars/1351584966236049408/22e7e090910630326a52d60396f5d8d0.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.784Z"
+    "verifiedAt": "2026-09-11T20:13:14.131Z"
   },
   {
     "token": "DISCORD_1357822476368744658",
     "username": "Rex Smith",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -2910,13 +2853,13 @@
     "discordTag": "@mat_rix03",
     "avatar": "https://cdn.discordapp.com/avatars/1357822476368744658/54bca330d02b1315dd8770a4ce73451c.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.784Z"
+    "verifiedAt": "2026-09-11T20:13:14.131Z"
   },
   {
     "token": "DISCORD_1365054692631121930",
     "username": "Siria Wayne",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -2924,13 +2867,13 @@
     "discordTag": "@_siryetta_",
     "avatar": "https://cdn.discordapp.com/avatars/1365054692631121930/d4ecdf2daf9fb478f9b498c1aaa3765c.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.784Z"
+    "verifiedAt": "2026-09-11T20:13:14.131Z"
   },
   {
     "token": "DISCORD_1370826419885838519",
     "username": "Lorenzo Valeri",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -2938,13 +2881,13 @@
     "discordTag": "@just_ravix",
     "avatar": "https://cdn.discordapp.com/avatars/1370826419885838519/c1d151b83810dd8b9af4c121eb4cf14f.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.784Z"
+    "verifiedAt": "2026-09-11T20:13:14.131Z"
   },
   {
     "token": "DISCORD_1374124765236957357",
     "username": "Andrea Freddo",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -2952,13 +2895,13 @@
     "discordTag": "@fivem.andre",
     "avatar": "https://cdn.discordapp.com/avatars/1374124765236957357/3ed9b0f5097305e17deb906645e2a660.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.784Z"
+    "verifiedAt": "2026-09-11T20:13:14.132Z"
   },
   {
     "token": "DISCORD_1375495249559814194",
     "username": "R4z3 Hanniball",
-    "roleName": "🥼┃V. Primario®",
-    "gradeName": "🥼┃V. Primario®",
+    "roleName": "V. Primario",
+    "gradeName": "V. Primario",
     "grade": 9,
     "isAllowed": true,
     "isMaster": false,
@@ -2966,13 +2909,13 @@
     "discordTag": "@hanniball8305",
     "avatar": "https://cdn.discordapp.com/avatars/1375495249559814194/6762254f431f617169e5c8d7e1dff301.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.784Z"
+    "verifiedAt": "2026-09-11T20:13:14.132Z"
   },
   {
     "token": "DISCORD_1376997722086969508",
     "username": "𝕯𝖎𝖊𝖌𝖔 𝕿𝖗𝖔𝖒𝖇𝖎𝖓𝖎",
-    "roleName": "🥼┃Supervisore®",
-    "gradeName": "🥼┃Supervisore®",
+    "roleName": "Supervisore",
+    "gradeName": "Supervisore",
     "grade": 15,
     "isAllowed": true,
     "isMaster": false,
@@ -2981,79 +2924,66 @@
     "avatar": "https://cdn.discordapp.com/avatars/1376997722086969508/a_196ea3642369e37f388a446de72d9353.png",
     "cdaRoleName": "Membro CDA",
     "hasCdaAccess": true,
-    "verifiedAt": "2026-09-11T10:57:42.785Z"
+    "verifiedAt": "2026-09-11T20:13:14.132Z"
   },
   {
     "token": "DISCORD_1380561345476427796",
     "username": "Nick Larsson",
-    "roleName": "👨‍🏫┃Responsabile Formatori DGS®",
-    "gradeName": "👨‍🏫┃Responsabile Formatori DGS®",
-    "grade": 12,
+    "roleName": "V. Responsabile Del Presidio",
+    "gradeName": "V. Responsabile Del Presidio",
+    "grade": 11,
     "isAllowed": true,
     "isMaster": false,
     "discordId": "1380561345476427796",
     "discordTag": "@norsk_sel",
     "avatar": "https://cdn.discordapp.com/avatars/1380561345476427796/d2836475e8890226e46b89eead350ddb.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.785Z"
+    "verifiedAt": "2026-09-11T20:13:14.133Z"
   },
   {
     "token": "DISCORD_1386410601693053099",
     "username": "Rosario Muniz",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
     "discordId": "1386410601693053099",
     "discordTag": "@babygang21",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.785Z"
+    "verifiedAt": "2026-09-11T20:13:14.133Z"
   },
   {
     "token": "DISCORD_1392127755109269526",
     "username": "Matteo Bottiglia",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
     "discordId": "1392127755109269526",
     "discordTag": "@matte.bz",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.786Z"
+    "verifiedAt": "2026-09-11T20:13:14.134Z"
   },
   {
     "token": "DISCORD_1397684834687651911",
     "username": "Luca Catone",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
     "discordId": "1397684834687651911",
     "discordTag": "@pippo_esposito_15212",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.786Z"
-  },
-  {
-    "token": "DISCORD_1424131590707085324",
-    "username": "RIccardo Giacomazzi",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
-    "grade": 2,
-    "isAllowed": true,
-    "isMaster": false,
-    "discordId": "1424131590707085324",
-    "discordTag": "@riki4000_75275",
-    "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.786Z"
+    "verifiedAt": "2026-09-11T20:13:14.135Z"
   },
   {
     "token": "DISCORD_1425592018851336232",
     "username": "Davide Gasi",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -3061,13 +2991,13 @@
     "discordTag": "@dejvidgasi_16883",
     "avatar": "https://cdn.discordapp.com/avatars/1425592018851336232/76fe1e7ceb70bf1e0863802cf61b18b5.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.786Z"
+    "verifiedAt": "2026-09-11T20:13:14.139Z"
   },
   {
     "token": "DISCORD_1431415352327147591",
     "username": "Salvatore Bruscia",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -3075,13 +3005,13 @@
     "discordTag": "@twitchskiuppiddu._70793",
     "avatar": "https://cdn.discordapp.com/avatars/1431415352327147591/c471829fe4c8dd0c5e8944d7231bfe2c.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.787Z"
+    "verifiedAt": "2026-09-11T20:13:14.140Z"
   },
   {
     "token": "DISCORD_1432749876080279612",
     "username": "Matias Corleone",
-    "roleName": "🚑┃Responsabile Generale EMS®",
-    "gradeName": "🚑┃Responsabile Generale EMS®",
+    "roleName": "Responsabile Generale EMS",
+    "gradeName": "Responsabile Generale EMS",
     "grade": 21,
     "isAllowed": true,
     "isMaster": false,
@@ -3089,13 +3019,13 @@
     "discordTag": "@_matiascorleone_",
     "avatar": "https://cdn.discordapp.com/avatars/1432749876080279612/63d64a9748dc6dcf0006b426b135a3af.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.787Z"
+    "verifiedAt": "2026-09-11T20:13:14.140Z"
   },
   {
     "token": "DISCORD_1433131220455260231",
     "username": "Francesco Rossi",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -3103,26 +3033,26 @@
     "discordTag": "@kita1887._79626",
     "avatar": "https://cdn.discordapp.com/avatars/1433131220455260231/97cba795528f90e32cbe024ed4c638df.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.787Z"
+    "verifiedAt": "2026-09-11T20:13:14.140Z"
   },
   {
     "token": "DISCORD_1439268839647875212",
     "username": "Jolly Parisi",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
     "discordId": "1439268839647875212",
     "discordTag": "@jolly01665",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.787Z"
+    "verifiedAt": "2026-09-11T20:13:14.140Z"
   },
   {
     "token": "DISCORD_1442095859662585970",
     "username": "Denny De Tommaso",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -3130,13 +3060,13 @@
     "discordTag": "@bullrp_60329",
     "avatar": "https://cdn.discordapp.com/avatars/1442095859662585970/a18a58c4fc5e729a20988890be740639.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.787Z"
+    "verifiedAt": "2026-09-11T20:13:14.140Z"
   },
   {
     "token": "DISCORD_1444335661137264846",
     "username": "Melo Ricordo",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -3144,13 +3074,13 @@
     "discordTag": "@melo76_",
     "avatar": "https://cdn.discordapp.com/avatars/1444335661137264846/184d3ba6b9447db2a146e0f5a30e2317.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.787Z"
+    "verifiedAt": "2026-09-11T20:13:14.140Z"
   },
   {
     "token": "DISCORD_1448307275671535677",
     "username": "Avrai Aura",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -3158,40 +3088,40 @@
     "discordTag": "@_exodia_69_",
     "avatar": "https://cdn.discordapp.com/avatars/1448307275671535677/7d3b1d532f393c33a96b8abb72cea1d8.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.787Z"
+    "verifiedAt": "2026-09-11T20:13:14.141Z"
   },
   {
     "token": "DISCORD_1448471854313377875",
     "username": "Matteo Corsi",
-    "roleName": "⚕️┃Chirurgo Specialista®",
-    "gradeName": "⚕️┃Chirurgo Specialista®",
-    "grade": 7,
+    "roleName": "Medico Esperto",
+    "gradeName": "Medico Esperto",
+    "grade": 6,
     "isAllowed": true,
     "isMaster": false,
     "discordId": "1448471854313377875",
     "discordTag": "@dlhlol",
     "avatar": "https://cdn.discordapp.com/avatars/1448471854313377875/f7f2e9361e8a54ce6e72580ac7b967af.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.787Z"
+    "verifiedAt": "2026-09-11T20:13:14.141Z"
   },
   {
     "token": "DISCORD_1448731640737042587",
     "username": "Chloe Fabbri",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
     "discordId": "1448731640737042587",
     "discordTag": "@sara_24768",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.788Z"
+    "verifiedAt": "2026-09-11T20:13:14.141Z"
   },
   {
     "token": "DISCORD_1450677619266949141",
     "username": "Filippo Ciro",
-    "roleName": "🥼┃Direttore Sanitario®",
-    "gradeName": "🥼┃Direttore Sanitario®",
+    "roleName": "Direttore Sanitario",
+    "gradeName": "Direttore Sanitario",
     "grade": 18,
     "isAllowed": true,
     "isMaster": false,
@@ -3200,13 +3130,13 @@
     "avatar": "https://cdn.discordapp.com/avatars/1450677619266949141/070976143cb629b1ca6b05ca9fcf9b3e.png",
     "cdaRoleName": "Vice Presidente CDA",
     "hasCdaAccess": true,
-    "verifiedAt": "2026-09-11T10:57:42.788Z"
+    "verifiedAt": "2026-09-11T20:13:14.141Z"
   },
   {
     "token": "DISCORD_1454159240502575168",
     "username": "Giuseppe Pupillo",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -3214,26 +3144,26 @@
     "discordTag": "@nicoo090435",
     "avatar": "https://cdn.discordapp.com/avatars/1454159240502575168/157e517cdbf371a47aaead44675714a3.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.788Z"
+    "verifiedAt": "2026-09-11T20:13:14.141Z"
   },
   {
     "token": "DISCORD_1454502569383825499",
     "username": "Kevin Randazzo",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
     "discordId": "1454502569383825499",
     "discordTag": "@davide052100",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.788Z"
+    "verifiedAt": "2026-09-11T20:13:14.141Z"
   },
   {
     "token": "DISCORD_1455881880212738079",
     "username": "Marcus Cain",
-    "roleName": "🥼┃Infermiere®",
-    "gradeName": "🥼┃Infermiere®",
+    "roleName": "Infermiere",
+    "gradeName": "Infermiere",
     "grade": 2.5,
     "isAllowed": true,
     "isMaster": false,
@@ -3241,26 +3171,26 @@
     "discordTag": "@leonardo029859",
     "avatar": "https://cdn.discordapp.com/avatars/1455881880212738079/85339f76d8806b329abe0b86fa631d9e.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.788Z"
+    "verifiedAt": "2026-09-11T20:13:14.142Z"
   },
   {
     "token": "DISCORD_1456095432668352574",
     "username": "Giggi Il Bullo",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
     "discordId": "1456095432668352574",
     "discordTag": "@luigi_53879",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.788Z"
+    "verifiedAt": "2026-09-11T20:13:14.142Z"
   },
   {
     "token": "DISCORD_1457128942803877923",
     "username": "Francesco Tucano",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -3268,13 +3198,13 @@
     "discordTag": "@bixioo.",
     "avatar": "https://cdn.discordapp.com/avatars/1457128942803877923/6e3621637f120c8e46618071fdce5e77.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.789Z"
+    "verifiedAt": "2026-09-11T20:13:14.142Z"
   },
   {
     "token": "DISCORD_1457504123326038097",
     "username": "Jere Rodri",
-    "roleName": "🥼┃Medico®",
-    "gradeName": "🥼┃Medico®",
+    "roleName": "Medico",
+    "gradeName": "Medico",
     "grade": 5,
     "isAllowed": true,
     "isMaster": false,
@@ -3282,13 +3212,13 @@
     "discordTag": "@jeremiasrodriguez03",
     "avatar": "https://cdn.discordapp.com/avatars/1457504123326038097/43bbcd3393f355433c228100cefc64e0.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.789Z"
+    "verifiedAt": "2026-09-11T20:13:14.142Z"
   },
   {
     "token": "DISCORD_1458468787899859120",
     "username": "Leandro Smith",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -3296,13 +3226,13 @@
     "discordTag": "@smith250_",
     "avatar": "https://cdn.discordapp.com/avatars/1458468787899859120/fdc79c90fe4ef2d96927946ce7f8a691.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.789Z"
+    "verifiedAt": "2026-09-11T20:13:14.142Z"
   },
   {
     "token": "DISCORD_1458484287274877039",
     "username": "Calamaro Tozzo",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -3310,27 +3240,27 @@
     "discordTag": "@thiago049808",
     "avatar": "https://cdn.discordapp.com/avatars/1458484287274877039/5445ffd7ffb201a98393cbdf684ea4b1.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.789Z"
+    "verifiedAt": "2026-09-11T20:13:14.142Z"
   },
   {
     "token": "DISCORD_1468999790200094923",
     "username": "Mattew Grinta",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
     "discordId": "1468999790200094923",
     "discordTag": "@matzfv.",
-    "avatar": "https://cdn.discordapp.com/avatars/1468999790200094923/42d5e4b5d0bc855b1f479a4e000ee0b7.png",
+    "avatar": "https://cdn.discordapp.com/avatars/1468999790200094923/227d70088649c83b01d3b464230034a1.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.789Z"
+    "verifiedAt": "2026-09-11T20:13:14.142Z"
   },
   {
     "token": "DISCORD_1481305641023832155",
     "username": "Celine White",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -3338,13 +3268,13 @@
     "discordTag": "@angeloblow",
     "avatar": "https://cdn.discordapp.com/avatars/1481305641023832155/92572f413033c75ea64d9845b44266b0.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.789Z"
+    "verifiedAt": "2026-09-11T20:13:14.143Z"
   },
   {
     "token": "DISCORD_1483564691304349996",
     "username": "Smooka Pipodi",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -3352,13 +3282,13 @@
     "discordTag": "@giuseppe112.",
     "avatar": "https://cdn.discordapp.com/avatars/1483564691304349996/cdb359071b6ebe7a502186604839ff88.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.789Z"
+    "verifiedAt": "2026-09-11T20:13:14.143Z"
   },
   {
     "token": "DISCORD_1487943783910871101",
     "username": "Gatox King",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -3366,13 +3296,13 @@
     "discordTag": "@gatox0332",
     "avatar": "https://cdn.discordapp.com/avatars/1487943783910871101/14c45bb98f0efb74688098463f31b959.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.789Z"
+    "verifiedAt": "2026-09-11T20:13:14.143Z"
   },
   {
     "token": "DISCORD_1493270054337384679",
     "username": "Alex Del Piero",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -3380,13 +3310,13 @@
     "discordTag": "@noparlatanto1801",
     "avatar": "https://cdn.discordapp.com/avatars/1493270054337384679/52f2f9c8e9eff7daa8f36ebc7bd3a8ee.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.790Z"
+    "verifiedAt": "2026-09-11T20:13:14.143Z"
   },
   {
     "token": "DISCORD_1493317006366347365",
     "username": "Davide Ruffolo",
-    "roleName": "🥼┃Infermiere®",
-    "gradeName": "🥼┃Infermiere®",
+    "roleName": "Infermiere",
+    "gradeName": "Infermiere",
     "grade": 2.5,
     "isAllowed": true,
     "isMaster": false,
@@ -3394,26 +3324,26 @@
     "discordTag": "@paladezz.",
     "avatar": "https://cdn.discordapp.com/avatars/1493317006366347365/da9d6f3d0dd22ce63473e8b852e7dfe3.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.790Z"
+    "verifiedAt": "2026-09-11T20:13:14.143Z"
   },
   {
     "token": "DISCORD_1504080133365956729",
     "username": "Davis Ucarlo",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
     "discordId": "1504080133365956729",
     "discordTag": "@swexy0948",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.790Z"
+    "verifiedAt": "2026-09-11T20:13:14.143Z"
   },
   {
     "token": "DISCORD_1517614828192006339",
     "username": "Tonino Scaletta",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -3421,13 +3351,13 @@
     "discordTag": "@ryzen_prime10",
     "avatar": "https://cdn.discordapp.com/avatars/1517614828192006339/9218ea4c27ea510f0a09302f94249537.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.790Z"
+    "verifiedAt": "2026-09-11T20:13:14.144Z"
   },
   {
     "token": "DISCORD_1520360555087396936",
     "username": "orzo",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -3435,26 +3365,26 @@
     "discordTag": "@faringedizioorzo",
     "avatar": "https://cdn.discordapp.com/avatars/1520360555087396936/29d731bff84d02c67328c2950c2c4bc4.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.790Z"
+    "verifiedAt": "2026-09-11T20:13:14.144Z"
   },
   {
     "token": "DISCORD_1541422880804438087",
     "username": "Pascalin Omnat",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
     "discordId": "1541422880804438087",
     "discordTag": "@antimodonetto",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.790Z"
+    "verifiedAt": "2026-09-11T20:13:14.144Z"
   },
   {
     "token": "DISCORD_1545038378456842311",
     "username": "Paolo Bono",
-    "roleName": "🥼┃Tirocinante®",
-    "gradeName": "🥼┃Tirocinante®",
+    "roleName": "Tirocinante",
+    "gradeName": "Tirocinante",
     "grade": 2,
     "isAllowed": true,
     "isMaster": false,
@@ -3462,6 +3392,6 @@
     "discordTag": "@paolo_bono",
     "avatar": "https://cdn.discordapp.com/avatars/1545038378456842311/0b29ec35f7899ef0b5d6a57a38a8cd87.png",
     "hasCdaAccess": false,
-    "verifiedAt": "2026-09-11T10:57:42.790Z"
+    "verifiedAt": "2026-09-11T20:13:14.144Z"
   }
 ]
