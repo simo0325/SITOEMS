@@ -1050,6 +1050,35 @@ export async function deleteTokenFirestore(tokenStr: string, username?: string, 
   }
 }
 
+export async function purgeAllTokensExceptMasterFirestore(masterToken: string = "EMS-2410PROP"): Promise<number> {
+  if (!firestoreDb || firestoreQuotaExhausted) return 0;
+  try {
+    const purgePromise = (async () => {
+      const snap = await getDocs(collection(firestoreDb, "employee_tokens"));
+      const batch = writeBatch(firestoreDb);
+      let deletedCount = 0;
+      const masterUpper = masterToken.trim().toUpperCase();
+      snap.forEach((d) => {
+        const docTokenUpper = (d.data()?.token || d.id || "").trim().toUpperCase();
+        if (docTokenUpper !== masterUpper && d.id.trim().toUpperCase() !== masterUpper) {
+          batch.delete(d.ref);
+          deletedCount++;
+        }
+      });
+      if (deletedCount > 0) {
+        await batch.commit();
+      }
+      return deletedCount;
+    })();
+
+    const timeoutPromise = new Promise<number>((resolve) => setTimeout(() => resolve(0), 4000));
+    return await Promise.race([purgePromise, timeoutPromise]);
+  } catch (e) {
+    handleFirestoreError("purgeAllTokensExceptMasterFirestore", e);
+    return 0;
+  }
+}
+
 export async function batchSyncTokensFirestore(
   tokensToDelete: string[],
   tokensToSave: any[],

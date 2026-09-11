@@ -38,9 +38,10 @@ import {
 
 interface LandingPageProps {
   onNavigate: (mode: "voter" | "admin" | "hierarchy" | "candidatura" | "cda" | "excel_gerarchia" | "role_election") => void;
+  canAccessCda?: boolean;
 }
 
-export default function LandingPage({ onNavigate }: LandingPageProps) {
+export default function LandingPage({ onNavigate, canAccessCda = false }: LandingPageProps) {
   const [copiedHandle, setCopiedHandle] = useState<string | null>(null);
   const [activeModal, setActiveModal] = useState<"regolamento" | "contatti" | "discord" | null>(null);
   const [selectedFounder, setSelectedFounder] = useState<{
@@ -241,14 +242,16 @@ export default function LandingPage({ onNavigate }: LandingPageProps) {
 
           {/* Call to action buttons */}
           <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
-            <button
-              onClick={() => onNavigate("cda")}
-              className="px-6 py-3.5 rounded-xl bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-300 hover:from-yellow-200 hover:to-yellow-300 text-slate-950 font-black text-sm tracking-wide shadow-lg shadow-yellow-950/40 border border-yellow-200 flex items-center gap-2.5 cursor-pointer transition-all hover:scale-102 active:scale-98"
-            >
-              <Award size={18} className="text-slate-950" />
-              <span>Sezione CDA</span>
-              <ArrowRight size={16} className="text-slate-950" />
-            </button>
+            {canAccessCda && (
+              <button
+                onClick={() => onNavigate("cda")}
+                className="px-6 py-3.5 rounded-xl bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-300 hover:from-yellow-200 hover:to-yellow-300 text-slate-950 font-black text-sm tracking-wide shadow-lg shadow-yellow-950/40 border border-yellow-200 flex items-center gap-2.5 cursor-pointer transition-all hover:scale-102 active:scale-98"
+              >
+                <Award size={18} className="text-slate-950" />
+                <span>Sezione CDA</span>
+                <ArrowRight size={16} className="text-slate-950" />
+              </button>
+            )}
 
             <button
               onClick={() => onNavigate("hierarchy")}

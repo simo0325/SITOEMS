@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   Bot,
   Shield,
@@ -20,6 +20,7 @@ import {
   EyeOff,
   Sparkles,
   HelpCircle,
+  Globe,
 } from "lucide-react";
 import { DiscordUserSession } from "../types.js";
 
@@ -36,6 +37,7 @@ interface DiscordConfigState {
   ownerRoleName: string;
   ownerRoleId: string;
   autoSyncEnabled: boolean;
+  canonicalUrl?: string;
   lastSyncAt?: string;
   lastSyncCount?: number;
 }
@@ -49,6 +51,7 @@ export default function DiscordBotAdmin({ adminToken, sessionInfo }: DiscordBotA
     ownerRoleName: "Proprietario",
     ownerRoleId: "",
     autoSyncEnabled: true,
+    canonicalUrl: "",
   });
   const [isConfigured, setIsConfigured] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -76,11 +79,40 @@ export default function DiscordBotAdmin({ adminToken, sessionInfo }: DiscordBotA
   const [showOwnerKey, setShowOwnerKey] = useState<boolean>(false);
   const [copiedOwnerKey, setCopiedOwnerKey] = useState<boolean>(false);
 
-  // Show/Hide Secret inputs
+  // Show/Hide Secret inputs & Copy States
   const [showSecrets, setShowSecrets] = useState<boolean>(false);
-  const [copiedRedirectUri, setCopiedRedirectUri] = useState<boolean>(false);
+  const [copiedRedirectIndex, setCopiedRedirectIndex] = useState<number | null>(null);
+  const [copiedAllRedirects, setCopiedAllRedirects] = useState<boolean>(false);
 
-  const redirectUri = `${window.location.origin}/auth/callback/discord`;
+  const currentOrigin = typeof window !== "undefined" ? window.location.origin : "";
+  const currentHost = typeof window !== "undefined" ? window.location.host : "";
+  const canonicalUri = config.canonicalUrl && config.canonicalUrl.startsWith("http")
+    ? `${config.canonicalUrl.replace(/\/$/, "")}/auth/callback/discord`
+    : null;
+
+  // Compute all required redirect variations for Discord Developer Portal
+  const standardRedirects = useMemo(() => {
+    const list: string[] = [];
+    if (canonicalUri) list.push(canonicalUri);
+    if (currentOrigin) list.push(`${currentOrigin}/auth/callback/discord`);
+    if (currentHost) {
+      list.push(`https://${currentHost}/auth/callback/discord`);
+      list.push(`http://${currentHost}/auth/callback/discord`);
+      if (currentHost.startsWith("www.")) {
+        const noWww = currentHost.replace(/^www\./, "");
+        list.push(`https://${noWww}/auth/callback/discord`);
+        list.push(`http://${noWww}/auth/callback/discord`);
+      } else if (!currentHost.match(/^\d+\.\d+\.\d+\.\d+/) && !currentHost.includes("localhost")) {
+        list.push(`https://www.${currentHost}/auth/callback/discord`);
+        list.push(`http://www.${currentHost}/auth/callback/discord`);
+      }
+    }
+    list.push("https://ais-dev-f7ddu6bz7ere7rk53fnhvp-765009000401.europe-west2.run.app/auth/callback/discord");
+    list.push("https://ais-pre-f7ddu6bz7ere7rk53fnhvp-765009000401.europe-west2.run.app/auth/callback/discord");
+    return Array.from(new Set(list));
+  }, [canonicalUri, currentOrigin, currentHost]);
+
+  const redirectUri = canonicalUri || `${currentOrigin}/auth/callback/discord`;
 
   // Fetch initial config and status
   useEffect(() => {
@@ -425,7 +457,7 @@ export default function DiscordBotAdmin({ adminToken, sessionInfo }: DiscordBotA
                 </div>
                 <div>
                   <h3 className="text-base font-bold text-white">Configurazione Discord Developer Portal</h3>
-                  <p className="text-[11px] text-slate-400">Parametri OAuth2 e Redirect URI</p>
+                  <p className="text-[11px] text-slate-400">Parametri OAuth2 e Gestione Redirect URI</p>
                 </div>
               </div>
               <a
@@ -438,47 +470,82 @@ export default function DiscordBotAdmin({ adminToken, sessionInfo }: DiscordBotA
               </a>
             </div>
 
+            {/* Explanatory Notice for VPS Deployments */}
+            <div className="bg-indigo-950/30 border border-indigo-500/30 rounded-2xl p-4 text-xs space-y-2">
+              <div className="flex items-center gap-2 text-indigo-300 font-bold">
+                <HelpCircle size={16} className="text-indigo-400 shrink-0" />
+                <span>Risoluzione errore "URI di reindirizzamento OAuth2 non valido" sulla VPS</span>
+              </div>
+              <p className="text-slate-300 leading-relaxed text-[11.5px]">
+                Discord richiede la <strong>corrispondenza esatta</strong> dell'URL. Se ad alcuni utenti l'accesso funziona ed altri ricevono l'errore di reindirizzamento, significa che accedono usando un protocollo o dominio diverso (es. <code className="text-amber-300">http://</code> invece di <code className="text-amber-300">https://</code>, con o senza <code className="text-amber-300">www.</code>, o tramite IP della VPS).
+              </p>
+              <div className="pt-1 flex flex-wrap items-center gap-2 text-[11px]">
+                <span className="text-slate-400">Soluzioni rapide:</span>
+                <span className="px-2 py-0.5 bg-white/10 rounded font-semibold text-emerald-300">1. Imposta l'URL Ufficiale nel modulo sotto</span>
+                <span className="text-slate-400">oppure</span>
+                <span className="px-2 py-0.5 bg-white/10 rounded font-semibold text-cyan-300">2. Aggiungi tutte le varianti elencate qui su Discord</span>
+              </div>
+            </div>
+
             <div className="space-y-2.5">
-              <label className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                Redirect URI (Incolla in OAuth2 -&gt; Redirects su Discord):
-              </label>
-              
-              {/* Current Domain Redirect */}
-              <div className="flex items-center gap-2 p-2 bg-black/40 border border-white/10 rounded-xl">
-                <span className="text-[10px] text-slate-400 font-bold uppercase px-1.5 py-0.5 bg-white/5 rounded shrink-0">Corrente</span>
-                <input
-                  type="text"
-                  readOnly
-                  value={redirectUri}
-                  className="bg-transparent text-xs font-mono text-cyan-300 flex-1 outline-hidden select-all"
-                />
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-bold uppercase tracking-wider text-slate-300">
+                  Redirect URI da inserire su Discord Developer Portal:
+                </label>
                 <button
-                  onClick={() => copyToClipboard(redirectUri, setCopiedRedirectUri)}
-                  className="px-3 py-1 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-xs font-bold text-slate-300 hover:text-white flex items-center gap-1 transition-colors cursor-pointer shrink-0"
+                  type="button"
+                  onClick={() => {
+                    navigator.clipboard.writeText(standardRedirects.join("\n"));
+                    setCopiedAllRedirects(true);
+                    setTimeout(() => setCopiedAllRedirects(false), 2500);
+                  }}
+                  className="px-2.5 py-1 bg-indigo-500/20 hover:bg-indigo-500/30 border border-indigo-500/40 text-indigo-300 hover:text-white rounded-lg text-[11px] font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
                 >
-                  {copiedRedirectUri ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} />}
-                  {copiedRedirectUri ? "Copiato!" : "Copia"}
+                  {copiedAllRedirects ? <Check size={13} className="text-emerald-400" /> : <Copy size={13} />}
+                  {copiedAllRedirects ? "Tutti i Redirect Copiati!" : "Copia tutti i Redirect (1 x riga)"}
                 </button>
               </div>
 
-              {/* Dev Cloud Run Redirect */}
-              <div className="flex items-center gap-2 p-2 bg-black/40 border border-white/10 rounded-xl">
-                <span className="text-[10px] text-indigo-400 font-bold uppercase px-1.5 py-0.5 bg-indigo-500/10 rounded shrink-0">Dev App</span>
-                <input
-                  type="text"
-                  readOnly
-                  value="https://ais-dev-f7ddu6bz7ere7rk53fnhvp-765009000401.europe-west2.run.app/auth/callback/discord"
-                  className="bg-transparent text-xs font-mono text-slate-300 flex-1 outline-hidden select-all"
-                />
-                <button
-                  onClick={() => {
-                    navigator.clipboard.writeText("https://ais-dev-f7ddu6bz7ere7rk53fnhvp-765009000401.europe-west2.run.app/auth/callback/discord");
-                    alert("URL Dev copiato negli appunti!");
-                  }}
-                  className="px-3 py-1 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-xs font-bold text-slate-300 hover:text-white flex items-center gap-1 transition-colors cursor-pointer shrink-0"
-                >
-                  <Copy size={14} /> Copia
-                </button>
+              {/* List of Redirect URIs */}
+              <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
+                {standardRedirects.map((uri, idx) => {
+                  const isCanonical = config.canonicalUrl && uri.startsWith(config.canonicalUrl);
+                  const isCurrent = uri === `${currentOrigin}/auth/callback/discord`;
+                  return (
+                    <div
+                      key={idx}
+                      className="flex items-center gap-2 p-2 bg-black/40 border border-white/10 rounded-xl"
+                    >
+                      <span className={`text-[9.5px] font-bold uppercase px-1.5 py-0.5 rounded shrink-0 ${
+                        isCanonical
+                          ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
+                          : isCurrent
+                          ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/30"
+                          : "bg-white/5 text-slate-400"
+                      }`}>
+                        {isCanonical ? "Canonical" : isCurrent ? "Attuale" : uri.startsWith("https") ? "HTTPS" : "HTTP"}
+                      </span>
+                      <input
+                        type="text"
+                        readOnly
+                        value={uri}
+                        className="bg-transparent text-xs font-mono text-cyan-300 flex-1 outline-hidden select-all"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          navigator.clipboard.writeText(uri);
+                          setCopiedRedirectIndex(idx);
+                          setTimeout(() => setCopiedRedirectIndex(null), 2500);
+                        }}
+                        className="px-2.5 py-1 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-xs font-bold text-slate-300 hover:text-white flex items-center gap-1 transition-colors cursor-pointer shrink-0"
+                      >
+                        {copiedRedirectIndex === idx ? <Check size={13} className="text-emerald-400" /> : <Copy size={13} />}
+                        {copiedRedirectIndex === idx ? "Copiato!" : "Copia"}
+                      </button>
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
@@ -541,6 +608,29 @@ export default function DiscordBotAdmin({ adminToken, sessionInfo }: DiscordBotA
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Canonical App URL / Official Domain */}
+          <div className="space-y-2 md:col-span-2 bg-[#1A1D2D]/70 p-4 rounded-2xl border border-indigo-500/30">
+            <label className="text-xs font-bold uppercase tracking-wider text-indigo-300 flex items-center justify-between">
+              <span className="flex items-center gap-1.5">
+                <Globe size={15} className="text-indigo-400" />
+                URL Ufficiale del Sito / Canonical URL (VPS / Dominio)
+              </span>
+              <span className="text-[10px] text-emerald-300 font-semibold bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                Consigliato per VPS
+              </span>
+            </label>
+            <input
+              type="text"
+              value={config.canonicalUrl || ""}
+              onChange={(e) => setConfig({ ...config, canonicalUrl: e.target.value })}
+              placeholder="es. https://miodominio.it oppure http://123.45.67.89:3000"
+              className="w-full px-4 py-3 bg-[#0B0C10] border border-white/10 rounded-xl text-white font-mono text-sm focus:outline-hidden focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400 transition-all"
+            />
+            <p className="text-[11.5px] text-slate-300 leading-relaxed">
+              Imposta qui l'indirizzo principale del tuo sito. In questo modo <strong>tutti gli utenti</strong> che provano ad accedere con Discord useranno sempre l'URL ufficiale registrato nel Discord Developer Portal, evitando errori a chi si connette via <code className="text-amber-300">http://</code>, <code className="text-amber-300">www.</code> o indirizzo IP diretto.
+            </p>
+          </div>
+
           {/* Client ID */}
           <div className="space-y-2">
             <label className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center justify-between">

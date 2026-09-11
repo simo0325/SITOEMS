@@ -197,6 +197,8 @@ const ROLE_GRADE_MAP: Record<string, number> = {
   // Dirigenza & Gerarchia EMS
   "responsabile generale ems": 21,
   "responsabile generale": 21,
+  "responsabile generale r.e.s.": 21,
+  "responsabile generale res": 21,
   "direttore generale": 20,
   "v. direttore generale": 19,
   "vice direttore generale": 19,
@@ -229,6 +231,8 @@ const ROLE_GRADE_MAP: Record<string, number> = {
   "medico": 5,
   "paramedico": 4,
   "soccorritore": 3,
+  "infermiere": 2.5,
+  "infermiera": 2.5,
   "tirocinante": 2,
   "allievo": 2,
   "volontario": 1.5,
@@ -236,32 +240,68 @@ const ROLE_GRADE_MAP: Record<string, number> = {
   "dipendente": 1,
 };
 
+export function isCdaOnlyRoleName(roleName?: string): boolean {
+  if (!roleName) return false;
+  const r = roleName.trim().toLowerCase().replace(/[.'’®™┃-]/g, "");
+  // Owners / Masters are the top of the main hierarchy, never hide them
+  if (r.includes("proprietario") || r.includes("master")) return false;
+  // Main hierarchy roles must never be considered CDA roles
+  if (
+    r.includes("direzione") ||
+    r.includes("sanitario") ||
+    r.includes("generale") ||
+    r.includes("primario") ||
+    r.includes("medico") ||
+    r.includes("infermier") ||
+    r.includes("soccorritore") ||
+    r.includes("paramedico") ||
+    r.includes("tirocinante") ||
+    r.includes("volontario") ||
+    r.includes("dipendente") ||
+    r.includes("presidio") ||
+    r.includes("supervisore")
+  ) {
+    return false;
+  }
+  return isCdaRoleName(roleName) || r.includes("cda") || r.includes("consiglio");
+}
+
 export function getSingleRoleGrade(roleName?: string): number {
   if (!roleName) return 0;
-  const clean = roleName.trim().toLowerCase();
+  const clean = roleName.trim().toLowerCase().replace(/[.'’®™┃]/g, "");
+
+  // CDA roles must NEVER be graded as EMS hospital hierarchy roles
+  if (
+    isCdaOnlyRoleName(roleName) ||
+    ((clean.includes("cda") || clean.includes("consiglio")) && !clean.includes("proprietario") && !clean.includes("master"))
+  ) {
+    return 0;
+  }
   
   if (ROLE_GRADE_MAP[clean] !== undefined) {
     return ROLE_GRADE_MAP[clean];
   }
 
   if (clean.includes("master")) return 100;
-  if (clean.includes("proprietario") && !clean.includes("vice") && !clean.includes("v.")) return 100;
-  if (clean.includes("vice proprietario") || clean.includes("v. proprietario")) return 99;
+  if (clean.includes("proprietario") && !clean.includes("vice") && !clean.includes("v")) return 100;
+  if (clean.includes("vice proprietario") || clean.includes("v proprietario")) return 99;
+
+  if (clean.includes("responsabile generale")) return 21;
 
   if (clean.includes("direttore generale")) {
-    if (clean.includes("v.") || clean.includes("vice")) return 19;
+    if (clean.includes("v") || clean.includes("vice")) return 19;
     return 20;
   }
-  if (clean.includes("v. direttore") || clean.includes("vice direttore")) return 17;
+  if (clean.includes("v direttore") || clean.includes("vice direttore")) return 17;
   if (clean.includes("direttore sanitario") || clean.includes("direttore")) return 18;
   if (clean.includes("segretario")) return 16.5;
   if (clean.includes("supervisore generale")) return 16;
-  if (clean.includes("v. supervisore") || clean.includes("vice supervisore")) return 14;
+  if (clean.includes("v supervisore") || clean.includes("vice supervisore")) return 14;
   if (clean.includes("assistente supervisore") || clean.includes("aiuto supervisore")) return 13;
   if (clean.includes("supervisore")) return 15;
-  if (clean.includes("v. responsabile") || clean.includes("vice responsabile")) return 11;
+  if (clean.includes("v responsabile") || clean.includes("vice responsabile")) return 11;
   if (clean.includes("responsabile del presidio") || clean.includes("responsabile presidio") || clean.includes("responsabile")) return 12;
-  if (clean.includes("v. primario") || clean.includes("vice primario")) return 9;
+  if (clean.includes("v primario") || clean.includes("vice primario")) return 9;
   if (clean.includes("primario di reparto") || clean.includes("primario")) return 10;
   if (clean.includes("medico capo")) return 8;
   if (clean.includes("specialista")) return 7;
@@ -269,6 +309,7 @@ export function getSingleRoleGrade(roleName?: string): number {
   if (clean.includes("medico")) return 5;
   if (clean.includes("paramedico")) return 4;
   if (clean.includes("soccorritore")) return 3;
+  if (clean.includes("infermier")) return 2.5;
   if (clean.includes("tirocinante") || clean.includes("allievo")) return 2;
   if (clean.includes("dipendente")) return 1;
 
@@ -314,7 +355,21 @@ export const ALLOWED_DISCORD_ROLES = [
   "V. Responsabile Del Presidio",
   "Primario di Reparto",
   "V. Primario di Reparto",
+  "Primario",
+  "V. Primario",
+  "Medico Capo",
+  "Medico Specialista",
+  "Specialista",
+  "Medico Esperto",
+  "Medico",
+  "Paramedico",
+  "Soccorritore",
+  "Infermiere",
+  "Infermiera",
+  "Tirocinante",
+  "Allievo",
   "Volontario",
+  "Dipendente",
   "Consigliere Finale CDA",
   "Presidente CDA",
   "Vice Presidente CDA",
@@ -673,23 +728,68 @@ export const ALL_EMS_PROMOTION_ROLES = [
   "Direttore Generale",
 ];
 
+export const DISCORD_CDA_ROLE_IDS: Record<string, { roleName: string; rank: number }> = {
+  "1360573608417693788": { roleName: "Presidente CDA", rank: 4 },
+  "1376598259388252270": { roleName: "Vice Presidente CDA", rank: 3 },
+  "1474509246447222949": { roleName: "Segretario CDA", rank: 2 },
+  "1430946447284637806": { roleName: "Consigliere Finale CDA", rank: 5 },
+  "1147840203285876746": { roleName: "Consiglio d'Amministrazione", rank: 1 },
+};
+
 export function isCdaRoleName(roleName: string): boolean {
   if (!roleName) return false;
-  const r = roleName.trim().toLowerCase();
+  const r = roleName.trim().toLowerCase().replace(/[.'’®™┃-]/g, "");
+  // Explicitly reject hospital/direction roles such as "Segretario Direzione"
+  if (r.includes("segretario direzione") || r.includes("direzione")) return false;
   if (r.includes("proprietario") || r.includes("master")) return true;
-  return r.includes("cda");
+  if (r.includes("consigliere finale")) return true;
+  if (r.includes("presidente cda") || r === "presidente del cda" || (r.includes("presidente") && (r.includes("cda") || r.includes("consiglio")))) return true;
+  if (r.includes("vice presidente cda") || r.includes("v presidente cda") || r.includes("vicepresidente cda") || (r.includes("vice presidente") && (r.includes("cda") || r.includes("consiglio")))) return true;
+  if (r.includes("segretario cda") || r === "segretario del cda" || (r.includes("segretario") && (r.includes("cda") || r.includes("consiglio")))) return true;
+  if (r.includes("membro cda") || r === "cda" || r.includes("consiglio damministrazione") || r.includes("consiglio di amministrazione") || r.includes("consiglio amministrazione")) return true;
+  return false;
 }
 
 export function getCdaRank(roleName: string): number {
   if (!roleName) return 0;
-  const r = roleName.trim().toLowerCase();
+  const r = roleName.trim().toLowerCase().replace(/[.'’®™┃-]/g, "");
+  // Explicitly reject hospital/direction roles such as "Segretario Direzione"
+  if (r.includes("segretario direzione") || r.includes("direzione")) return 0;
+
   if (r.includes("proprietario") || r.includes("master")) return 100;
   if (r.includes("consigliere finale")) return 5;
-  if (r.includes("presidente cda") && !r.includes("vice") && !r.includes("v.")) return 4;
-  if (r.includes("vice presidente") || r.includes("v. presidente") || r.includes("vicepresidente")) return 3;
-  if (r.includes("segretario")) return 2;
-  if (r.includes("membro") || r.includes("cda")) return 1;
+  if ((r.includes("presidente") || r.includes("presidenza")) && !r.includes("vice") && !r.includes("v") && (r.includes("cda") || r.includes("consiglio"))) return 4;
+  if ((r.includes("vice presidente") || r.includes("v presidente") || r.includes("vicepresidente")) && (r.includes("cda") || r.includes("consiglio"))) return 3;
+  if (r.includes("segretario cda") || (r.includes("segretario") && (r.includes("cda") || r.includes("consiglio")))) return 2;
+  if (r.includes("membro cda") || r === "cda" || r.includes("consiglio damministrazione") || r.includes("consiglio amministrazione") || r.includes("consiglio di amministrazione")) return 1;
   return 0;
+}
+
+export function canAccessCdaPortal(session?: {
+  isMaster?: boolean;
+  token?: string;
+  roleName?: string;
+  cdaRoleName?: string;
+  hasCdaAccess?: boolean;
+} | null): boolean {
+  if (!session) return false;
+  if (session.isMaster) return true;
+  if (session.token && session.token.toUpperCase() === "EMS-2410PROP") return true;
+  if (session.hasCdaAccess === false) return false;
+
+  // Master / Proprietario check
+  const cleanRole = (session.roleName || "").trim().toLowerCase();
+  if (cleanRole.includes("proprietario") || cleanRole.includes("master")) return true;
+
+  // CDA access is governed STRICTLY by explicit CDA role (cdaRoleName)
+  if (session.cdaRoleName && getCdaRank(session.cdaRoleName) >= 1) return true;
+
+  // If hasCdaAccess is explicitly true and cdaRoleName is a recognized CDA role
+  if (session.hasCdaAccess === true && session.cdaRoleName && isCdaRoleName(session.cdaRoleName)) return true;
+
+  // Note: session.roleName is the GENERAL hierarchy role (e.g. Segretario Direzione, Direttore Sanitario, etc.)
+  // and does NOT grant CDA access!
+  return false;
 }
 
 export const CANDIDATURA_CURRENT_ROLES = [
@@ -787,13 +887,74 @@ export function getRoleBadgeStyle(roleName: string): RoleBadgeStyle {
   if (r.includes("aspettativa")) {
     return { className: "bg-emerald-800/30 text-emerald-300 border border-emerald-700/50 font-bold" };
   }
+
+  // Proprietario
+  if (r.includes("proprietario")) {
+    if (r.includes("vice") || r.includes("v.")) {
+      return { className: "bg-slate-900/90 text-white border border-slate-200/80 font-black shadow-sm shadow-slate-200/20" };
+    }
+    return { className: "bg-slate-950/90 text-[#b89bf3] border border-[#b89bf3]/50 font-extrabold shadow-sm shadow-indigo-950/30" };
+  }
+
+  // CDA / Consiglio d'Amministrazione
+  if (r.includes("cda") || r.includes("consiglio di amministrazione") || r.includes("consiglio damministrazione") || r.includes("consiglio amministrazione") || r.includes("consigliere finale")) {
+    return { className: "bg-gradient-to-r from-amber-500/30 via-yellow-400/40 to-amber-500/30 text-yellow-300 border border-yellow-400/90 font-black shadow-md shadow-amber-950/60" };
+  }
+
+  // Responsabile Generale EMS
+  if (r.includes("responsabile generale ems") || r.includes("responsabile generale")) {
+    return { className: "bg-gradient-to-r from-[#f8f8f8]/20 via-[#7eeaff]/25 to-[#f8f8f8]/20 text-[#7eeaff] border border-[#7eeaff]/60 font-black shadow-sm shadow-[#7eeaff]/20" };
+  }
+
+  // Direzione Generale
+  if (r.includes("direttore generale")) {
+    return { className: "bg-cyan-500/20 text-cyan-300 border border-cyan-500/50 font-black shadow-sm shadow-cyan-950/40" };
+  }
+
+  // Direzione Sanitaria
+  if (r.includes("direttore sanitario")) {
+    if (r.includes("vice") || r.includes("v.")) {
+      return { className: "bg-rose-500/20 text-rose-300 border border-rose-500/50 font-black shadow-sm shadow-rose-950/40" };
+    }
+    return { className: "bg-red-700/25 text-red-200 border border-red-500/60 font-black shadow-sm shadow-red-950/40" };
+  }
+
+  // Segreteria Direzione
+  if (r.includes("segretario")) {
+    return { className: "bg-violet-700/20 text-violet-300 border border-violet-500/50 font-black shadow-sm shadow-violet-950/40" };
+  }
+
+  // Supervisori
+  if (r.includes("supervisore generale")) {
+    return { className: "bg-purple-600/20 text-purple-300 border border-purple-500/50 font-black shadow-sm shadow-purple-950/40" };
+  }
+  if (r.includes("supervisore")) {
+    if (r.includes("assistente") || r.includes("aiuto")) {
+      return { className: "bg-pink-400/20 text-pink-300 border border-pink-400/50 font-black shadow-sm shadow-pink-950/40" };
+    }
+    if (r.includes("vice") || r.includes("v.")) {
+      return { className: "bg-pink-600/20 text-pink-300 border border-pink-500/50 font-black shadow-sm shadow-pink-950/40" };
+    }
+    return { className: "bg-rose-600/20 text-rose-300 border border-rose-500/50 font-black shadow-sm shadow-rose-950/40" };
+  }
+
+  // Responsabili Presidio
+  if (r.includes("responsabile del presidio") || r.includes("responsabile presidio")) {
+    if (r.includes("vice") || r.includes("v.")) {
+      return { className: "bg-orange-400/20 text-orange-300 border border-orange-400/50 font-black shadow-sm shadow-orange-950/40" };
+    }
+    return { className: "bg-orange-600/20 text-orange-300 border border-orange-500/50 font-black shadow-sm shadow-orange-950/40" };
+  }
   
+  // Primari di Reparto
   if (r.includes("v. primario di reparto") || r.includes("vice primario di reparto")) {
-    return { className: "bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold" };
+    return { className: "bg-amber-400/20 text-amber-300 border border-amber-400/50 font-black shadow-sm shadow-amber-950/40" };
   }
   if (r.includes("primario di reparto")) {
-    return { className: "bg-amber-700/20 text-amber-200 border border-amber-600/40 font-bold" };
+    return { className: "bg-amber-700/20 text-amber-200 border border-amber-500/50 font-black shadow-sm shadow-amber-950/40" };
   }
+
+  // Medico / Primario Base
   if (r === "primario" || r === "primario°") {
     return {
       style: { backgroundColor: "#07095e" },
@@ -813,43 +974,13 @@ export function getRoleBadgeStyle(roleName: string): RoleBadgeStyle {
     return { className: "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold" };
   }
   if (r.includes("volontario") || r.includes("volontaria")) {
-    return { className: "bg-[#c2410c]/25 text-[#ff7849] border border-[#ea580c]/50 font-bold shadow-xs" };
+    return { className: "bg-gradient-to-r from-[#a7a7a8]/20 via-[#d09a9a]/20 to-[#f78c8c]/25 text-[#f78c8c] border border-[#f78c8c]/50 font-bold shadow-xs shadow-[#f78c8c]/20" };
   }
   if (r.includes("tirocinante") || r.includes("allievo") || r === "tirocinante°") {
     return { className: "bg-lime-500/20 text-lime-300 border border-lime-500/40 font-bold" };
   }
-  if (r.includes("v. responsabile") || r.includes("vice responsabile")) {
-    return { className: "bg-orange-500/20 text-orange-300 border border-orange-500/40 font-bold" };
-  }
-  if (r.includes("responsabile del presidio") || r.includes("responsabile presidio")) {
-    return { className: "bg-orange-600/20 text-orange-200 border border-orange-600/40 font-bold" };
-  }
   if (r.includes("assistente") || r.includes("aiuto")) {
     return { className: "bg-pink-500/20 text-pink-300 border border-pink-500/40 font-bold" };
-  }
-  if (r.includes("v. supervisore") || r.includes("vice supervisore")) {
-    return { className: "bg-pink-600/20 text-pink-200 border border-pink-600/40 font-bold" };
-  }
-  if (r.includes("supervisore generale")) {
-    return { className: "bg-purple-500/20 text-purple-300 border border-purple-500/40 font-bold" };
-  }
-  if (r.includes("supervisore")) {
-    return { className: "bg-rose-500/20 text-rose-300 border border-rose-500/40 font-bold" };
-  }
-  if (r.includes("segretario")) {
-    return { className: "bg-violet-500/20 text-violet-300 border border-violet-500/40 font-bold" };
-  }
-  if (r.includes("v. direttore") || r.includes("vice direttore")) {
-    return { className: "bg-red-500/20 text-red-300 border border-red-500/40 font-bold" };
-  }
-  if (r.includes("direttore sanitario")) {
-    return { className: "bg-red-600/20 text-red-200 border border-red-600/40 font-bold" };
-  }
-  if (r.includes("direttore generale")) {
-    return { className: "bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-bold" };
-  }
-  if (r.includes("proprietario")) {
-    return { className: "bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold" };
   }
 
   return { className: "bg-slate-800 text-slate-300 border border-slate-700 font-bold" };
@@ -907,6 +1038,17 @@ export function canAccessRoleElection(user?: DiscordUserSession | { roleName?: s
   const grade = getUserEffectiveGrade(user);
   const minGrade = getSingleRoleGrade("segretario direzione"); // 16.5
   return grade >= minGrade;
+}
+
+export const PRIMARIO_MIN_GRADE = 10;
+
+export function canAccessCandidatura(user?: DiscordUserSession | { roleName?: string; token?: string; isMaster?: boolean } | null): boolean {
+  if (!user) return false;
+  if (user.isMaster) return true;
+  const cleanRole = (user.roleName || "").trim().toLowerCase();
+  if (cleanRole.includes("proprietario") || cleanRole.includes("master")) return true;
+  const grade = getUserEffectiveGrade(user);
+  return grade >= PRIMARIO_MIN_GRADE;
 }
 
 export function isOwnerKey(userOrToken?: string | { token?: string; roleName?: string; isMaster?: boolean } | null): boolean {

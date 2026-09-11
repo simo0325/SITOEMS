@@ -2100,7 +2100,7 @@ export default function ExcelGerarchiaView({
 
                         return (
                           <tr
-                            key={entry.id}
+                            key={entry.id ? `${entry.id}-${idx}` : `row-${idx}`}
                             draggable
                             onDragStart={(e) => handleDragStart(e, idx, entry)}
                             onDragOver={(e) => handleDragOver(e, idx)}

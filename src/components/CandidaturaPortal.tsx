@@ -27,13 +27,15 @@ import {
   DiscordUserSession,
   getRoleBadgeStyle,
   getNextPromotionRole,
+  canAccessCandidatura,
 } from "../types.js";
 
 interface CandidaturaPortalProps {
   discordSession?: DiscordUserSession | null;
+  onNavigate?: (mode: string) => void;
 }
 
-export default function CandidaturaPortal({ discordSession }: CandidaturaPortalProps) {
+export default function CandidaturaPortal({ discordSession, onNavigate }: CandidaturaPortalProps) {
   const [fullName, setFullName] = useState<string>(discordSession?.username || "");
   const [currentRole, setCurrentRole] = useState<string>("Primario");
   const [desiredRole, setDesiredRole] = useState<string>(() => getNextPromotionRole("Primario"));
@@ -236,6 +238,72 @@ export default function CandidaturaPortal({ discordSession }: CandidaturaPortalP
           <Loader2 size={24} className="animate-spin text-red-500" />
           <span className="font-semibold text-sm">Caricamento portale candidature in corso...</span>
         </div>
+      </div>
+    );
+  }
+
+  const isAllowed = canAccessCandidatura(discordSession);
+  if (!isAllowed) {
+    return (
+      <div className="max-w-2xl mx-auto py-16 px-4">
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-[#111118] border border-red-500/30 rounded-3xl p-8 sm:p-10 shadow-2xl text-center space-y-6"
+        >
+          <div className="w-16 h-16 bg-red-500/10 border border-red-500/30 rounded-2xl flex items-center justify-center mx-auto text-red-400 shadow-lg shadow-red-950/40">
+            <Lock size={32} />
+          </div>
+
+          <div className="space-y-2">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-bold uppercase tracking-wider">
+              <AlertCircle size={13} />
+              Accesso Riservato ai Gradi Dirigenziali
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-black text-white uppercase tracking-tight">
+              Candidatura Non Disponibile
+            </h2>
+            <p className="text-slate-400 text-sm max-w-md mx-auto leading-relaxed">
+              La sezione <strong className="text-white">Invia Candidatura EMS</strong> è accessibile esclusivamente a partire dal grado di <strong className="text-amber-300">Primario (incluso)</strong> in su.
+            </p>
+          </div>
+
+          {discordSession ? (
+            <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 text-xs space-y-1 max-w-md mx-auto">
+              <div className="text-slate-400">Account collegato: <strong className="text-white">{discordSession.username}</strong></div>
+              <div className="text-slate-400 flex items-center justify-center gap-2">
+                <span>Ruolo attuale:</span>
+                <span className="font-bold text-rose-400 bg-rose-500/15 px-2 py-0.5 rounded-full border border-rose-500/30">
+                  {discordSession.roleName || "Nessun Ruolo"}
+                </span>
+                <span className="text-slate-500">(Grado insufficiente)</span>
+              </div>
+            </div>
+          ) : (
+            <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 text-xs text-slate-400 max-w-md mx-auto">
+              Non hai effettuato l'accesso. Collega il tuo account Discord per verificare il tuo grado all'interno del corpo EMS.
+            </div>
+          )}
+
+          <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
+            {onNavigate && (
+              <button
+                onClick={() => onNavigate("home")}
+                className="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs uppercase tracking-wider transition-all cursor-pointer"
+              >
+                Torna alla Home
+              </button>
+            )}
+            {onNavigate && !discordSession && (
+              <button
+                onClick={() => onNavigate("voter")}
+                className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-[#5865F2] hover:opacity-95 text-white font-bold text-xs uppercase tracking-wider transition-all cursor-pointer shadow-lg shadow-indigo-950/50"
+              >
+                Accedi con Discord
+              </button>
+            )}
+          </div>
+        </motion.div>
       </div>
     );
   }

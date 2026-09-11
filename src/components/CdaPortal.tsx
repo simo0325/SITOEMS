@@ -1205,9 +1205,17 @@ export default function CdaPortal({ discordSession, onSessionUpdated }: CdaPorta
                 Membro Connesso
               </span>
               <div className="text-sm font-black text-white">{permissions.username}</div>
-              <div className="inline-block bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2.5 py-0.5 rounded-md text-[11px] font-bold">
-                {permissions.roleName}
-              </div>
+              {(() => {
+                const badge = getRoleBadgeStyle(permissions.roleName);
+                return (
+                  <div
+                    className={`inline-block px-2.5 py-0.5 rounded-md text-[11px] font-black border shadow-xs ${badge.className}`}
+                    style={badge.style}
+                  >
+                    {permissions.roleName}
+                  </div>
+                );
+              })()}
             </div>
           </div>
         </div>

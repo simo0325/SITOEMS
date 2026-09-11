@@ -12,7 +12,7 @@ import NotificationMenu from "./components/NotificationMenu.js";
 import HospitalDinoGame from "./components/HospitalDinoGame.js";
 import RoleElectionPortal from "./components/RoleElectionPortal.js";
 import emsLogo from "./assets/images/ems_logo_1784649117886.jpg";
-import { DiscordUserSession, getUserEffectiveGrade, getSingleRoleGrade, canAccessRoleElection } from "./types.js";
+import { DiscordUserSession, getUserEffectiveGrade, getSingleRoleGrade, canAccessRoleElection, canAccessCdaPortal, getRoleBadgeStyle, isCdaOnlyRoleName } from "./types.js";
 
 type AppMode = "home" | "voter" | "admin" | "hierarchy" | "candidatura" | "cda" | "excel_gerarchia" | "role_election";
 
@@ -168,12 +168,16 @@ export default function App() {
   const minAdminGrade = getSingleRoleGrade("vice direttore sanitario");
   const canAccessAdmin = userEffectiveGrade >= minAdminGrade;
   const canAccessElection = discordSession ? canAccessRoleElection(discordSession) : false;
+  const canAccessCda = canAccessCdaPortal(discordSession);
 
   useEffect(() => {
     if (mode === "admin" && !canAccessAdmin) {
       setMode("home");
     }
-  }, [mode, canAccessAdmin]);
+    if (mode === "cda" && discordSession && !canAccessCda) {
+      setMode("home");
+    }
+  }, [mode, canAccessAdmin, canAccessCda, discordSession]);
 
   const handleConfigChanged = () => {
     setConfigVersion((prev) => prev + 1);
@@ -259,6 +263,46 @@ export default function App() {
   };
 
   if (isGameActive) {
+    if (!discordSession || discordSession.isTestToken) {
+      return (
+        <div className="min-h-screen bg-[#0a0a0f] text-slate-200 font-sans flex flex-col items-center justify-center p-4">
+          <div className="bg-[#111118] border border-pink-500/30 rounded-3xl p-8 max-w-md w-full text-center space-y-5 shadow-2xl">
+            <div className="w-16 h-16 bg-pink-500/10 border border-pink-500/30 rounded-2xl flex items-center justify-center mx-auto text-pink-400 shadow-lg shadow-pink-950/40">
+              <Camera size={32} />
+            </div>
+            <div className="space-y-1">
+              <h2 className="text-xl font-black text-white uppercase tracking-tight">Accesso Riservato Discord</h2>
+              <p className="text-sm text-slate-400 leading-relaxed">
+                Il gioco <strong className="text-pink-400">Filippa Runner 2D</strong> è accessibile esclusivamente agli utenti che hanno effettuato l'accesso con Discord.
+              </p>
+            </div>
+            <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
+              <button
+                onClick={() => {
+                  setIsGameActive(false);
+                  const targetUrl = getUrlForMode(mode, false);
+                  if (typeof window !== "undefined" && window.location.pathname !== targetUrl) {
+                    window.history.pushState({}, document.title, targetUrl);
+                  }
+                }}
+                className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold transition-all cursor-pointer"
+              >
+                Torna Indietro
+              </button>
+              <button
+                onClick={() => {
+                  setIsGameActive(false);
+                  handleNavigate("voter");
+                }}
+                className="px-4 py-2 rounded-xl bg-[#5865F2] hover:bg-[#4752C4] text-white text-xs font-bold transition-all cursor-pointer shadow-lg shadow-indigo-950/50"
+              >
+                Accedi con Discord
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
     return (
       <HospitalDinoGame
         onClose={() => {
@@ -308,10 +352,22 @@ export default function App() {
                 >
                   <Sparkles size={14} className="text-purple-400 shrink-0 animate-pulse group-hover:scale-110 transition-transform" />
                   <span className="text-purple-300 font-bold text-2xs uppercase tracking-wider hidden sm:inline">Token TEST:</span>
-                  <span className="text-white font-bold truncate max-w-[120px] sm:max-w-none">{discordSession.username}</span>
-                  <span className="text-purple-300 font-bold bg-purple-500/20 px-2 py-0.5 rounded-full border border-purple-500/30 text-[10px] sm:text-[11px] shrink-0">
-                    {discordSession.roleName}
+                  <span className="font-bold text-white truncate max-w-[130px] sm:max-w-none">
+                    {discordSession.username}
                   </span>
+                  {(() => {
+                    const role = discordSession.roleName || "";
+                    if (!role || isCdaOnlyRoleName(role)) return null;
+                    const roleBadge = getRoleBadgeStyle(role);
+                    return (
+                      <span
+                        className={`text-[10px] sm:text-[11px] font-black px-2.5 py-0.5 rounded-full border shadow-xs transition-all shrink-0 ${roleBadge.className}`}
+                        style={roleBadge.style}
+                      >
+                        {role}
+                      </span>
+                    );
+                  })()}
                   {remainingTestTime && (
                     <span className="text-amber-300 font-mono font-bold bg-amber-500/20 px-2 py-0.5 rounded-full border border-amber-500/40 text-[10px] sm:text-[11px] flex items-center gap-1 shrink-0">
                       <Clock size={10} className="text-amber-400 shrink-0" />
@@ -344,10 +400,22 @@ export default function App() {
                   ) : (
                     <Bot size={14} className="text-[#5865F2] shrink-0 group-hover:scale-110 transition-transform" />
                   )}
-                  <span className="text-white font-bold truncate max-w-[120px] sm:max-w-none">{discordSession.username}</span>
-                  <span className="text-indigo-200 font-bold bg-[#5865F2]/25 px-2 py-0.5 rounded-full border border-[#5865F2]/40 text-[10px] sm:text-[11px] shrink-0">
-                    {discordSession.roleName}
+                  <span className="font-bold text-white truncate max-w-[130px] sm:max-w-none">
+                    {discordSession.username}
                   </span>
+                  {(() => {
+                    const role = discordSession.roleName || "";
+                    if (!role || isCdaOnlyRoleName(role)) return null;
+                    const roleBadge = getRoleBadgeStyle(role);
+                    return (
+                      <span
+                        className={`text-[10px] sm:text-[11px] font-black px-2.5 py-0.5 rounded-full border shadow-xs transition-all shrink-0 ${roleBadge.className}`}
+                        style={roleBadge.style}
+                      >
+                        {role}
+                      </span>
+                    );
+                  })()}
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
@@ -456,20 +524,30 @@ export default function App() {
                     }`}
                   >
                     <FileText size={16} className={mode === "candidatura" ? "text-white" : "text-blue-400"} />
-                    <span>Invia Candidatura EMS</span>
+                    <div className="flex items-center justify-between w-full">
+                      <span>Invia Candidatura EMS</span>
+                      <span className="text-[9px] px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300 font-bold border border-blue-500/30">
+                        ≥ Primario
+                      </span>
+                    </div>
                   </button>
 
-                  <button
-                    onClick={() => { handleNavigate("cda"); setIsNavOpen(false); }}
-                    className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all text-left cursor-pointer ${
-                      mode === "cda"
-                        ? "bg-gradient-to-r from-amber-600 to-amber-500 text-slate-950 font-black shadow-md shadow-amber-950/50"
-                        : "text-slate-300 hover:bg-white/10 hover:text-white"
-                    }`}
-                  >
-                    <Award size={16} className={mode === "cda" ? "text-slate-950" : "text-amber-400"} />
-                    <span>Sezione CDA</span>
-                  </button>
+                  {(!discordSession || canAccessCda) && (
+                    <button
+                      onClick={() => { handleNavigate("cda"); setIsNavOpen(false); }}
+                      className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all text-left cursor-pointer ${
+                        mode === "cda"
+                          ? "bg-gradient-to-r from-amber-600 to-amber-500 text-slate-950 font-black shadow-md shadow-amber-950/50"
+                          : "text-slate-300 hover:bg-white/10 hover:text-white"
+                      }`}
+                    >
+                      <Award size={16} className={mode === "cda" ? "text-slate-950" : "text-amber-400"} />
+                      <span>Sezione CDA</span>
+                      <span className="ml-auto text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                        CDA
+                      </span>
+                    </button>
+                  )}
 
                   <button
                     onClick={() => { handleNavigate("voter"); setIsNavOpen(false); }}
@@ -539,18 +617,21 @@ export default function App() {
             </span>
           </div>
           <span className="text-purple-300 font-medium hidden sm:inline">
-            • Utente: <strong>{discordSession.username}</strong> ({discordSession.roleName})
+            • Utente: <strong>{discordSession.username}</strong>
+            {discordSession.roleName && !isCdaOnlyRoleName(discordSession.roleName) ? ` (${discordSession.roleName})` : ""}
           </span>
         </div>
       )}
 
       {/* Main Content Area */}
       <main className="flex-grow w-full max-w-full overflow-x-hidden">
-        {mode === "home" && <LandingPage onNavigate={handleNavigate} />}
+        {mode === "home" && <LandingPage onNavigate={handleNavigate} canAccessCda={canAccessCda} />}
         
         {mode === "hierarchy" && (
           <EmsHierarchy
-            isAdmin={false}
+            isAdmin={canAccessAdmin}
+            adminToken={discordSession?.token}
+            discordSession={discordSession}
           />
         )}
 
@@ -562,7 +643,12 @@ export default function App() {
           />
         )}
 
-        {mode === "candidatura" && <CandidaturaPortal discordSession={discordSession} />}
+        {mode === "candidatura" && (
+          <CandidaturaPortal
+            discordSession={discordSession}
+            onNavigate={handleNavigate}
+          />
+        )}
 
         {mode === "cda" && (
           <CdaPortal
@@ -647,8 +733,8 @@ export default function App() {
           </div>
         </footer>
       )}
-      {/* Floating Mini Camera Easter Egg Widget - Bottom Left, Home Page Only, Almost Invisible */}
-      {mode === "home" && (
+      {/* Floating Mini Camera Easter Egg Widget - Bottom Left, Home Page Only, Only visible when logged in with Discord */}
+      {mode === "home" && Boolean(discordSession && !discordSession.isTestToken) && (
         <div className="fixed bottom-3 left-3 z-40">
           <button
             onClick={() => {

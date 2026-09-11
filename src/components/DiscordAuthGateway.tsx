@@ -182,33 +182,6 @@ export default function DiscordAuthGateway({
     }
   };
 
-  // Fast test login as Proprietario (useful during development / initial configuration)
-  const handleQuickOwnerTest = async () => {
-    setIsVerifying(true);
-    setErrorMessage(null);
-    try {
-      const res = await fetch("/api/discord/dev-login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ asOwner: true }),
-      });
-      const data = await res.json();
-      if (res.ok && data.success) {
-        localStorage.setItem("discordToken", data.token);
-        localStorage.setItem("adminToken", data.token);
-        localStorage.setItem("discordUserSession", JSON.stringify(data.userSession));
-        setSuccessMessage("Accesso simulato effettuato come Proprietario!");
-        setTimeout(() => onVerified(data.userSession), 600);
-      } else {
-        throw new Error(data.error || "Errore login dev");
-      }
-    } catch (err: any) {
-      setErrorMessage(err.message || "Errore simulazione");
-    } finally {
-      setIsVerifying(false);
-    }
-  };
-
   const portalTitle = targetPortalName === "voter" ? "Portale Elettore" : "Area Amministrazione";
 
   return (
@@ -334,9 +307,30 @@ export default function DiscordAuthGateway({
                 </p>
 
                 <div className="space-y-2">
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">
-                    1. Copia l'URL di reindirizzamento:
-                  </span>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">
+                      1. Copia l'URL di reindirizzamento:
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        navigator.clipboard.writeText(suggestedRedirects.join("\n"));
+                        setCopiedUrlIndex(999);
+                        setTimeout(() => setCopiedUrlIndex(null), 2500);
+                      }}
+                      className="px-2 py-0.5 bg-indigo-500/20 hover:bg-indigo-500/30 border border-indigo-500/40 rounded text-[10px] font-bold text-indigo-300 hover:text-white flex items-center gap-1 transition-colors cursor-pointer"
+                    >
+                      {copiedUrlIndex === 999 ? (
+                        <>
+                          <Check size={11} className="text-emerald-400" /> Tutti Copiati!
+                        </>
+                      ) : (
+                        <>
+                          <Copy size={11} /> Copia Tutti (1 x riga)
+                        </>
+                      )}
+                    </button>
+                  </div>
                   {suggestedRedirects.map((url, idx) => (
                     <div
                       key={idx}
@@ -394,27 +388,16 @@ export default function DiscordAuthGateway({
             )}
           </div>
 
-          {/* Quick Bot Configuration / Dev Hint if not yet configured */}
+          {/* Quick Bot Configuration Hint if not yet configured */}
           {!botConfigured && (
-            <div className="bg-amber-950/20 border border-amber-500/30 rounded-2xl p-4 text-xs text-amber-200 space-y-3">
+            <div className="bg-amber-950/20 border border-amber-500/30 rounded-2xl p-4 text-xs text-amber-200 space-y-2">
               <div className="flex items-center gap-2 font-bold text-amber-300">
                 <AlertCircle size={16} />
                 <span>Bot Discord in attesa di configurazione iniziale</span>
               </div>
               <p className="text-[11.5px] text-slate-300 leading-relaxed">
-                Le credenziali Discord (Client ID e Bot Token) non sono ancora state impostate. Puoi configurarle all'interno di <strong>Amministrazione &gt; Bot Discord</strong> oppure effettuare l'accesso di prova come Proprietario.
+                Le credenziali Discord (Client ID e Bot Token) non sono ancora state impostate. Per accedere alla piattaforma puoi utilizzare la <strong>Chiave di Emergenza</strong> sottostante inserendo il codice master.
               </p>
-              <div className="pt-1">
-                <button
-                  type="button"
-                  onClick={handleQuickOwnerTest}
-                  disabled={isVerifying}
-                  className="w-full py-2.5 bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-200 font-bold rounded-xl text-xs flex items-center justify-center gap-2 transition-all cursor-pointer"
-                >
-                  <Sparkles size={14} className="text-amber-400" />
-                  Accedi come Proprietario (Master EMS - Prova Rapida)
-                </button>
-              </div>
             </div>
           )}
 
@@ -435,14 +418,14 @@ export default function DiscordAuthGateway({
             {showEmergencyToken && (
               <form onSubmit={handleVerifyManualToken} className="p-4 pt-0 space-y-3 border-t border-white/5">
                 <p className="text-[11px] text-slate-400">
-                  Se riscontri problemi con Discord, puoi inserire qui la <strong>Chiave Proprietario</strong> o un token manuale pre-esistente.
+                  Se riscontri problemi con Discord, puoi inserire qui la <strong>Chiave Proprietario</strong> per autenticarti manualmente.
                 </p>
                 <div className="flex gap-2">
                   <input
                     type="password"
                     value={tokenInput}
                     onChange={(e) => setTokenInput(e.target.value)}
-                    placeholder="es. EMS-2410PROP o token manuale..."
+                    placeholder="Inserisci la Chiave di Emergenza..."
                     className="flex-1 px-3 py-2.5 bg-[#08080C] border border-white/10 rounded-xl text-xs font-mono text-white focus:outline-hidden focus:border-amber-400 transition-all"
                   />
                   <button

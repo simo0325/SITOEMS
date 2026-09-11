@@ -112,6 +112,8 @@ export default function AdminPortal({ onConfigChanged }: AdminPortalProps) {
   const [isExcelImportModalOpen, setIsExcelImportModalOpen] = useState<boolean>(false);
   const [isResetAllModalOpen, setIsResetAllModalOpen] = useState<boolean>(false);
   const [isResettingAll, setIsResettingAll] = useState<boolean>(false);
+  const [isPurgeAllModalOpen, setIsPurgeAllModalOpen] = useState<boolean>(false);
+  const [isPurgingAll, setIsPurgingAll] = useState<boolean>(false);
   const [isResettingSingleToken, setIsResettingSingleToken] = useState<string | null>(null);
   const [newEmpFullName, setNewEmpFullName] = useState<string>("");
   const [newEmpRole, setNewEmpRole] = useState<string>("Primario di Reparto");
@@ -1440,8 +1442,8 @@ export default function AdminPortal({ onConfigChanged }: AdminPortalProps) {
   };
 
   const handleResetSingleToken = async (emp: DiscordUserSession) => {
-    if (emp.token.trim().toUpperCase() === "EMS-2410PROP") {
-      setTokenActionError("La Key Master EMS-2410PROP è permanente e non può essere resettata.");
+    if (isOwnerKey(emp.token)) {
+      setTokenActionError("La Key Master di Emergenza è permanente e non può essere resettata.");
       return;
     }
     const confirmed = window.confirm(
@@ -1498,6 +1500,33 @@ export default function AdminPortal({ onConfigChanged }: AdminPortalProps) {
       setTokenActionError(err.message || "Errore durante il reset globale dei token.");
     } finally {
       setIsResettingAll(false);
+    }
+  };
+
+  const handlePurgeAllTokensExceptMaster = async () => {
+    try {
+      setIsPurgingAll(true);
+      setTokenActionError(null);
+      const activeToken = token || localStorage.getItem("adminToken") || "";
+      const res = await fetch("/api/admin/employee-tokens/purge-all-except-master", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${activeToken}`,
+        },
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Errore durante la rimozione dei token.");
+      }
+      setTokenSuccessMessage(data.message || "Tutti i token di accesso sono stati rimossi eccetto la Master Key EMS-2410PROP.");
+      setIsPurgeAllModalOpen(false);
+      await fetchEmployeeTokens(activeToken, true);
+      await fetchDashboardData(activeToken, true);
+    } catch (err: any) {
+      setTokenActionError(err.message || "Errore durante la rimozione dei token.");
+    } finally {
+      setIsPurgingAll(false);
     }
   };
 
@@ -4078,15 +4107,26 @@ export default function AdminPortal({ onConfigChanged }: AdminPortalProps) {
                       </button>
                     )}
                     {(isMasterSession || isProprietarioUser) && (
-                      <button
-                        type="button"
-                        onClick={() => setIsResetAllModalOpen(true)}
-                        className="px-3 py-1.5 bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 font-bold text-xs rounded-lg border border-rose-500/30 shadow-md flex items-center gap-1.5 cursor-pointer transition-all active:scale-95"
-                        title="Resetta e rigenera tutti i token dei dipendenti mantenendo unicamente la Master Key EMS-2410PROP"
-                      >
-                        <RotateCcw size={14} className="text-rose-400" />
-                        <span>Resetta Tutte le Key (tranne Master)</span>
-                      </button>
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => setIsResetAllModalOpen(true)}
+                          className="px-3 py-1.5 bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 font-bold text-xs rounded-lg border border-rose-500/30 shadow-md flex items-center gap-1.5 cursor-pointer transition-all active:scale-95"
+                          title="Resetta e rigenera tutti i token dei dipendenti mantenendo unicamente la Master Key di Emergenza"
+                        >
+                          <RotateCcw size={14} className="text-rose-400" />
+                          <span>Resetta Tutte le Key (tranne Master)</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setIsPurgeAllModalOpen(true)}
+                          className="px-3 py-1.5 bg-red-700/30 hover:bg-red-600/40 text-red-200 font-bold text-xs rounded-lg border border-red-500/40 shadow-md flex items-center gap-1.5 cursor-pointer transition-all active:scale-95"
+                          title="Rimuovi completamente tutti i token di accesso conservando solo EMS-2410PROP"
+                        >
+                          <Trash2 size={14} className="text-red-400" />
+                          <span>Rimuovi Tutti i Token (tranne EMS-2410PROP)</span>
+                        </button>
+                      </>
                     )}
                     <button
                       onClick={() => setActiveTab("revoked_tokens")}
@@ -7095,7 +7135,7 @@ export default function AdminPortal({ onConfigChanged }: AdminPortalProps) {
                     <span>Regola Master Key:</span>
                   </p>
                   <p>
-                    L'unica chiave che rimarrà invariata e permanente è la <strong>Master Key EMS-2410PROP</strong>. Tutte le altre chiavi dei dipendenti verranno resettate e rigenerate con nuovi codici casuali.
+                    L'unica chiave che rimarrà invariata e permanente è la <strong>Master Key di Emergenza</strong>. Tutte le altre chiavi dei dipendenti verranno resettate e rigenerate con nuovi codici casuali.
                   </p>
                 </div>
                 <div className="flex items-center justify-end gap-3 pt-2">
@@ -7122,6 +7162,74 @@ export default function AdminPortal({ onConfigChanged }: AdminPortalProps) {
                       <>
                         <RotateCcw size={13} />
                         <span>Conferma Reset di Tutte le Key</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+
+        {/* Modal Conferma Rimozione Completa Token (tranne Master EMS-2410PROP) */}
+        {isPurgeAllModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fadeIn">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-[#161618] border border-red-500/50 rounded-xl shadow-2xl max-w-md w-full overflow-hidden"
+            >
+              <div className="p-4 bg-red-500/10 border-b border-red-500/20 flex items-center justify-between">
+                <div className="flex items-center gap-2 font-bold text-red-400 text-sm">
+                  <Trash2 size={18} />
+                  <span>Conferma Rimozione Totale Token</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsPurgeAllModalOpen(false)}
+                  className="p-1 hover:bg-white/10 rounded text-slate-400 hover:text-white cursor-pointer"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+              <div className="p-6 space-y-4">
+                <p className="text-sm text-slate-300 leading-relaxed">
+                  Sei sicuro di voler <strong>eliminare permanentemente tutti i token di accesso</strong> dei dipendenti?
+                </p>
+                <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-xs text-red-300 space-y-1.5">
+                  <p className="font-bold flex items-center gap-1">
+                    <ShieldAlert size={14} />
+                    <span>Master Key Preservata:</span>
+                  </p>
+                  <p>
+                    Verranno cancellati tutti i token presenti in memoria e su database Firestore. L'unico token di accesso che rimarrà valido per accedere è <strong>EMS-2410PROP</strong>.
+                  </p>
+                </div>
+                <div className="flex items-center justify-end gap-3 pt-2">
+                  <button
+                    type="button"
+                    disabled={isPurgingAll}
+                    onClick={() => setIsPurgeAllModalOpen(false)}
+                    className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold rounded-lg border border-white/10 cursor-pointer"
+                  >
+                    Annulla
+                  </button>
+                  <button
+                    type="button"
+                    disabled={isPurgingAll}
+                    onClick={handlePurgeAllTokensExceptMaster}
+                    className="px-4 py-2 bg-red-600 hover:bg-red-500 text-white text-xs font-bold rounded-lg shadow-md flex items-center gap-2 cursor-pointer"
+                  >
+                    {isPurgingAll ? (
+                      <>
+                        <RefreshCw size={14} className="animate-spin" />
+                        <span>Rimozione in corso...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Trash2 size={14} />
+                        <span>Conferma Rimozione Totale</span>
                       </>
                     )}
                   </button>

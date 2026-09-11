@@ -21,13 +21,19 @@ import {
   UserCheck,
   Cog,
   Bot,
+  FileSpreadsheet,
+  Download,
+  Key,
+  Lock,
 } from "lucide-react";
+import HierarchyImportModal from "./HierarchyImportModal.js";
 import {
   HierarchyCategoryKey,
   HierarchyMember,
   HIERARCHY_CATEGORIES,
   HierarchyCategoryConfig,
   isOwnerKey,
+  DiscordUserSession,
 } from "../types.js";
 
 interface RoleStyle {
@@ -314,17 +320,35 @@ function renderRoleSymbolIcon(symbol: "star" | "cross" | "crown" | "crown-vice" 
 interface EmsHierarchyProps {
   isAdmin?: boolean;
   adminToken?: string;
+  discordSession?: DiscordUserSession | null;
 }
 
-export default function EmsHierarchy({ isAdmin = false, adminToken }: EmsHierarchyProps) {
+export default function EmsHierarchy({ isAdmin = false, adminToken, discordSession }: EmsHierarchyProps) {
   const [members, setMembers] = useState<HierarchyMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<string>("ALL");
 
-  // Admin Modal states
+  // Admin and Import Modal states
   const [showModal, setShowModal] = useState(false);
+  const [showImportModal, setShowImportModal] = useState(false);
+  const [showUnlockModal, setShowUnlockModal] = useState(false);
+  const [unlockKey, setUnlockKey] = useState("");
+  const [unlockError, setUnlockError] = useState<string | null>(null);
+  const [isUnlocking, setIsUnlocking] = useState(false);
+  const [localAdminUnlocked, setLocalAdminUnlocked] = useState(false);
+
+  const effectiveAdmin = Boolean(
+    isAdmin ||
+    localAdminUnlocked ||
+    (typeof window !== "undefined" && Boolean(localStorage.getItem("adminToken")))
+  );
+  const effectiveToken =
+    adminToken ||
+    (typeof window !== "undefined" ? localStorage.getItem("adminToken") : "") ||
+    discordSession?.token ||
+    "";
   const [editingMember, setEditingMember] = useState<HierarchyMember | null>(null);
   const [formName, setFormName] = useState("");
   const [formRole, setFormRole] = useState("");
@@ -392,6 +416,37 @@ export default function EmsHierarchy({ isAdmin = false, adminToken }: EmsHierarc
     setShowModal(true);
   };
 
+  const handleUnlockAdmin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!unlockKey.trim()) return;
+
+    try {
+      setIsUnlocking(true);
+      setUnlockError(null);
+      const res = await fetch("/api/auth/master-login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ masterKey: unlockKey.trim() }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        if (typeof window !== "undefined") {
+          localStorage.setItem("adminToken", data.token || unlockKey.trim());
+        }
+        setLocalAdminUnlocked(true);
+        setShowUnlockModal(false);
+        setUnlockKey("");
+        showNotification("Modalità modifica manuale della gerarchia sbloccata!");
+      } else {
+        setUnlockError(data.error || "Chiave Master o credenziali non valide.");
+      }
+    } catch {
+      setUnlockError("Errore di rete durante la verifica.");
+    } finally {
+      setIsUnlocking(false);
+    }
+  };
+
   const handleSaveMember = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formName.trim()) {
@@ -416,7 +471,7 @@ export default function EmsHierarchy({ isAdmin = false, adminToken }: EmsHierarc
         method,
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${adminToken || localStorage.getItem("adminToken")}`,
+          Authorization: `Bearer ${effectiveToken}`,
         },
         body: JSON.stringify({
           name: formName.trim(),
@@ -451,7 +506,7 @@ export default function EmsHierarchy({ isAdmin = false, adminToken }: EmsHierarc
       const res = await fetch(`/api/admin/hierarchy/${memberToDelete.id}`, {
         method: "DELETE",
         headers: {
-          Authorization: `Bearer ${adminToken || localStorage.getItem("adminToken")}`,
+          Authorization: `Bearer ${effectiveToken}`,
         },
       });
       const data = await res.json();
@@ -477,7 +532,7 @@ export default function EmsHierarchy({ isAdmin = false, adminToken }: EmsHierarc
       const res = await fetch("/api/admin/hierarchy/sync", {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${adminToken || localStorage.getItem("adminToken")}`,
+          Authorization: `Bearer ${effectiveToken}`,
         },
       });
       const data = await res.json();
@@ -596,21 +651,39 @@ export default function EmsHierarchy({ isAdmin = false, adminToken }: EmsHierarc
               </div>
             </div>
 
-            {isAdmin && (
-              <div className="flex flex-wrap gap-2">
+            {effectiveAdmin ? (
+              <div className="flex flex-wrap items-center gap-2">
                 <button
                   onClick={handleOpenAddModal}
-                  className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-bold text-xs uppercase tracking-wider rounded-2xl shadow-lg shadow-red-950/40 transition-all cursor-pointer active:scale-95"
+                  className="flex items-center gap-2 px-3.5 sm:px-4 py-2.5 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-bold text-xs uppercase tracking-wider rounded-2xl shadow-lg shadow-red-950/40 transition-all cursor-pointer active:scale-95"
                 >
                   <Plus className="w-4 h-4" /> Nuovo Membro
                 </button>
                 <button
+                  onClick={() => setShowImportModal(true)}
+                  className="flex items-center gap-2 px-3.5 sm:px-4 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs uppercase tracking-wider rounded-2xl shadow-lg shadow-emerald-950/40 transition-all cursor-pointer active:scale-95"
+                  title="Importa o carica direttamente da foglio note o Excel"
+                >
+                  <FileSpreadsheet className="w-4 h-4" /> Importa Note / Excel
+                </button>
+                <button
                   onClick={() => setShowSyncConfirm(true)}
                   disabled={syncing}
-                  className="flex items-center gap-2 px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs uppercase tracking-wider rounded-2xl border border-slate-700 transition-all cursor-pointer active:scale-95 disabled:opacity-50"
+                  className="flex items-center gap-2 px-3 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs uppercase tracking-wider rounded-2xl border border-slate-700 transition-all cursor-pointer active:scale-95 disabled:opacity-50"
                   title="Sincronizza automaticamente con i candidati ed i proprietari"
                 >
                   <RefreshCw className={`w-4 h-4 ${syncing ? "animate-spin" : ""}`} /> Sincronizza
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setShowUnlockModal(true)}
+                  className="flex items-center gap-2 px-3.5 py-2.5 bg-slate-900/90 hover:bg-slate-800 text-slate-300 hover:text-white font-bold text-xs uppercase tracking-wider rounded-2xl border border-slate-700/80 transition-all cursor-pointer shadow-sm active:scale-95"
+                  title="Abilita modifica manuale della gerarchia"
+                >
+                  <Key className="w-4 h-4 text-amber-400" />
+                  <span>Modifica a Mano</span>
                 </button>
               </div>
             )}
@@ -882,7 +955,7 @@ export default function EmsHierarchy({ isAdmin = false, adminToken }: EmsHierarc
                                   </div>
 
                                   {/* Admin Controls */}
-                                  {isAdmin && (
+                                  {effectiveAdmin && (
                                     <div className="flex items-center gap-1 opacity-90 sm:opacity-0 group-hover:opacity-100 transition-opacity shrink-0 bg-slate-900/90 p-1 rounded-xl border border-slate-800">
                                       <button
                                         onClick={() => handleOpenEditModal(m)}
@@ -1045,7 +1118,7 @@ export default function EmsHierarchy({ isAdmin = false, adminToken }: EmsHierarc
               </div>
 
               {/* Tag Dev (Sviluppatore) */}
-              {(isAdmin || isOwnerKey(adminToken || localStorage.getItem("adminToken")) || (formRole && formRole.toLowerCase().includes("proprietario")) || formIsDev) && (
+              {(effectiveAdmin || isOwnerKey(effectiveToken) || (formRole && formRole.toLowerCase().includes("proprietario")) || formIsDev) && (
                 <div className="p-3 bg-blue-950/40 border border-blue-500/30 rounded-xl flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Cog className="w-4 h-4 text-blue-400" />
@@ -1206,6 +1279,89 @@ export default function EmsHierarchy({ isAdmin = false, adminToken }: EmsHierarc
                 Chiudi
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Hierarchy Import Modal (Excel / Notes) */}
+      <HierarchyImportModal
+        isOpen={showImportModal}
+        onClose={() => setShowImportModal(false)}
+        onSuccess={(newMembers, message) => {
+          setMembers(newMembers);
+          showNotification(message);
+          fetchHierarchy();
+        }}
+        adminToken={effectiveToken}
+        currentMembers={members}
+      />
+
+      {/* Emergency / Manual Admin Unlock Modal */}
+      {showUnlockModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
+          <div className="bg-[#111118] border border-slate-700/80 rounded-3xl w-full max-w-md overflow-hidden shadow-2xl animate-fade-in">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800 bg-slate-900/60">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                  <Key size={18} />
+                </div>
+                <div>
+                  <h3 className="text-base font-black text-white uppercase tracking-wider">
+                    Sblocca Gestione Gerarchia
+                  </h3>
+                  <p className="text-xs text-slate-400">
+                    Inserisci la Chiave Master EMS per abilitare la modifica
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => { setShowUnlockModal(false); setUnlockError(null); }}
+                className="text-slate-400 hover:text-white p-1 rounded-lg"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <form onSubmit={handleUnlockAdmin} className="p-6 space-y-4">
+              {unlockError && (
+                <div className="bg-rose-950/80 border border-rose-500/40 text-rose-300 p-3 rounded-xl text-xs flex items-center gap-2">
+                  <Info size={14} className="text-rose-400 shrink-0" />
+                  <span>{unlockError}</span>
+                </div>
+              )}
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-slate-300 uppercase tracking-wider block">
+                  Chiave Master Emergency:
+                </label>
+                <input
+                  type="password"
+                  value={unlockKey}
+                  onChange={(e) => setUnlockKey(e.target.value)}
+                  placeholder="Inserisci la chiave..."
+                  className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500 font-mono"
+                  autoFocus
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => { setShowUnlockModal(false); setUnlockError(null); }}
+                  className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold uppercase transition-colors"
+                >
+                  Annulla
+                </button>
+                <button
+                  type="submit"
+                  disabled={!unlockKey.trim() || isUnlocking}
+                  className="px-5 py-2 rounded-xl bg-gradient-to-r from-amber-600 to-yellow-600 hover:from-amber-500 hover:to-yellow-500 text-slate-950 font-black text-xs uppercase tracking-wider flex items-center gap-2 shadow-lg transition-all active:scale-95 disabled:opacity-50"
+                >
+                  {isUnlocking ? <RefreshCw size={14} className="animate-spin" /> : <Check size={14} />}
+                  <span>Sblocca</span>
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
