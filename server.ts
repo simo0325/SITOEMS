@@ -5983,9 +5983,16 @@ function getCdaCallerInfo(req: express.Request) {
   let session = REGISTERED_DISCORD_USERS.get(cleanTokenUpper) || REGISTERED_DISCORD_USERS.get(userToken);
 
   // 2. Search values if not found directly
+  const headerDiscordId = ((req.headers["x-discord-id"] || req.headers["x-discord-user-id"]) as string || "").trim();
+  const headerRolesRaw = req.headers["x-discord-roles"] as string | undefined;
+
   if (!session) {
     for (const s of REGISTERED_DISCORD_USERS.values()) {
       if (s.token && (s.token.toUpperCase() === cleanTokenUpper || s.token === userToken)) {
+        session = s;
+        break;
+      }
+      if (s.discordId && (cleanTokenUpper === `DISCORD_${s.discordId}` || cleanTokenUpper.includes(s.discordId) || (headerDiscordId && s.discordId === headerDiscordId))) {
         session = s;
         break;
       }
@@ -6035,6 +6042,25 @@ function getCdaCallerInfo(req: express.Request) {
     else if (rolesList.includes("1376598259388252270")) cdaRole = "Vice Presidente CDA";
     else if (rolesList.includes("1474509246447222949")) cdaRole = "Segretario CDA";
     else if (rolesList.includes("1147840203285876746")) cdaRole = "Consiglio d'Amministrazione";
+  }
+
+  // Check header-provided discord roles if present
+  if (!cdaRole && headerRolesRaw) {
+    try {
+      const parsedRoles = typeof headerRolesRaw === "string" ? JSON.parse(headerRolesRaw) : headerRolesRaw;
+      if (Array.isArray(parsedRoles)) {
+        if (parsedRoles.includes("1430946447284637806")) cdaRole = "Consigliere Finale CDA";
+        else if (parsedRoles.includes("1360573608417693788")) cdaRole = "Presidente CDA";
+        else if (parsedRoles.includes("1376598259388252270")) cdaRole = "Vice Presidente CDA";
+        else if (parsedRoles.includes("1474509246447222949")) cdaRole = "Segretario CDA";
+        else if (parsedRoles.includes("1147840203285876746")) cdaRole = "Consiglio d'Amministrazione";
+      }
+    } catch {}
+  }
+
+  // If session explicitly has CDA access, fall back to cdaRoleName or Consiglio d'Amministrazione
+  if (!cdaRole && session && (session.hasCdaAccess || (session.roleName && isCdaRoleName(session.roleName)))) {
+    cdaRole = session.cdaRoleName || (isCdaRoleName(session.roleName) ? session.roleName : "Consiglio d'Amministrazione");
   }
 
   // Check hierarchy member explicit CDA role or badge
@@ -8958,8 +8984,6 @@ export async function syncAllDataWithFirestore(force = false) {
 async function startServer() {
   try {
     ensureTokensForCandidates();
-    // Fast memory/file purge (0ms, non-blocking)
-    purgeAllTokensExceptMaster(false).catch((e) => console.warn("Memory token purge warning:", e));
 
     if (!HIERARCHY_MEMBERS || HIERARCHY_MEMBERS.length === 0) {
       HIERARCHY_MEMBERS = loadHierarchyFromFile();
@@ -8983,9 +9007,6 @@ async function startServer() {
 
     app.listen(PORT, "0.0.0.0", () => {
       console.log(`Server running on http://0.0.0.0:${PORT}`);
-
-      // Run Cloud Firestore purge in the background after server is listening
-      purgeAllTokensExceptMaster(true).catch((e) => console.warn("Background Firestore token purge warning:", e));
 
       // Asynchronously synchronize with Cloud Firestore in the background (if not exhausted)
       if (!isFirestoreQuotaExhausted()) {

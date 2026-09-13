@@ -932,6 +932,8 @@ export function canAccessCdaPortal(session?: {
   roleName?: string;
   cdaRoleName?: string;
   hasCdaAccess?: boolean;
+  roles?: string[];
+  discordRoles?: string[];
 } | null): boolean {
   if (!session) return false;
   if (session.isMaster) return true;
@@ -941,11 +943,25 @@ export function canAccessCdaPortal(session?: {
   const cleanRole = (session.roleName || "").trim().toLowerCase();
   if (cleanRole.includes("proprietario") || cleanRole.includes("master")) return true;
 
+  // Check raw Discord Role IDs (including base CDA role 1147840203285876746)
+  const roleList = (session.roles || session.discordRoles || []) as string[];
+  if (Array.isArray(roleList)) {
+    if (
+      roleList.includes("1147840203285876746") || // Membro CDA / Consiglio d'Amministrazione (Base CDA)
+      roleList.includes("1474509246447222949") || // Segretario CDA
+      roleList.includes("1376598259388252270") || // Vice Presidente CDA
+      roleList.includes("1360573608417693788") || // Presidente CDA
+      roleList.includes("1430946447284637806")    // Consigliere Finale CDA
+    ) {
+      return true;
+    }
+  }
+
+  // Explicit CDA access flag
+  if (session.hasCdaAccess === true) return true;
+
   // CDA access is governed by explicit CDA role (cdaRoleName)
   if (session.cdaRoleName && getCdaRank(session.cdaRoleName) >= 1) return true;
-
-  // If hasCdaAccess is explicitly true and cdaRoleName is a recognized CDA role
-  if (session.hasCdaAccess === true && session.cdaRoleName && isCdaRoleName(session.cdaRoleName)) return true;
 
   // If roleName itself is a recognized CDA role
   if (session.roleName && isCdaRoleName(session.roleName) && !session.roleName.toLowerCase().includes("segretario direzione")) return true;

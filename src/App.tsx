@@ -667,10 +667,18 @@ export default function App() {
         )}
 
         {mode === "cda" && (
-          <CdaPortal
-            discordSession={discordSession}
-            onSessionUpdated={(session) => setDiscordSession(session)}
-          />
+          discordSession ? (
+            <CdaPortal
+              discordSession={discordSession}
+              onSessionUpdated={(session) => setDiscordSession(session)}
+            />
+          ) : (
+            <DiscordAuthGateway
+              targetPortalName="cda"
+              onVerified={(session) => setDiscordSession(session)}
+              onCancel={() => handleNavigate("home")}
+            />
+          )
         )}
 
         {mode === "voter" && (

@@ -22,7 +22,7 @@ import {
 import { DiscordUserSession } from "../types.js";
 
 interface DiscordAuthGatewayProps {
-  targetPortalName: "voter" | "admin";
+  targetPortalName: "voter" | "admin" | "cda";
   onVerified: (session: DiscordUserSession) => void;
   onCancel: () => void;
 }
@@ -182,7 +182,12 @@ export default function DiscordAuthGateway({
     }
   };
 
-  const portalTitle = targetPortalName === "voter" ? "Portale Elettore" : "Area Amministrazione";
+  const portalTitle =
+    targetPortalName === "voter"
+      ? "Portale Elettore"
+      : targetPortalName === "cda"
+      ? "Sezione CDA"
+      : "Area Amministrazione";
 
   return (
     <div className="min-h-[80vh] flex items-center justify-center px-4 py-12 animate-fade-in">
