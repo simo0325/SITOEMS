@@ -531,6 +531,8 @@ interface DiscordSession {
   candidateId?: string;
   hideFromHierarchy?: boolean;
   isDev?: boolean;
+  roles?: string[];
+  discordRoles?: string[];
 }
 
 const DISCORD_USERS_FILE = path.join(process.cwd(), "discord_registered_users.json");
@@ -1396,6 +1398,7 @@ app.get("/api/discord/session", async (req, res) => {
       displayRoleName = "";
       displayGradeName = "";
     }
+    const hasCdaAccess = Boolean(cdaRole || isMaster || registered.hasCdaAccess);
     return res.json({
       authenticated: true,
       session: {
@@ -1403,6 +1406,7 @@ app.get("/api/discord/session", async (req, res) => {
         roleName: displayRoleName,
         gradeName: displayGradeName,
         cdaRoleName: cdaRole,
+        hasCdaAccess,
         isMaster,
       },
     });
@@ -1755,7 +1759,9 @@ app.get(["/auth/callback/discord", "/auth/callback/discord/", "/api/auth/discord
       discordTag,
       avatar: avatarUrl,
       cdaRoleName: match.cdaRole || undefined,
-      hasCdaAccess: Boolean(match.cdaRole),
+      hasCdaAccess: Boolean(match.cdaRole || match.isOwner),
+      roles: guildMember?.roles || [],
+      discordRoles: guildMember?.roles || [],
       verifiedAt: new Date().toISOString(),
     };
 
@@ -1815,7 +1821,7 @@ app.post("/api/discord/sync-guild-members", requireAdmin, async (req, res) => {
       const roleNames = (m.roles || []).map((rId) => roleMap.get(rId) || "").filter(Boolean);
       const match = matchDiscordMemberRoles(roleNames, cfg.ownerRoleName, m.roles);
 
-      if (match.isAllowed && match.highestEmsRole) {
+      if (match.isAllowed && (match.highestEmsRole || match.cdaRole)) {
         const rawDisplayName = m.nick || m.user.global_name || m.user.username;
         const cleanName = rawDisplayName.replace(/\[.*?\]|\(.*?\)/g, "").trim() || rawDisplayName.trim();
         const discordTag = `@${m.user.username}`;
@@ -1835,11 +1841,13 @@ app.post("/api/discord/sync-guild-members", requireAdmin, async (req, res) => {
           }
         }
 
+        const assignedRole = match.highestEmsRole || (match.cdaRole ? match.cdaRole : "");
+
         const sessionData: DiscordSession = {
           token: memberToken,
           username: cleanName,
-          roleName: match.highestEmsRole,
-          gradeName: match.highestEmsRole,
+          roleName: assignedRole,
+          gradeName: assignedRole,
           grade: match.highestGrade,
           isAllowed: true,
           isMaster: match.isOwner,
@@ -1847,7 +1855,9 @@ app.post("/api/discord/sync-guild-members", requireAdmin, async (req, res) => {
           discordTag,
           avatar: avatarUrl,
           cdaRoleName: match.cdaRole || undefined,
-          hasCdaAccess: Boolean(match.cdaRole),
+          hasCdaAccess: Boolean(match.cdaRole || match.isOwner),
+          roles: m.roles || [],
+          discordRoles: m.roles || [],
           verifiedAt: new Date().toISOString(),
         };
 
@@ -2004,6 +2014,76 @@ app.get("/api/admin/owner-key", requireProprietario, (req, res) => {
 app.get("/api/discord/registered-users", (req, res) => {
   const list = Array.from(REGISTERED_DISCORD_USERS.values());
   res.json({ count: list.length, users: list });
+});
+
+// EMS Employees Discord Role ID: 987106484116668467
+const EMS_EMPLOYEES_ROLE_ID = "987106484116668467";
+let cachedEmsEmployeesCount: number | null = null;
+let lastEmsEmployeesCountTime = 0;
+
+async function getEmsEmployeesRoleCount(): Promise<number> {
+  const now = Date.now();
+  // Cache for 20 seconds to prevent hitting Discord API rate limits
+  if (cachedEmsEmployeesCount !== null && now - lastEmsEmployeesCountTime < 20000) {
+    return cachedEmsEmployeesCount;
+  }
+
+  const cfg = getDiscordConfig();
+  if (cfg.botToken && cfg.guildId) {
+    try {
+      const members = await fetchAllDiscordGuildMembers();
+      if (Array.isArray(members)) {
+        let count = 0;
+        for (const m of members) {
+          if (!m.user || (m.user as any).bot) continue;
+          if (Array.isArray(m.roles) && m.roles.includes(EMS_EMPLOYEES_ROLE_ID)) {
+            count++;
+          }
+        }
+        cachedEmsEmployeesCount = count;
+        lastEmsEmployeesCountTime = now;
+        return count;
+      }
+    } catch (err) {
+      console.error("[STATS] Errore conteggio membri Discord con ruolo dipendenti:", err);
+    }
+  }
+
+  // Fallback 1: check registered users with roles array
+  let fallbackCount = 0;
+  for (const u of REGISTERED_DISCORD_USERS.values()) {
+    if (Array.isArray(u.roles) && u.roles.includes(EMS_EMPLOYEES_ROLE_ID)) {
+      fallbackCount++;
+    }
+  }
+  if (fallbackCount > 0) {
+    cachedEmsEmployeesCount = fallbackCount;
+    lastEmsEmployeesCountTime = now;
+    return fallbackCount;
+  }
+
+  // Fallback 2: Count active EMS personnel in hierarchy
+  ensureHierarchyLoaded();
+  const activeStaff = HIERARCHY_MEMBERS.filter((m) => m.name && !m.leaveStatus).length;
+  if (activeStaff > 0) {
+    return activeStaff;
+  }
+
+  return cachedEmsEmployeesCount || 0;
+}
+
+// Real-time count of members with Discord role 987106484116668467 ("Numero di Dipendenti dell'EMS")
+app.get(["/api/stats/ems-employees-count", "/api/discord/role-members-count/987106484116668467"], async (req, res) => {
+  try {
+    const count = await getEmsEmployeesRoleCount();
+    res.json({
+      success: true,
+      roleId: EMS_EMPLOYEES_ROLE_ID,
+      count,
+    });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message || "Errore recupero conteggio dipendenti EMS." });
+  }
 });
 
 // --- PUBLIC API ENDPOINTS ---
@@ -5845,6 +5925,8 @@ function getCdaCallerInfo(req: express.Request) {
     userToken = authHeader.substring(7).trim();
   } else if (req.query.token) {
     userToken = String(req.query.token).trim();
+  } else if (req.body?.token) {
+    userToken = String(req.body.token).trim();
   }
 
   const caller = getCallerGradeAndRole(req);
@@ -5948,7 +6030,7 @@ function getCdaCallerInfo(req: express.Request) {
   // Check session discord role IDs if present
   if (!cdaRole && session && Array.isArray((session as any).discordRoles || (session as any).roles)) {
     const rolesList: string[] = (session as any).discordRoles || (session as any).roles;
-    if (rolesList.includes("1430946447284637806")) cdaRole = "Consigliere FINALE CDA";
+    if (rolesList.includes("1430946447284637806")) cdaRole = "Consigliere Finale CDA";
     else if (rolesList.includes("1360573608417693788")) cdaRole = "Presidente CDA";
     else if (rolesList.includes("1376598259388252270")) cdaRole = "Vice Presidente CDA";
     else if (rolesList.includes("1474509246447222949")) cdaRole = "Segretario CDA";
@@ -5968,7 +6050,8 @@ function getCdaCallerInfo(req: express.Request) {
   const isOwner = !!(
     (session?.roleName || "").toLowerCase().includes("proprietario") ||
     (hierarchyMember && (hierarchyMember.roleName || "").toLowerCase().includes("proprietario")) ||
-    (cdaRole && cdaRole.toLowerCase().includes("proprietario"))
+    (cdaRole && cdaRole.toLowerCase().includes("proprietario")) ||
+    session?.isMaster
   );
 
   if (isOwner) {
@@ -5976,7 +6059,7 @@ function getCdaCallerInfo(req: express.Request) {
   }
 
   const rank = isOwner ? 100 : getCdaRank(cdaRole);
-  const isCda = isOwner || (rank >= 1 && session?.hasCdaAccess !== false);
+  const isCda = isOwner || rank >= 1;
 
   if (!isCda) {
     return {
@@ -8946,7 +9029,7 @@ async function syncDiscordMembersInternal() {
       if (!m.user || (m.user as any).bot) continue;
       const roleNames = (m.roles || []).map((rId) => roleMap.get(rId) || "").filter(Boolean);
       const match = matchDiscordMemberRoles(roleNames, cfg.ownerRoleName, m.roles);
-      if (match.isAllowed && match.highestEmsRole) {
+      if (match.isAllowed && (match.highestEmsRole || match.cdaRole)) {
         const rawDisplayName = m.nick || m.user.global_name || m.user.username;
         const cleanName = rawDisplayName.replace(/\[.*?\]|\(.*?\)/g, "").trim() || rawDisplayName.trim();
         const discordTag = `@${m.user.username}`;
@@ -8963,11 +9046,12 @@ async function syncDiscordMembersInternal() {
             break;
           }
         }
+        const assignedRole = match.highestEmsRole || (match.cdaRole ? match.cdaRole : "");
         REGISTERED_DISCORD_USERS.set(memberToken.toUpperCase(), {
           token: memberToken,
           username: cleanName,
-          roleName: match.highestEmsRole,
-          gradeName: match.highestEmsRole,
+          roleName: assignedRole,
+          gradeName: assignedRole,
           grade: match.highestGrade,
           isAllowed: true,
           isMaster: match.isOwner,
@@ -8975,7 +9059,9 @@ async function syncDiscordMembersInternal() {
           discordTag,
           avatar: avatarUrl,
           cdaRoleName: match.cdaRole || undefined,
-          hasCdaAccess: Boolean(match.cdaRole),
+          hasCdaAccess: Boolean(match.cdaRole || match.isOwner),
+          roles: m.roles || [],
+          discordRoles: m.roles || [],
           verifiedAt: new Date().toISOString(),
         });
         count++;

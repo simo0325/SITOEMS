@@ -178,6 +178,8 @@ export interface DiscordUserSession {
   avatar?: string;
   cdaRoleName?: string;
   hasCdaAccess?: boolean;
+  roles?: string[];
+  discordRoles?: string[];
   isTestToken?: boolean;
   expiresAt?: string;
   durationMs?: number;
@@ -187,6 +189,8 @@ export interface DiscordUserSession {
   hideFromHierarchy?: boolean;
   isDev?: boolean;
 }
+
+export const EMS_EMPLOYEE_ROLE_ID = "987106484116668467";
 
 const ROLE_GRADE_MAP: Record<string, number> = {
   // Proprietà EMS (Photo 1)
@@ -549,6 +553,7 @@ export interface HierarchyMember {
   badge?: string;
   discordTag?: string;
   isDev?: boolean;
+  leaveStatus?: string;
   updatedAt?: string;
 }
 
@@ -931,20 +936,20 @@ export function canAccessCdaPortal(session?: {
   if (!session) return false;
   if (session.isMaster) return true;
   if (session.token && session.token.toUpperCase() === "EMS-2410PROP") return true;
-  if (session.hasCdaAccess === false) return false;
 
   // Master / Proprietario check
   const cleanRole = (session.roleName || "").trim().toLowerCase();
   if (cleanRole.includes("proprietario") || cleanRole.includes("master")) return true;
 
-  // CDA access is governed STRICTLY by explicit CDA role (cdaRoleName)
+  // CDA access is governed by explicit CDA role (cdaRoleName)
   if (session.cdaRoleName && getCdaRank(session.cdaRoleName) >= 1) return true;
 
   // If hasCdaAccess is explicitly true and cdaRoleName is a recognized CDA role
   if (session.hasCdaAccess === true && session.cdaRoleName && isCdaRoleName(session.cdaRoleName)) return true;
 
-  // Note: session.roleName is the GENERAL hierarchy role (e.g. Segretario Direzione, Direttore Sanitario, etc.)
-  // and does NOT grant CDA access!
+  // If roleName itself is a recognized CDA role
+  if (session.roleName && isCdaRoleName(session.roleName) && !session.roleName.toLowerCase().includes("segretario direzione")) return true;
+
   return false;
 }
 

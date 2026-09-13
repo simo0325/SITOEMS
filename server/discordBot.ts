@@ -357,10 +357,10 @@ export const DISCORD_CDA_ROLE_IDS: Record<string, { roleName: string; rank: numb
   "1376598259388252270": { roleName: "Vice Presidente CDA", rank: 3 },
   "1474509246447222949": { roleName: "Segretario CDA", rank: 2 },
   "1430946447284637806": { roleName: "Consigliere Finale CDA", rank: 5 },
-  "1147840203285876746": { roleName: "Membro CDA", rank: 1 },
+  "1147840203285876746": { roleName: "Consiglio d'Amministrazione", rank: 1 },
 };
 
-// Map a set of Discord role names and role IDs to EMS hierarchy and permissions
+// Map a set of Discord role names and role IDs to EMS hierarchy and CDA permissions
 export function matchDiscordMemberRoles(
   roleNames: string[],
   ownerRoleNameConfig?: string,
@@ -370,13 +370,20 @@ export function matchDiscordMemberRoles(
   highestEmsRole: string | null;
   highestGrade: number;
   cdaRole: string | null;
+  cdaRank: number;
+  cdaRoleId: string | null;
+  mainRoleId: string | null;
+  hasMainRole: boolean;
+  hasCdaRole: boolean;
   isAllowed: boolean;
 } {
   let isOwner = false;
   let highestEmsRole: string | null = null;
   let highestGrade = 0;
+  let matchedMainRoleId: string | null = null;
   let cdaRole: string | null = null;
   let highestCdaRank = 0;
+  let matchedCdaRoleId: string | null = null;
 
   const targetOwnerName = (ownerRoleNameConfig || "Proprietario").trim().toLowerCase().replace(/[.'’®™┃]/g, "");
 
@@ -384,30 +391,46 @@ export function matchDiscordMemberRoles(
   let matchedMainById = false;
   if (roleIds && Array.isArray(roleIds) && roleIds.length > 0) {
     for (const rId of roleIds) {
-      // Check CDA Role IDs
-      const cdaMatch = DISCORD_CDA_ROLE_IDS[rId];
+      const cleanRId = String(rId).trim();
+
+      // Check CDA Role IDs (Strictly the 5 official CDA IDs)
+      const cdaMatch = DISCORD_CDA_ROLE_IDS[cleanRId];
       if (cdaMatch && cdaMatch.rank > highestCdaRank) {
         highestCdaRank = cdaMatch.rank;
         cdaRole = cdaMatch.roleName;
+        matchedCdaRoleId = cleanRId;
       }
 
-      // Check EMS Main Hierarchy Role IDs (Strictly the 21 IDs specified)
-      const mainMatch = DISCORD_MAIN_HIERARCHY_ROLE_IDS[rId];
+      // Check EMS Main Hierarchy Role IDs (Strictly the 21 official hierarchy IDs)
+      const mainMatch = DISCORD_MAIN_HIERARCHY_ROLE_IDS[cleanRId];
       if (mainMatch) {
         matchedMainById = true;
         if (mainMatch.grade > highestGrade) {
           highestGrade = mainMatch.grade;
           highestEmsRole = mainMatch.name;
+          matchedMainRoleId = cleanRId;
         }
-        if (rId === "1244676788672659517" || mainMatch.name === "Proprietario EMS") {
+        if (cleanRId === "1244676788672659517" || mainMatch.name === "Proprietario EMS") {
           isOwner = true;
         }
       }
     }
   }
 
-  // 2. FALLBACK ONLY: If roleIds were not provided or no main hierarchy role was found by ID
-  if (!matchedMainById) {
+  // 2. CHECK CDA BY ROLE NAME (ALWAYS executed if CDA was not found by exact ID)
+  if (!cdaRole && roleNames && Array.isArray(roleNames)) {
+    for (const rawRole of roleNames) {
+      if (!rawRole) continue;
+      const cdaMatch = matchCanonicalCdaRole(rawRole);
+      if (cdaMatch && cdaMatch.rank > highestCdaRank) {
+        highestCdaRank = cdaMatch.rank;
+        cdaRole = cdaMatch.name;
+      }
+    }
+  }
+
+  // 3. FALLBACK ONLY FOR MAIN HIERARCHY: If roleIds were not provided or no main hierarchy role was found by ID
+  if (!matchedMainById && roleNames && Array.isArray(roleNames)) {
     for (const rawRole of roleNames) {
       if (!rawRole) continue;
       const r = rawRole.trim();
@@ -424,15 +447,6 @@ export function matchDiscordMemberRoles(
         if (highestGrade < 100) {
           highestGrade = 100;
           highestEmsRole = "Proprietario EMS";
-        }
-      }
-
-      // Check CDA by Role Name if not found by ID
-      if (!cdaRole) {
-        const cdaMatch = matchCanonicalCdaRole(r);
-        if (cdaMatch && cdaMatch.rank > highestCdaRank) {
-          highestCdaRank = cdaMatch.rank;
-          cdaRole = cdaMatch.name;
         }
       }
 
@@ -458,6 +472,11 @@ export function matchDiscordMemberRoles(
     highestEmsRole,
     highestGrade,
     cdaRole,
+    cdaRank: highestCdaRank,
+    cdaRoleId: matchedCdaRoleId,
+    mainRoleId: matchedMainRoleId,
+    hasMainRole: Boolean(highestEmsRole),
+    hasCdaRole: Boolean(cdaRole),
     isAllowed: highestGrade > 0 || isOwner || highestCdaRank > 0,
   };
 }

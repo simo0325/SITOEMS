@@ -242,7 +242,7 @@ export default function CdaPortal({ discordSession, onSessionUpdated }: CdaPorta
   // Fetch CDA data (Candidature + Proposals)
   const fetchCdaData = useCallback(
     async (tokenToUse?: string, isSilent = false) => {
-      const token = tokenToUse || activeToken;
+      const token = tokenToUse || activeToken || discordSession?.token || localStorage.getItem("discordToken") || "";
       if (!token) return;
 
       if (!isSilent) {
@@ -478,6 +478,8 @@ export default function CdaPortal({ discordSession, onSessionUpdated }: CdaPorta
           username: data.userPermissions.username,
           roleName: data.userPermissions.roleName,
           grade: data.userPermissions.cdaRank,
+          cdaRoleName: data.userPermissions.roleName,
+          hasCdaAccess: true,
           isAllowed: true,
           verifiedAt: new Date().toISOString(),
           token: cleanTok,

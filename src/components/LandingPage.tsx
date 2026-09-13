@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "motion/react";
 import giovanniImg from "../assets/images/giovanni.png";
 import antonyImg from "../assets/images/antony.png";
@@ -45,6 +45,32 @@ interface LandingPageProps {
 export default function LandingPage({ onNavigate, canAccessCda = false, canAccessExcel = false }: LandingPageProps) {
   const [copiedHandle, setCopiedHandle] = useState<string | null>(null);
   const [activeModal, setActiveModal] = useState<"regolamento" | "contatti" | "discord" | null>(null);
+  const [emsEmployeesCount, setEmsEmployeesCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    const fetchEmployeesCount = async () => {
+      try {
+        const res = await fetch("/api/stats/ems-employees-count");
+        if (res.ok) {
+          const data = await res.json();
+          if (isMounted && typeof data.count === "number") {
+            setEmsEmployeesCount(data.count);
+          }
+        }
+      } catch (err) {
+        // silent fail
+      }
+    };
+
+    fetchEmployeesCount();
+    const interval = setInterval(fetchEmployeesCount, 12000);
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
+  }, []);
+
   const [selectedFounder, setSelectedFounder] = useState<{
     name: string;
     role: string;
@@ -324,8 +350,10 @@ export default function LandingPage({ onNavigate, canAccessCda = false, canAcces
               <div className="text-xs text-slate-400 font-medium mt-1">Civico EMS</div>
             </div>
             <div className="p-4 rounded-xl bg-slate-900/40 border border-slate-800/80 backdrop-blur-xs">
-              <div className="text-2xl font-black text-emerald-400">BLSD</div>
-              <div className="text-xs text-slate-400 font-medium mt-1">Formazione Continua</div>
+              <div className="text-2xl font-black text-emerald-400">
+                {emsEmployeesCount !== null ? emsEmployeesCount : "..."}
+              </div>
+              <div className="text-xs text-slate-400 font-medium mt-1">Numero di Dipendenti dell'EMS</div>
             </div>
           </div>
         </div>
