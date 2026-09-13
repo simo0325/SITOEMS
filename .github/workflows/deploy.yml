@@ -1,0 +1,66 @@
+name: Deploy to VPS
+
+on:
+  workflow_dispatch:
+    inputs:
+      restart_pm2:
+        description: 'Riavviare il processo PM2 del sito?'
+        required: true
+        type: boolean
+        default: true
+  # Se desideri abilitare il deploy automatico a ogni git push su main, decommenta qui sotto:
+  # push:
+  #   branches:
+  #     - main
+
+jobs:
+  deploy:
+    name: Deploy to VPS
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Esecuzione Deploy via SSH sulla VPS
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          password: ${{ secrets.VPS_PASSWORD }}
+          port: ${{ secrets.VPS_PORT || 22 }}
+          script: |
+            set -e
+            echo "=========================================="
+            echo "🚀 INIZIO DEPLOY SU VPS EMS"
+            echo "=========================================="
+
+            TARGET_DIR="${{ secrets.VPS_TARGET_DIR || '/var/www/sitoems' }}"
+            PM2_NAME="${{ secrets.PM2_APP_NAME || 'sitoems' }}"
+
+            if [ ! -d "$TARGET_DIR" ]; then
+              echo "❌ Cartella non trovata sulla VPS: $TARGET_DIR"
+              echo "Imposta il secret VPS_TARGET_DIR su GitHub con il percorso corretto."
+              exit 1
+            fi
+
+            cd "$TARGET_DIR"
+
+            echo "📥 [1/4] Scaricamento del codice aggiornato da GitHub..."
+            git pull origin main
+
+            echo "📦 [2/4] Installazione dipendenze..."
+            npm install --production=false
+
+            echo "🔨 [3/4] Compilazione (Vite build + esbuild)..."
+            npm run build
+
+            if [ "${{ github.event.inputs.restart_pm2 }}" != "false" ]; then
+              echo "🔄 [4/4] Ricaricamento processo PM2 ($PM2_NAME)..."
+              pm2 reload "$PM2_NAME" 2>/dev/null || pm2 restart "$PM2_NAME" 2>/dev/null || pm2 restart all
+              pm2 save
+            else
+              echo "⏭️ [4/4] Riavvio PM2 saltato su richiesta."
+            fi
+
+            echo "=========================================="
+            echo "✅ DEPLOY SU VPS COMPLETATO CON SUCCESSO!"
+            echo "=========================================="
