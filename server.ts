@@ -341,6 +341,14 @@ interface SessionData {
   employeeUsername?: string;
   employeeRoleName?: string;
   reviewerName?: string;
+  avatar?: string;
+  cdaRoleName?: string;
+  hasCdaAccess?: boolean;
+  roles?: string[];
+  discordRoles?: string[];
+  discordId?: string;
+  discordTag?: string;
+  isMaster?: boolean;
 }
 
 const ACTIVE_SESSIONS_FILE = path.join(process.cwd(), "active_sessions.json");
@@ -356,10 +364,18 @@ function loadActiveSessions(): Map<string, SessionData> {
             map.set(s.token, {
               createdAt: s.createdAt || Date.now(),
               lastSeen: s.lastSeen || Date.now(),
-              employeeToken: s.employeeToken,
+              employeeToken: s.employeeToken || s.token,
               employeeUsername: s.employeeUsername,
               employeeRoleName: s.employeeRoleName,
               reviewerName: s.reviewerName,
+              avatar: s.avatar,
+              cdaRoleName: s.cdaRoleName,
+              hasCdaAccess: s.hasCdaAccess,
+              roles: s.roles || [],
+              discordRoles: s.discordRoles || s.roles || [],
+              discordId: s.discordId,
+              discordTag: s.discordTag,
+              isMaster: s.isMaster,
             });
           }
         });
@@ -1358,7 +1374,7 @@ app.get("/api/discord/session", async (req, res) => {
     return res.status(401).json({ authenticated: false });
   }
 
-  const rawToken = authHeader.substring(7);
+  const rawToken = authHeader.substring(7).trim();
   const tokenUpper = rawToken.toUpperCase();
 
   // 1. Always recognize and guarantee Master Secret Token session
@@ -1369,8 +1385,26 @@ app.get("/api/discord/session", async (req, res) => {
     return res.json({ authenticated: true, session: MASTER_SESSION });
   }
 
+  const headerDiscordId = ((req.headers["x-discord-id"] || req.headers["x-discord-user-id"]) as string || "").trim();
+  const headerRolesRaw = req.headers["x-discord-roles"] as string | undefined;
+
   // 2. Check REGISTERED_DISCORD_USERS
-  const registered = REGISTERED_DISCORD_USERS.get(tokenUpper);
+  let registered = REGISTERED_DISCORD_USERS.get(tokenUpper) || REGISTERED_DISCORD_USERS.get(rawToken);
+  if (!registered) {
+    for (const [key, user] of REGISTERED_DISCORD_USERS.entries()) {
+      if (
+        key.toUpperCase() === tokenUpper ||
+        key === rawToken ||
+        (user.token && (user.token.toUpperCase() === tokenUpper || user.token === rawToken)) ||
+        (headerDiscordId && user.discordId === headerDiscordId) ||
+        (user.discordId && rawToken.includes(user.discordId))
+      ) {
+        registered = user;
+        break;
+      }
+    }
+  }
+
   if (registered) {
     if (registered.expiresAt && new Date().getTime() > new Date(registered.expiresAt).getTime()) {
       REGISTERED_DISCORD_USERS.delete(tokenUpper);
@@ -1393,12 +1427,33 @@ app.get("/api/discord/session", async (req, res) => {
     let displayRoleName = registered.roleName;
     let displayGradeName = registered.gradeName;
     let cdaRole = registered.cdaRoleName;
+
+    const allRoles: string[] = [
+      ...((registered.roles || []) as string[]),
+      ...((registered.discordRoles || []) as string[]),
+    ];
+    if (headerRolesRaw) {
+      try {
+        const parsed = JSON.parse(headerRolesRaw);
+        if (Array.isArray(parsed)) allRoles.push(...parsed);
+      } catch {}
+    }
+
+    if (!cdaRole) {
+      if (allRoles.includes("1430946447284637806")) cdaRole = "Consigliere Finale CDA";
+      else if (allRoles.includes("1360573608417693788")) cdaRole = "Presidente CDA";
+      else if (allRoles.includes("1376598259388252270")) cdaRole = "Vice Presidente CDA";
+      else if (allRoles.includes("1474509246447222949")) cdaRole = "Segretario CDA";
+      else if (allRoles.includes("1147840203285876746")) cdaRole = "Consiglio d'Amministrazione";
+    }
+
     if (displayRoleName && isCdaOnlyRoleName(displayRoleName)) {
       if (!cdaRole) cdaRole = displayRoleName;
       displayRoleName = "";
       displayGradeName = "";
     }
-    const hasCdaAccess = Boolean(cdaRole || isMaster || registered.hasCdaAccess);
+    const hasCdaAccess = Boolean(cdaRole || isMaster || registered.hasCdaAccess || allRoles.includes("1147840203285876746"));
+
     return res.json({
       authenticated: true,
       session: {
@@ -1408,12 +1463,23 @@ app.get("/api/discord/session", async (req, res) => {
         cdaRoleName: cdaRole,
         hasCdaAccess,
         isMaster,
+        roles: allRoles,
+        discordRoles: allRoles,
       },
     });
   }
 
-  // 3. Check ACTIVE_SESSIONS (created via admin password login or unlock)
-  const activeSess = ACTIVE_SESSIONS.get(rawToken) || ACTIVE_SESSIONS.get(tokenUpper);
+  // 3. Check ACTIVE_SESSIONS (created via admin password login, unlock, or active session cache)
+  let activeSess = ACTIVE_SESSIONS.get(rawToken) || ACTIVE_SESSIONS.get(tokenUpper);
+  if (!activeSess && headerDiscordId) {
+    for (const s of ACTIVE_SESSIONS.values()) {
+      if (s.discordId === headerDiscordId) {
+        activeSess = s;
+        break;
+      }
+    }
+  }
+
   if (activeSess) {
     activeSess.lastSeen = Date.now();
     saveActiveSessions(ACTIVE_SESSIONS);
@@ -1428,6 +1494,29 @@ app.get("/api/discord/session", async (req, res) => {
       cleanRole === "proprietario" ||
       cleanRole.includes("proprietario")
     );
+
+    let cdaRole = activeSess.cdaRoleName;
+    const allRoles: string[] = [
+      ...((activeSess.roles || []) as string[]),
+      ...((activeSess.discordRoles || []) as string[]),
+    ];
+    if (headerRolesRaw) {
+      try {
+        const parsed = JSON.parse(headerRolesRaw);
+        if (Array.isArray(parsed)) allRoles.push(...parsed);
+      } catch {}
+    }
+
+    if (!cdaRole) {
+      if (allRoles.includes("1430946447284637806")) cdaRole = "Consigliere Finale CDA";
+      else if (allRoles.includes("1360573608417693788")) cdaRole = "Presidente CDA";
+      else if (allRoles.includes("1376598259388252270")) cdaRole = "Vice Presidente CDA";
+      else if (allRoles.includes("1474509246447222949")) cdaRole = "Segretario CDA";
+      else if (allRoles.includes("1147840203285876746")) cdaRole = "Consiglio d'Amministrazione";
+    }
+
+    const hasCdaAccess = Boolean(cdaRole || isMaster || activeSess.hasCdaAccess || allRoles.includes("1147840203285876746"));
+
     return res.json({
       authenticated: true,
       session: {
@@ -1438,6 +1527,13 @@ app.get("/api/discord/session", async (req, res) => {
         isAllowed: true,
         verifiedAt: new Date(activeSess.createdAt).toISOString(),
         isMaster,
+        avatar: activeSess.avatar,
+        cdaRoleName: cdaRole,
+        hasCdaAccess,
+        roles: allRoles,
+        discordRoles: allRoles,
+        discordId: activeSess.discordId,
+        discordTag: activeSess.discordTag,
       },
     });
   }
@@ -1684,9 +1780,17 @@ app.get(["/auth/callback/discord", "/auth/callback/discord/", "/api/auth/discord
     // 2. Fetch user profile from Discord
     const discordUser = await fetchDiscordUserProfile(accessToken);
     const discordTag = `@${discordUser.username}`;
-    const avatarUrl = discordUser.avatar
-      ? `https://cdn.discordapp.com/avatars/${discordUser.id}/${discordUser.avatar}.png`
-      : undefined;
+    let avatarUrl: string | undefined = undefined;
+    if (discordUser.avatar) {
+      avatarUrl = `https://cdn.discordapp.com/avatars/${discordUser.id}/${discordUser.avatar}.png`;
+    } else {
+      try {
+        const defaultIdx = Number((BigInt(discordUser.id) >> 22n) % 6n);
+        avatarUrl = `https://cdn.discordapp.com/embed/avatars/${isNaN(defaultIdx) ? 0 : defaultIdx}.png`;
+      } catch {
+        avatarUrl = `https://cdn.discordapp.com/embed/avatars/0.png`;
+      }
+    }
 
     // 3. Check guild membership and roles using the Bot Token
     let guildMember = null;
@@ -1771,13 +1875,25 @@ app.get(["/auth/callback/discord", "/auth/callback/discord/", "/api/auth/discord
     saveTokenFirestore(sessionData).catch((e) => console.error("Firestore save token error:", e));
 
     // Also register in ACTIVE_SESSIONS
-    ACTIVE_SESSIONS.set(sessionToken, {
+    const activeData: SessionData = {
       createdAt: Date.now(),
       lastSeen: Date.now(),
       employeeToken: sessionToken,
       employeeUsername: cleanName,
       employeeRoleName: assignedHierarchyRole,
-    });
+      avatar: avatarUrl,
+      cdaRoleName: match.cdaRole || undefined,
+      hasCdaAccess: Boolean(match.cdaRole || match.isOwner),
+      roles: guildMember?.roles || [],
+      discordRoles: guildMember?.roles || [],
+      discordId: discordUser.id,
+      discordTag,
+      isMaster: match.isOwner,
+    };
+    ACTIVE_SESSIONS.set(sessionToken, activeData);
+    if (sessionToken.toUpperCase() !== sessionToken) {
+      ACTIVE_SESSIONS.set(sessionToken.toUpperCase(), activeData);
+    }
     saveActiveSessions(ACTIVE_SESSIONS);
 
     addAccessLog(
@@ -1825,19 +1941,31 @@ app.post("/api/discord/sync-guild-members", requireAdmin, async (req, res) => {
         const rawDisplayName = m.nick || m.user.global_name || m.user.username;
         const cleanName = rawDisplayName.replace(/\[.*?\]|\(.*?\)/g, "").trim() || rawDisplayName.trim();
         const discordTag = `@${m.user.username}`;
-        const avatarUrl = m.user.avatar
-          ? `https://cdn.discordapp.com/avatars/${m.user.id}/${m.user.avatar}.png`
-          : undefined;
-
         let memberToken = `DISCORD_${m.user.id}`;
         // Preserve existing token if already registered
+        let existingSession: DiscordSession | undefined = undefined;
         for (const [tKey, regUser] of REGISTERED_DISCORD_USERS.entries()) {
           if (
             regUser.discordId === m.user.id ||
             (regUser.discordTag && regUser.discordTag.toLowerCase() === discordTag.toLowerCase())
           ) {
             memberToken = tKey;
+            existingSession = regUser;
             break;
+          }
+        }
+
+        let avatarUrl: string | undefined = undefined;
+        if (m.user.avatar) {
+          avatarUrl = `https://cdn.discordapp.com/avatars/${m.user.id}/${m.user.avatar}.png`;
+        } else if (existingSession?.avatar) {
+          avatarUrl = existingSession.avatar;
+        } else {
+          try {
+            const defaultIdx = Number((BigInt(m.user.id) >> 22n) % 6n);
+            avatarUrl = `https://cdn.discordapp.com/embed/avatars/${isNaN(defaultIdx) ? 0 : defaultIdx}.png`;
+          } catch {
+            avatarUrl = `https://cdn.discordapp.com/embed/avatars/0.png`;
           }
         }
 
@@ -1854,14 +1982,24 @@ app.post("/api/discord/sync-guild-members", requireAdmin, async (req, res) => {
           discordId: m.user.id,
           discordTag,
           avatar: avatarUrl,
-          cdaRoleName: match.cdaRole || undefined,
-          hasCdaAccess: Boolean(match.cdaRole || match.isOwner),
-          roles: m.roles || [],
-          discordRoles: m.roles || [],
+          cdaRoleName: match.cdaRole || existingSession?.cdaRoleName || undefined,
+          hasCdaAccess: Boolean(match.cdaRole || match.isOwner || existingSession?.hasCdaAccess),
+          roles: m.roles || existingSession?.roles || [],
+          discordRoles: m.roles || existingSession?.discordRoles || [],
           verifiedAt: new Date().toISOString(),
         };
 
         REGISTERED_DISCORD_USERS.set(memberToken.toUpperCase(), sessionData);
+        REGISTERED_DISCORD_USERS.set(memberToken, sessionData);
+
+        const existingActive = ACTIVE_SESSIONS.get(memberToken) || ACTIVE_SESSIONS.get(memberToken.toUpperCase());
+        if (existingActive) {
+          existingActive.avatar = avatarUrl || existingActive.avatar;
+          existingActive.cdaRoleName = match.cdaRole || existingActive.cdaRoleName;
+          existingActive.hasCdaAccess = Boolean(match.cdaRole || match.isOwner || existingActive.hasCdaAccess);
+          existingActive.roles = m.roles || existingActive.roles || [];
+          existingActive.discordRoles = m.roles || existingActive.discordRoles || [];
+        }
         syncedCount++;
       }
     }
@@ -6001,6 +6139,29 @@ function getCdaCallerInfo(req: express.Request) {
         break;
       }
     }
+
+    if (!session) {
+      const active = ACTIVE_SESSIONS.get(userToken) || ACTIVE_SESSIONS.get(cleanTokenUpper);
+      if (active) {
+        session = {
+          token: userToken,
+          username: active.employeeUsername || active.reviewerName || "Amministratore",
+          roleName: active.employeeRoleName || "",
+          gradeName: active.employeeRoleName || "",
+          grade: 1,
+          isAllowed: true,
+          isMaster: (active as any).isMaster || cleanTokenUpper === MASTER_SECRET_TOKEN.toUpperCase(),
+          avatar: active.avatar,
+          cdaRoleName: active.cdaRoleName,
+          hasCdaAccess: active.hasCdaAccess,
+          roles: active.roles || active.discordRoles || [],
+          discordRoles: active.discordRoles || active.roles || [],
+          discordId: active.discordId,
+          discordTag: active.discordTag,
+          verifiedAt: new Date(active.createdAt).toISOString(),
+        };
+      }
+    }
   }
 
   // Check if session is an expired TEST token
@@ -8850,33 +9011,35 @@ export async function syncAllDataWithFirestore(force = false) {
     const cloudTokenKeys = new Set<string>();
 
     if (cloudTokensAndLogs.tokens && cloudTokensAndLogs.tokens.length > 0) {
-      // Purge non-master tokens from Firestore and memory
       cloudTokensAndLogs.tokens.forEach((t) => {
         if (t && t.token) {
           const uKey = t.token.toUpperCase();
           const isMaster = uKey === "EMS-2410PROP" || uKey === MASTER_SECRET_TOKEN.toUpperCase();
 
-          if (!isMaster) {
-            // Permanently delete any non-master token from Firestore
-            deleteTokenFirestore(t.token, t.username, t.candidateId);
-            REGISTERED_DISCORD_USERS.delete(uKey);
+          cloudTokenKeys.add(uKey);
+          ALLOWED_OFFICIAL_TOKEN_KEYS.add(uKey);
+          const existingLocal = REGISTERED_DISCORD_USERS.get(uKey);
+          const mergedSession: DiscordSession = {
+            ...existingLocal,
+            ...t,
+            token: isMaster ? "EMS-2410PROP" : t.token,
+            roleName: isMaster ? "Proprietario" : (t.roleName || existingLocal?.roleName || "Membro"),
+            gradeName: isMaster ? "Proprietario" : (t.gradeName || existingLocal?.gradeName || "Membro"),
+            grade: isMaster ? 100 : (t.grade ?? existingLocal?.grade ?? 1),
+            isAllowed: true,
+            isMaster: isMaster || t.isMaster || existingLocal?.isMaster,
+            cdaRoleName: t.cdaRoleName || existingLocal?.cdaRoleName,
+            hasCdaAccess: isMaster || t.hasCdaAccess || existingLocal?.hasCdaAccess,
+            roles: t.roles || existingLocal?.roles || [],
+            discordRoles: t.discordRoles || existingLocal?.discordRoles || [],
+            avatar: t.avatar || existingLocal?.avatar,
+            discordTag: t.discordTag || existingLocal?.discordTag,
+            discordId: t.discordId || existingLocal?.discordId,
+          };
+          if (isMaster) {
+            REGISTERED_DISCORD_USERS.set("EMS-2410PROP", masterSessionToSave);
+            REGISTERED_DISCORD_USERS.set(uKey, masterSessionToSave);
           } else {
-            cloudTokenKeys.add(uKey);
-            ALLOWED_OFFICIAL_TOKEN_KEYS.add(uKey);
-            const existingLocal = REGISTERED_DISCORD_USERS.get(uKey);
-            const mergedSession: DiscordSession = {
-              ...existingLocal,
-              ...t,
-              token: "EMS-2410PROP",
-              roleName: "Proprietario",
-              gradeName: "Proprietario",
-              grade: 100,
-              isAllowed: true,
-              isMaster: true,
-              cdaRoleName: "Consigliere Finale CDA",
-              hasCdaAccess: true,
-            };
-            REGISTERED_DISCORD_USERS.set("EMS-2410PROP", mergedSession);
             REGISTERED_DISCORD_USERS.set(uKey, mergedSession);
           }
         }
@@ -8954,10 +9117,18 @@ export async function syncAllDataWithFirestore(force = false) {
           ACTIVE_SESSIONS.set(s.token, {
             createdAt: s.createdAt || Date.now(),
             lastSeen: s.lastSeen || Date.now(),
-            employeeToken: s.employeeToken,
+            employeeToken: s.employeeToken || s.token,
             employeeUsername: s.employeeUsername,
             employeeRoleName: s.employeeRoleName,
             reviewerName: s.reviewerName,
+            avatar: s.avatar,
+            cdaRoleName: s.cdaRoleName,
+            hasCdaAccess: s.hasCdaAccess,
+            roles: s.roles || [],
+            discordRoles: s.discordRoles || s.roles || [],
+            discordId: s.discordId,
+            discordTag: s.discordTag,
+            isMaster: s.isMaster,
           });
         }
       });
@@ -9054,21 +9225,35 @@ async function syncDiscordMembersInternal() {
         const rawDisplayName = m.nick || m.user.global_name || m.user.username;
         const cleanName = rawDisplayName.replace(/\[.*?\]|\(.*?\)/g, "").trim() || rawDisplayName.trim();
         const discordTag = `@${m.user.username}`;
-        const avatarUrl = m.user.avatar
-          ? `https://cdn.discordapp.com/avatars/${m.user.id}/${m.user.avatar}.png`
-          : undefined;
         let memberToken = `DISCORD_${m.user.id}`;
+        let existingSession: DiscordSession | undefined = undefined;
         for (const [tKey, regUser] of REGISTERED_DISCORD_USERS.entries()) {
           if (
             regUser.discordId === m.user.id ||
             (regUser.discordTag && regUser.discordTag.toLowerCase() === discordTag.toLowerCase())
           ) {
             memberToken = tKey;
+            existingSession = regUser;
             break;
           }
         }
+
+        let avatarUrl: string | undefined = undefined;
+        if (m.user.avatar) {
+          avatarUrl = `https://cdn.discordapp.com/avatars/${m.user.id}/${m.user.avatar}.png`;
+        } else if (existingSession?.avatar) {
+          avatarUrl = existingSession.avatar;
+        } else {
+          try {
+            const defaultIdx = Number((BigInt(m.user.id) >> 22n) % 6n);
+            avatarUrl = `https://cdn.discordapp.com/embed/avatars/${isNaN(defaultIdx) ? 0 : defaultIdx}.png`;
+          } catch {
+            avatarUrl = `https://cdn.discordapp.com/embed/avatars/0.png`;
+          }
+        }
+
         const assignedRole = match.highestEmsRole || (match.cdaRole ? match.cdaRole : "");
-        REGISTERED_DISCORD_USERS.set(memberToken.toUpperCase(), {
+        const memberSession: DiscordSession = {
           token: memberToken,
           username: cleanName,
           roleName: assignedRole,
@@ -9079,12 +9264,24 @@ async function syncDiscordMembersInternal() {
           discordId: m.user.id,
           discordTag,
           avatar: avatarUrl,
-          cdaRoleName: match.cdaRole || undefined,
-          hasCdaAccess: Boolean(match.cdaRole || match.isOwner),
-          roles: m.roles || [],
-          discordRoles: m.roles || [],
+          cdaRoleName: match.cdaRole || existingSession?.cdaRoleName || undefined,
+          hasCdaAccess: Boolean(match.cdaRole || match.isOwner || existingSession?.hasCdaAccess),
+          roles: m.roles || existingSession?.roles || [],
+          discordRoles: m.roles || existingSession?.discordRoles || [],
           verifiedAt: new Date().toISOString(),
-        });
+        };
+
+        REGISTERED_DISCORD_USERS.set(memberToken.toUpperCase(), memberSession);
+        REGISTERED_DISCORD_USERS.set(memberToken, memberSession);
+
+        const existingActive = ACTIVE_SESSIONS.get(memberToken) || ACTIVE_SESSIONS.get(memberToken.toUpperCase());
+        if (existingActive) {
+          existingActive.avatar = avatarUrl || existingActive.avatar;
+          existingActive.cdaRoleName = match.cdaRole || existingActive.cdaRoleName;
+          existingActive.hasCdaAccess = Boolean(match.cdaRole || match.isOwner || existingActive.hasCdaAccess);
+          existingActive.roles = m.roles || existingActive.roles || [];
+          existingActive.discordRoles = m.roles || existingActive.discordRoles || [];
+        }
         count++;
       }
     }

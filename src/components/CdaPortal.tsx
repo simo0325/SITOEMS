@@ -303,11 +303,31 @@ export default function CdaPortal({ discordSession, onSessionUpdated }: CdaPorta
     return await res.json();
   };
 
+  // Memoized auth headers with roles and discordId for all CDA API requests
+  const getAuthHeaders = useCallback(
+    (extra?: Record<string, string>): Record<string, string> => {
+      const token = activeToken || discordSession?.token || localStorage.getItem("discordToken") || "";
+      const headers: Record<string, string> = {
+        Authorization: `Bearer ${token}`,
+        ...extra,
+      };
+      const rawRoles = (discordSession?.roles || discordSession?.discordRoles || []) as string[];
+      if (rawRoles.length > 0) {
+        headers["x-discord-roles"] = JSON.stringify(rawRoles);
+      }
+      if (discordSession?.discordId) {
+        headers["x-discord-id"] = discordSession.discordId;
+      }
+      return headers;
+    },
+    [activeToken, discordSession]
+  );
+
   // Fetch CDA data (Candidature + Proposals)
   const fetchCdaData = useCallback(
     async (tokenToUse?: string, isSilent = false) => {
       const token = tokenToUse || activeToken || discordSession?.token || localStorage.getItem("discordToken") || "";
-      if (!token) return;
+      if (!token && !initialPermissions) return;
 
       if (!isSilent) {
         setLoadingData(true);
@@ -315,16 +335,7 @@ export default function CdaPortal({ discordSession, onSessionUpdated }: CdaPorta
       }
 
       try {
-        const headers: Record<string, string> = {
-          Authorization: `Bearer ${token}`,
-        };
-        const rawRoles = (discordSession?.roles || discordSession?.discordRoles || []) as string[];
-        if (rawRoles.length > 0) {
-          headers["x-discord-roles"] = JSON.stringify(rawRoles);
-        }
-        if (discordSession?.discordId) {
-          headers["x-discord-id"] = discordSession.discordId;
-        }
+        const headers = getAuthHeaders();
 
         const [candRes, propRes] = await Promise.all([
           fetch(`/api/cda/candidature?token=${encodeURIComponent(token)}`, {
@@ -350,6 +361,8 @@ export default function CdaPortal({ discordSession, onSessionUpdated }: CdaPorta
 
         if (candData.userPermissions) {
           setPermissions(candData.userPermissions);
+        } else if (initialPermissions) {
+          setPermissions(initialPermissions);
         }
         const newCands = candData.candidature || [];
         setCandidature(newCands);
@@ -372,7 +385,7 @@ export default function CdaPortal({ discordSession, onSessionUpdated }: CdaPorta
         }
       }
     },
-    [activeToken, discordSession, initialPermissions]
+    [activeToken, discordSession, initialPermissions, getAuthHeaders]
   );
 
   // Co-signer Lookup
@@ -429,7 +442,8 @@ export default function CdaPortal({ discordSession, onSessionUpdated }: CdaPorta
   // Submit New Proposal
   const handleSubmitProposal = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!activeToken) return;
+    const token = activeToken || discordSession?.token || localStorage.getItem("discordToken") || "";
+    if (!token && !initialPermissions) return;
 
     setSubmittingProposal(true);
     setErrorMsg(null);
@@ -438,10 +452,9 @@ export default function CdaPortal({ discordSession, onSessionUpdated }: CdaPorta
     try {
       const res = await fetch("/api/cda/proposals", {
         method: "POST",
-        headers: {
+        headers: getAuthHeaders({
           "Content-Type": "application/json",
-          Authorization: `Bearer ${activeToken}`,
-        },
+        }),
         body: JSON.stringify({
           type: newPropType,
           proposerName: newPropProposer || permissions?.username || "Membro CDA",
@@ -488,17 +501,18 @@ export default function CdaPortal({ discordSession, onSessionUpdated }: CdaPorta
   };
 
   useEffect(() => {
-    if (!activeToken) return;
+    const token = activeToken || discordSession?.token || localStorage.getItem("discordToken") || "";
+    if (!token && !initialPermissions) return;
 
-    fetchCdaData(activeToken, false);
+    fetchCdaData(token, false);
 
     // Continuous real-time background polling for CDA data updates (every 4s)
     const pollInterval = setInterval(() => {
-      fetchCdaData(activeToken, true);
+      fetchCdaData(token, true);
     }, 4000);
 
     return () => clearInterval(pollInterval);
-  }, [activeToken, fetchCdaData]);
+  }, [activeToken, discordSession?.token, fetchCdaData, initialPermissions]);
 
   // Keyboard shortcut: Escape key closes active modal
   useEffect(() => {
@@ -531,9 +545,9 @@ export default function CdaPortal({ discordSession, onSessionUpdated }: CdaPorta
 
     try {
       const res = await fetch(`/api/cda/candidature?token=${encodeURIComponent(cleanTok)}`, {
-        headers: {
+        headers: getAuthHeaders({
           Authorization: `Bearer ${cleanTok}`,
-        },
+        }),
       });
       const data = await parseJsonResponse(res);
 
@@ -618,7 +632,7 @@ export default function CdaPortal({ discordSession, onSessionUpdated }: CdaPorta
 
   // Proposal Action Handlers
   const handleProposalRender = async () => {
-    if (!selectedProp || !activeToken) return;
+    if (!selectedProp) return;
     setSubmittingAction(true);
     setErrorMsg(null);
     setSuccessMsg(null);
@@ -626,10 +640,9 @@ export default function CdaPortal({ discordSession, onSessionUpdated }: CdaPorta
     try {
       const res = await fetch(`/api/cda/proposals/${encodeURIComponent(selectedProp.id)}/render`, {
         method: "POST",
-        headers: {
+        headers: getAuthHeaders({
           "Content-Type": "application/json",
-          Authorization: `Bearer ${activeToken}`,
-        },
+        }),
       });
       const data = await parseJsonResponse(res);
 
@@ -648,7 +661,7 @@ export default function CdaPortal({ discordSession, onSessionUpdated }: CdaPorta
   };
 
   const handleProposalVote = async () => {
-    if (!selectedProp || !activeToken) return;
+    if (!selectedProp) return;
 
     if (permissions?.isMaster && !voterOwnerName) {
       setErrorMsg("Seleziona per quale Proprietario stai votando (Giovanni Manzo, Simone Rizzus o Antony Romano).");
@@ -672,10 +685,9 @@ export default function CdaPortal({ discordSession, onSessionUpdated }: CdaPorta
     try {
       const res = await fetch(`/api/cda/proposals/${encodeURIComponent(selectedProp.id)}/vote`, {
         method: "POST",
-        headers: {
+        headers: getAuthHeaders({
           "Content-Type": "application/json",
-          Authorization: `Bearer ${activeToken}`,
-        },
+        }),
         body: JSON.stringify({
           decision: voteDecision,
           reason: actionReason,
@@ -700,7 +712,7 @@ export default function CdaPortal({ discordSession, onSessionUpdated }: CdaPorta
   };
 
   const handleProposalDirectApprove = async () => {
-    if (!selectedProp || !activeToken) return;
+    if (!selectedProp) return;
 
     if (selectedProp.type === "REINTEGRO" && !reinstatementSelectedRole) {
       setErrorMsg("Seleziona il grado con il quale la persona deve essere reintegrata.");
@@ -714,10 +726,9 @@ export default function CdaPortal({ discordSession, onSessionUpdated }: CdaPorta
     try {
       const res = await fetch(`/api/cda/proposals/${encodeURIComponent(selectedProp.id)}/direct-approve`, {
         method: "POST",
-        headers: {
+        headers: getAuthHeaders({
           "Content-Type": "application/json",
-          Authorization: `Bearer ${activeToken}`,
-        },
+        }),
         body: JSON.stringify({
           reason: actionReason,
           chosenRole: selectedProp.type === "REINTEGRO" ? reinstatementSelectedRole : undefined,
@@ -740,7 +751,7 @@ export default function CdaPortal({ discordSession, onSessionUpdated }: CdaPorta
   };
 
   const handleProposalDirectReturn = async () => {
-    if (!selectedProp || !activeToken) return;
+    if (!selectedProp) return;
     setSubmittingAction(true);
     setErrorMsg(null);
     setSuccessMsg(null);
@@ -748,10 +759,9 @@ export default function CdaPortal({ discordSession, onSessionUpdated }: CdaPorta
     try {
       const res = await fetch(`/api/cda/proposals/${encodeURIComponent(selectedProp.id)}/direct-return`, {
         method: "POST",
-        headers: {
+        headers: getAuthHeaders({
           "Content-Type": "application/json",
-          Authorization: `Bearer ${activeToken}`,
-        },
+        }),
         body: JSON.stringify({ reason: actionReason }),
       });
       const data = await parseJsonResponse(res);
@@ -771,7 +781,7 @@ export default function CdaPortal({ discordSession, onSessionUpdated }: CdaPorta
   };
 
   const handleProposalPreventive = async () => {
-    if (!selectedProp || !activeToken) return;
+    if (!selectedProp) return;
 
     setSubmittingAction(true);
     setErrorMsg(null);
@@ -780,10 +790,9 @@ export default function CdaPortal({ discordSession, onSessionUpdated }: CdaPorta
     try {
       const res = await fetch(`/api/cda/proposals/${encodeURIComponent(selectedProp.id)}/preventive`, {
         method: "POST",
-        headers: {
+        headers: getAuthHeaders({
           "Content-Type": "application/json",
-          Authorization: `Bearer ${activeToken}`,
-        },
+        }),
         body: JSON.stringify({
           reason: actionReason,
         }),
@@ -805,7 +814,7 @@ export default function CdaPortal({ discordSession, onSessionUpdated }: CdaPorta
   };
 
   const handleProposalResolveTie = async () => {
-    if (!selectedProp || !activeToken) return;
+    if (!selectedProp) return;
 
     if (selectedProp.type === "REINTEGRO" && tieDecision === "APPROVE" && !reinstatementSelectedRole) {
       setErrorMsg("Seleziona il grado con il quale la persona deve essere reintegrata.");
@@ -819,10 +828,9 @@ export default function CdaPortal({ discordSession, onSessionUpdated }: CdaPorta
     try {
       const res = await fetch(`/api/cda/proposals/${encodeURIComponent(selectedProp.id)}/resolve-tie`, {
         method: "POST",
-        headers: {
+        headers: getAuthHeaders({
           "Content-Type": "application/json",
-          Authorization: `Bearer ${activeToken}`,
-        },
+        }),
         body: JSON.stringify({
           decision: tieDecision,
           reason: actionReason,
@@ -846,7 +854,7 @@ export default function CdaPortal({ discordSession, onSessionUpdated }: CdaPorta
   };
 
   const handleProposalCancel = async () => {
-    if (!selectedProp || !activeToken) return;
+    if (!selectedProp) return;
 
     if (!permissions?.isMaster && (!actionReason || actionReason.trim().length < 3)) {
       setErrorMsg("La motivazione del ritiro è obbligatoria per il proponente.");
@@ -860,10 +868,9 @@ export default function CdaPortal({ discordSession, onSessionUpdated }: CdaPorta
     try {
       const res = await fetch(`/api/cda/proposals/${encodeURIComponent(selectedProp.id)}/cancel`, {
         method: "POST",
-        headers: {
+        headers: getAuthHeaders({
           "Content-Type": "application/json",
-          Authorization: `Bearer ${activeToken}`,
-        },
+        }),
         body: JSON.stringify({ reason: actionReason }),
       });
       const data = await parseJsonResponse(res);
@@ -885,7 +892,7 @@ export default function CdaPortal({ discordSession, onSessionUpdated }: CdaPorta
 
   // Action Handlers
   const handleRenderToCda = async () => {
-    if (!selectedCand || !activeToken) return;
+    if (!selectedCand) return;
     setSubmittingAction(true);
     setErrorMsg(null);
     setSuccessMsg(null);
@@ -893,10 +900,9 @@ export default function CdaPortal({ discordSession, onSessionUpdated }: CdaPorta
     try {
       const res = await fetch(`/api/cda/render/${encodeURIComponent(selectedCand.id)}`, {
         method: "POST",
-        headers: {
+        headers: getAuthHeaders({
           "Content-Type": "application/json",
-          Authorization: `Bearer ${activeToken}`,
-        },
+        }),
       });
       const data = await parseJsonResponse(res);
 
@@ -915,7 +921,7 @@ export default function CdaPortal({ discordSession, onSessionUpdated }: CdaPorta
   };
 
   const handleDirectReview = async (action: "APPROVE" | "RETURN") => {
-    if (!selectedCand || !activeToken) return;
+    if (!selectedCand) return;
 
     if (!permissions?.isReasonOptional && (!actionReason || actionReason.trim().length < 3)) {
       setErrorMsg("Il motivo dell'azione è obbligatorio per il tuo ruolo!");
@@ -929,10 +935,9 @@ export default function CdaPortal({ discordSession, onSessionUpdated }: CdaPorta
     try {
       const res = await fetch(`/api/cda/direct-review/${encodeURIComponent(selectedCand.id)}`, {
         method: "POST",
-        headers: {
+        headers: getAuthHeaders({
           "Content-Type": "application/json",
-          Authorization: `Bearer ${activeToken}`,
-        },
+        }),
         body: JSON.stringify({ action, reason: actionReason }),
       });
       const data = await parseJsonResponse(res);
@@ -952,7 +957,7 @@ export default function CdaPortal({ discordSession, onSessionUpdated }: CdaPorta
   };
 
   const handleVote = async () => {
-    if (!selectedCand || !activeToken) return;
+    if (!selectedCand) return;
 
     if (permissions?.isMaster && !voterOwnerName) {
       setErrorMsg("Seleziona per quale Proprietario stai votando (Giovanni Manzo, Simone Rizzus o Antony Romano).");
@@ -971,10 +976,9 @@ export default function CdaPortal({ discordSession, onSessionUpdated }: CdaPorta
     try {
       const res = await fetch(`/api/cda/vote/${encodeURIComponent(selectedCand.id)}`, {
         method: "POST",
-        headers: {
+        headers: getAuthHeaders({
           "Content-Type": "application/json",
-          Authorization: `Bearer ${activeToken}`,
-        },
+        }),
         body: JSON.stringify({
           decision: voteDecision,
           reason: actionReason,
@@ -998,7 +1002,7 @@ export default function CdaPortal({ discordSession, onSessionUpdated }: CdaPorta
   };
 
   const handlePreventiveAccept = async () => {
-    if (!selectedCand || !activeToken) return;
+    if (!selectedCand) return;
     setSubmittingAction(true);
     setErrorMsg(null);
     setSuccessMsg(null);
@@ -1006,10 +1010,9 @@ export default function CdaPortal({ discordSession, onSessionUpdated }: CdaPorta
     try {
       const res = await fetch(`/api/cda/preventive-accept/${encodeURIComponent(selectedCand.id)}`, {
         method: "POST",
-        headers: {
+        headers: getAuthHeaders({
           "Content-Type": "application/json",
-          Authorization: `Bearer ${activeToken}`,
-        },
+        }),
         body: JSON.stringify({ reason: actionReason }),
       });
       const data = await parseJsonResponse(res);
@@ -1029,7 +1032,7 @@ export default function CdaPortal({ discordSession, onSessionUpdated }: CdaPorta
   };
 
   const handleResolveTie = async () => {
-    if (!selectedCand || !activeToken) return;
+    if (!selectedCand) return;
 
     if (!permissions?.isReasonOptional && (!actionReason || actionReason.trim().length < 3)) {
       setErrorMsg("Specificare il motivo della decisione di parità!");
@@ -1043,10 +1046,9 @@ export default function CdaPortal({ discordSession, onSessionUpdated }: CdaPorta
     try {
       const res = await fetch(`/api/cda/resolve-tie/${encodeURIComponent(selectedCand.id)}`, {
         method: "POST",
-        headers: {
+        headers: getAuthHeaders({
           "Content-Type": "application/json",
-          Authorization: `Bearer ${activeToken}`,
-        },
+        }),
         body: JSON.stringify({ decision: tieDecision, reason: actionReason }),
       });
       const data = await parseJsonResponse(res);

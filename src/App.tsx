@@ -72,6 +72,57 @@ function getUrlForMode(mode: AppMode, isGameActive: boolean): string {
   }
 }
 
+const UserAvatar: React.FC<{ avatar?: string; discordId?: string; username: string }> = ({
+  avatar,
+  discordId,
+  username,
+}) => {
+  const [imgError, setImgError] = useState(false);
+
+  // Compute fallback default discord embed avatar if discordId is available
+  const defaultDiscordAvatar = React.useMemo(() => {
+    if (!discordId) return "https://cdn.discordapp.com/embed/avatars/0.png";
+    try {
+      const index = Number((BigInt(discordId) >> 22n) % 6n);
+      return `https://cdn.discordapp.com/embed/avatars/${isNaN(index) ? 0 : index}.png`;
+    } catch {
+      return "https://cdn.discordapp.com/embed/avatars/0.png";
+    }
+  }, [discordId]);
+
+  const [currentSrc, setCurrentSrc] = useState<string>(avatar || defaultDiscordAvatar);
+
+  useEffect(() => {
+    setImgError(false);
+    setCurrentSrc(avatar || defaultDiscordAvatar);
+  }, [avatar, defaultDiscordAvatar]);
+
+  const handleImageError = () => {
+    if (currentSrc !== defaultDiscordAvatar) {
+      setCurrentSrc(defaultDiscordAvatar);
+    } else {
+      setImgError(true);
+    }
+  };
+
+  if (imgError) {
+    return (
+      <div className="w-5 h-5 rounded-full bg-[#5865F2]/20 border border-[#5865F2]/40 flex items-center justify-center shrink-0">
+        <Bot size={13} className="text-[#5865F2] group-hover:scale-110 transition-transform" />
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={currentSrc}
+      alt={username || "Utente"}
+      className="w-5 h-5 rounded-full object-cover border border-white/20 shrink-0 bg-slate-800"
+      onError={handleImageError}
+    />
+  );
+};
+
 export default function App() {
   const [mode, setMode] = useState<AppMode>(() => getInitialStateFromUrl().mode);
   const [isNavOpen, setIsNavOpen] = useState<boolean>(false);
@@ -182,7 +233,16 @@ export default function App() {
       setMode("home");
     }
     if (mode === "cda" && discordSession && !canAccessCda) {
-      setMode("home");
+      let cachedCanAccess = false;
+      try {
+        const cached = localStorage.getItem("discordUserSession");
+        if (cached) {
+          cachedCanAccess = canAccessCdaPortal(JSON.parse(cached));
+        }
+      } catch {}
+      if (!cachedCanAccess) {
+        setMode("home");
+      }
     }
     if (mode === "excel_gerarchia" && !canAccessExcel) {
       setMode("home");
@@ -229,9 +289,16 @@ export default function App() {
       }
 
       try {
-        const response = await fetch("/api/discord/session", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const headers: Record<string, string> = { Authorization: `Bearer ${token}` };
+        const rawRoles = (discordSession.roles || discordSession.discordRoles || []) as string[];
+        if (rawRoles.length > 0) {
+          headers["x-discord-roles"] = JSON.stringify(rawRoles);
+        }
+        if (discordSession.discordId) {
+          headers["x-discord-id"] = discordSession.discordId;
+        }
+
+        const response = await fetch("/api/discord/session", { headers });
 
         if (response.status === 401) {
           if (discordSession.isMaster) return;
@@ -241,12 +308,28 @@ export default function App() {
           const data = await response.json();
           if (data.session) {
             setDiscordSession((prev) => {
-              if (JSON.stringify(prev) !== JSON.stringify(data.session)) {
-                return data.session;
+              const prevRoles = ((prev?.roles || prev?.discordRoles || []) as string[]);
+              const newRoles = ((data.session.roles || data.session.discordRoles || []) as string[]);
+              const combinedRoles = Array.from(new Set([...prevRoles, ...newRoles]));
+
+              const merged: DiscordUserSession = {
+                ...prev,
+                ...data.session,
+                avatar: data.session.avatar || prev?.avatar,
+                cdaRoleName: data.session.cdaRoleName || prev?.cdaRoleName,
+                hasCdaAccess: data.session.hasCdaAccess !== undefined ? (data.session.hasCdaAccess || prev?.hasCdaAccess) : prev?.hasCdaAccess,
+                roles: combinedRoles,
+                discordRoles: combinedRoles,
+                discordId: data.session.discordId || prev?.discordId,
+                discordTag: data.session.discordTag || prev?.discordTag,
+              };
+
+              if (JSON.stringify(prev) !== JSON.stringify(merged)) {
+                localStorage.setItem("discordUserSession", JSON.stringify(merged));
+                return merged;
               }
               return prev;
             });
-            localStorage.setItem("discordUserSession", JSON.stringify(data.session));
           }
         }
       } catch (err) {
@@ -401,15 +484,11 @@ export default function App() {
                   className="flex flex-wrap sm:flex-nowrap items-center justify-center gap-1.5 sm:gap-2.5 bg-gradient-to-r from-indigo-950/90 via-slate-900/90 to-[#5865F2]/20 border border-[#5865F2]/40 hover:border-[#5865F2] rounded-full px-3 sm:px-4 py-1 sm:py-1.5 text-[11px] sm:text-xs shadow-lg shadow-indigo-950/50 cursor-pointer transition-all active:scale-95 group text-center mx-auto max-w-full"
                   title="Sessione verificata Discord"
                 >
-                  {discordSession.avatar ? (
-                    <img
-                      src={discordSession.avatar}
-                      alt={discordSession.username}
-                      className="w-5 h-5 rounded-full object-cover border border-white/20 shrink-0"
-                    />
-                  ) : (
-                    <Bot size={14} className="text-[#5865F2] shrink-0 group-hover:scale-110 transition-transform" />
-                  )}
+                  <UserAvatar
+                    avatar={discordSession.avatar}
+                    discordId={discordSession.discordId}
+                    username={discordSession.username}
+                  />
                   <span className="font-bold text-white truncate max-w-[130px] sm:max-w-none">
                     {discordSession.username}
                   </span>
