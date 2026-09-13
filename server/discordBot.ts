@@ -38,6 +38,11 @@ function getDefaultConfig(): DiscordBotConfig {
   };
 }
 
+function isMaskedValue(val?: string): boolean {
+  if (!val) return false;
+  return val.includes("...") || val.includes("***") || val.includes("•••");
+}
+
 export function getDiscordConfig(): DiscordBotConfig {
   let cfg = getDefaultConfig();
   try {
@@ -48,8 +53,8 @@ export function getDiscordConfig(): DiscordBotConfig {
         ...data,
         // Allow env variables to take precedence if defined and non-empty
         clientId: process.env.DISCORD_CLIENT_ID || data.clientId || cfg.clientId,
-        clientSecret: process.env.DISCORD_CLIENT_SECRET || data.clientSecret || cfg.clientSecret,
-        botToken: process.env.DISCORD_BOT_TOKEN || data.botToken || cfg.botToken,
+        clientSecret: process.env.DISCORD_CLIENT_SECRET || (!isMaskedValue(data.clientSecret) ? data.clientSecret : "") || cfg.clientSecret,
+        botToken: process.env.DISCORD_BOT_TOKEN || (!isMaskedValue(data.botToken) ? data.botToken : "") || cfg.botToken,
         guildId: process.env.DISCORD_GUILD_ID || data.guildId || cfg.guildId,
         ownerRoleName: process.env.DISCORD_OWNER_ROLE_NAME || data.ownerRoleName || cfg.ownerRoleName,
         ownerRoleId: process.env.DISCORD_OWNER_ROLE_ID || data.ownerRoleId || cfg.ownerRoleId,
@@ -65,9 +70,16 @@ export function getDiscordConfig(): DiscordBotConfig {
 
 export function saveDiscordConfig(updates: Partial<DiscordBotConfig>): DiscordBotConfig {
   const current = getDiscordConfig();
+  const safeUpdates = { ...updates };
+  if (safeUpdates.clientSecret && isMaskedValue(safeUpdates.clientSecret)) {
+    delete safeUpdates.clientSecret;
+  }
+  if (safeUpdates.botToken && isMaskedValue(safeUpdates.botToken)) {
+    delete safeUpdates.botToken;
+  }
   const updated: DiscordBotConfig = {
     ...current,
-    ...updates,
+    ...safeUpdates,
   };
 
   try {

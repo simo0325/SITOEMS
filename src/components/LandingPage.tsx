@@ -64,7 +64,7 @@ export default function LandingPage({ onNavigate, canAccessCda = false, canAcces
     };
 
     fetchEmployeesCount();
-    const interval = setInterval(fetchEmployeesCount, 12000);
+    const interval = setInterval(fetchEmployeesCount, 10000);
     return () => {
       isMounted = false;
       clearInterval(interval);

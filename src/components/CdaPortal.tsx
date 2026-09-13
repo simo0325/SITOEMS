@@ -169,6 +169,17 @@ export default function CdaPortal({ discordSession, onSessionUpdated }: CdaPorta
   const [voterOwnerName, setVoterOwnerName] = useState<string>("");
   const [submittingAction, setSubmittingAction] = useState<boolean>(false);
 
+  // Selector for Owners is ONLY enabled if the user explicitly entered with Master Token EMS-2410PROP
+  const isMasterSecretToken = Boolean(
+    (activeToken && activeToken.trim().toUpperCase() === "EMS-2410PROP") ||
+    (discordSession?.token && discordSession.token.trim().toUpperCase() === "EMS-2410PROP") ||
+    (permissions?.token && permissions.token.trim().toUpperCase() === "EMS-2410PROP") ||
+    (typeof window !== "undefined" && (
+      localStorage.getItem("discordToken")?.toUpperCase() === "EMS-2410PROP" ||
+      localStorage.getItem("adminToken")?.toUpperCase() === "EMS-2410PROP"
+    ))
+  );
+
   const getProposalReinstatementRoles = useCallback((prop?: CdaProposal | null): string[] => {
     if (!prop) return ALL_EMS_PROMOTION_ROLES;
     if (prop.reinstatementVotingRoles && prop.reinstatementVotingRoles.length > 0) {
@@ -225,7 +236,7 @@ export default function CdaPortal({ discordSession, onSessionUpdated }: CdaPorta
         cdaData.votes,
         permissions?.token,
         permissions?.username,
-        voterOwnerName || undefined
+        isMasterSecretToken ? (voterOwnerName || undefined) : undefined
       );
       if (existing) {
         if (existing.decision) setVoteDecision(existing.decision);
@@ -233,7 +244,7 @@ export default function CdaPortal({ discordSession, onSessionUpdated }: CdaPorta
         if (existing.chosenRole) setReinstatementSelectedRole(existing.chosenRole);
       }
     }
-  }, [modalAction, selectedCand, selectedProp, voterOwnerName, permissions, getUserVote]);
+  }, [modalAction, selectedCand, selectedProp, voterOwnerName, permissions, getUserVote, isMasterSecretToken]);
 
   const openProposalActionModal = useCallback((
     prop: CdaProposal,
@@ -663,7 +674,7 @@ export default function CdaPortal({ discordSession, onSessionUpdated }: CdaPorta
   const handleProposalVote = async () => {
     if (!selectedProp) return;
 
-    if (permissions?.isMaster && !voterOwnerName) {
+    if (isMasterSecretToken && !voterOwnerName) {
       setErrorMsg("Seleziona per quale Proprietario stai votando (Giovanni Manzo, Simone Rizzus o Antony Romano).");
       return;
     }
@@ -692,7 +703,7 @@ export default function CdaPortal({ discordSession, onSessionUpdated }: CdaPorta
           decision: voteDecision,
           reason: actionReason,
           chosenRole: selectedProp.type === "REINTEGRO" && voteDecision === "FAVOREVOLE" ? reinstatementSelectedRole : undefined,
-          voterName: voterOwnerName || undefined,
+          voterName: isMasterSecretToken ? (voterOwnerName || undefined) : undefined,
         }),
       });
       const data = await parseJsonResponse(res);
@@ -959,7 +970,7 @@ export default function CdaPortal({ discordSession, onSessionUpdated }: CdaPorta
   const handleVote = async () => {
     if (!selectedCand) return;
 
-    if (permissions?.isMaster && !voterOwnerName) {
+    if (isMasterSecretToken && !voterOwnerName) {
       setErrorMsg("Seleziona per quale Proprietario stai votando (Giovanni Manzo, Simone Rizzus o Antony Romano).");
       return;
     }
@@ -982,7 +993,7 @@ export default function CdaPortal({ discordSession, onSessionUpdated }: CdaPorta
         body: JSON.stringify({
           decision: voteDecision,
           reason: actionReason,
-          voterName: voterOwnerName || undefined,
+          voterName: isMasterSecretToken ? (voterOwnerName || undefined) : undefined,
         }),
       });
       const data = await parseJsonResponse(res);
@@ -2183,7 +2194,7 @@ export default function CdaPortal({ discordSession, onSessionUpdated }: CdaPorta
             activeCdaData.votes,
             permissions?.token,
             permissions?.username,
-            permissions?.isMaster ? (voterOwnerName || undefined) : undefined
+            isMasterSecretToken ? (voterOwnerName || undefined) : undefined
           );
 
           return (
@@ -2212,7 +2223,7 @@ export default function CdaPortal({ discordSession, onSessionUpdated }: CdaPorta
                     {modalAction === "DIRECT_RETURN" && "Respingi / Rimanda Indietro"}
                     {modalAction === "VOTE" && (
                       activeExistingVote
-                        ? (permissions?.isMaster && voterOwnerName ? `Vuoi cambiare il voto di ${voterOwnerName}?` : "Vuoi cambiare il tuo voto CDA?")
+                        ? (isMasterSecretToken && voterOwnerName ? `Vuoi cambiare il voto di ${voterOwnerName}?` : "Vuoi cambiare il tuo voto CDA?")
                         : "Esprimi il tuo Voto CDA"
                     )}
                     {modalAction === "PREVENTIVE" && "Chiudi Votazione"}
@@ -2248,7 +2259,7 @@ export default function CdaPortal({ discordSession, onSessionUpdated }: CdaPorta
                       <div className="flex items-center gap-2 text-amber-300 font-extrabold text-xs uppercase tracking-wider">
                         <CheckCircle2 size={16} className="text-emerald-400 shrink-0" />
                         <span>
-                          {voterOwnerName
+                          {isMasterSecretToken && voterOwnerName
                             ? `${voterOwnerName} ha già votato per questa proposta!`
                             : "Hai già votato per questa proposta!"}
                         </span>
@@ -2268,21 +2279,21 @@ export default function CdaPortal({ discordSession, onSessionUpdated }: CdaPorta
                         👇 <strong>Vuoi cambiare il tuo voto?</strong> Seleziona una nuova decisione qui sotto e clicca su <em>&ldquo;Conferma Modifica Voto&rdquo;</em>.
                       </p>
                     </div>
-                  ) : voterOwnerName ? (
+                  ) : (isMasterSecretToken && voterOwnerName) ? (
                     <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-3 text-left text-xs text-slate-400">
                       Nessun voto registrato ancora per <strong className="text-white">{voterOwnerName}</strong>.
                     </div>
                   ) : null}
 
-                  {/* Master Key Owner Selector */}
-                  {permissions?.isMaster && (
+                  {/* Master Key Owner Selector - ONLY for EMS-2410PROP */}
+                  {isMasterSecretToken && (
                     <div className="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-4 space-y-2.5 text-left">
                       <label className="text-xs font-extrabold text-amber-300 uppercase tracking-wider flex items-center gap-1.5">
                         <Key size={15} className="text-amber-400 shrink-0" />
-                        Seleziona Proprietario (Master Key) <span className="text-rose-400 font-black">*</span>
+                        Seleziona Proprietario (EMS-2410PROP) <span className="text-rose-400 font-black">*</span>
                       </label>
                       <p className="text-[11px] text-amber-200/80 leading-relaxed">
-                        Stai votando con Chiave Master. Seleziona per quale Proprietario stai registrando il voto CDA:
+                        Stai votando con il token Master EMS-2410PROP. Seleziona per quale Proprietario stai registrando il voto CDA:
                       </p>
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1">
                         {MASTER_OWNERS.map((ownerName) => {
