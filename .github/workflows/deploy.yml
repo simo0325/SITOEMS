@@ -44,7 +44,13 @@ jobs:
             cd "$TARGET_DIR"
 
             echo "📥 [1/4] Scaricamento del codice aggiornato da GitHub..."
-            git pull origin main
+            # Gestione modifiche locali sulla VPS (es. file json/log modificati a runtime dal server)
+            git stash --include-untracked 2>/dev/null || git stash 2>/dev/null || true
+            if ! git pull origin main; then
+              echo "⚠️ Git pull standard fallito per conflitti locali, allineamento a origin/main..."
+              git fetch origin main
+              git reset --hard origin/main
+            fi
 
             echo "📦 [2/4] Installazione dipendenze..."
             npm install --production=false
