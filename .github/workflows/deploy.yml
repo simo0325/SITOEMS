@@ -8,10 +8,9 @@ on:
         required: true
         type: boolean
         default: true
-  # Se desideri abilitare il deploy automatico a ogni git push su main, decommenta qui sotto:
-  # push:
-  #   branches:
-  #     - main
+  push:
+    branches:
+      - main
 
 jobs:
   deploy:

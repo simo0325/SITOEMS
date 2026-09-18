@@ -34,6 +34,7 @@ import {
   HierarchyCategoryConfig,
   isOwnerKey,
   DiscordUserSession,
+  getSingleRoleGrade,
 } from "../types.js";
 
 interface RoleStyle {
@@ -757,16 +758,41 @@ export default function EmsHierarchy({ isAdmin = false, adminToken, discordSessi
               rolesMap.set(role, []);
             });
 
+            const normalizeRole = (r: string) =>
+              r.toLowerCase().replace(/[.'’®™┃-]/g, "").replace(/\s+/g, "");
+
             // Populate members into role buckets
             categoryMembers.forEach((m) => {
               const cleanRole = m.roleName.trim();
+              const normRole = normalizeRole(cleanRole);
               let matchedRoleKey = cleanRole;
 
-              // Match against known roles case-insensitively if possible
+              // Match against known roles case-insensitively and ignoring punctuation/spacing
               for (const knownRole of Array.from(rolesMap.keys())) {
-                if (knownRole.toLowerCase() === cleanRole.toLowerCase()) {
+                const normKnown = normalizeRole(knownRole);
+                if (normKnown === normRole || knownRole.toLowerCase() === cleanRole.toLowerCase()) {
                   matchedRoleKey = knownRole;
                   break;
+                }
+              }
+
+              // Special handling for Supervisione roles: ensure V. Supervisore and Assistente Supervisore match their proper bucket
+              if (catConfig.key === "SUPERVISIONE") {
+                if (normRole.includes("supervisore")) {
+                  if (normRole.includes("generale")) {
+                    matchedRoleKey = "Supervisore Generale";
+                  } else if (normRole.includes("assistente") || normRole.includes("aiuto")) {
+                    matchedRoleKey = "Assistente Supervisore";
+                  } else if (
+                    normRole.includes("vice") ||
+                    normRole.startsWith("vsupervisore") ||
+                    normRole.startsWith("v.") ||
+                    normRole === "vsupervisore"
+                  ) {
+                    matchedRoleKey = "V. Supervisore";
+                  } else if (normRole === "supervisore") {
+                    matchedRoleKey = "Supervisore";
+                  }
                 }
               }
 
@@ -776,10 +802,19 @@ export default function EmsHierarchy({ isAdmin = false, adminToken, discordSessi
               rolesMap.get(matchedRoleKey)!.push(m);
             });
 
-            // Filter out roles with zero members
-            const activeRoleGroups = Array.from(rolesMap.entries()).filter(
-              ([_, list]) => list.length > 0
-            );
+            // Filter out roles with zero members and sort strictly by hierarchical order
+            const activeRoleGroups = Array.from(rolesMap.entries())
+              .filter(([_, list]) => list.length > 0)
+              .sort(([roleA], [roleB]) => {
+                const normA = normalizeRole(roleA);
+                const normB = normalizeRole(roleB);
+                const idxA = catConfig.rolesIncluded.findIndex((r) => normalizeRole(r) === normA);
+                const idxB = catConfig.rolesIncluded.findIndex((r) => normalizeRole(r) === normB);
+                if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+                if (idxA !== -1) return -1;
+                if (idxB !== -1) return 1;
+                return getSingleRoleGrade(roleB) - getSingleRoleGrade(roleA);
+              });
 
             return (
               <div
@@ -1006,9 +1041,9 @@ export default function EmsHierarchy({ isAdmin = false, adminToken, discordSessi
                 >
                   <option value="PROPRIETARI">PROPRIETARI (Proprietario, Vice Proprietario)</option>
                   <option value="DIRIGENZA_GENERALE">DIRIGENZA GENERALE (Responsabile Generale EMS, Direttore Generale)</option>
-                  <option value="DIRIGENZA_SANITARIA">DIRIGENZA SANITARIA (Segretario, V. Direttore, Direttore Sanitario)</option>
-                  <option value="SUPERVISIONE">SUPERVISIONE (Assistente, V. Supervisore, Supervisore, Sup. Generale)</option>
-                  <option value="FUNZIONARI">FUNZIONARI (Vice Primario, Primario, V. Responsabile, Responsabile Presidio)</option>
+                  <option value="DIRIGENZA_SANITARIA">DIRIGENZA SANITARIA (Direttore Sanitario, V. Direttore Sanitario, Segretario Direzione)</option>
+                  <option value="SUPERVISIONE">SUPERVISIONE (Supervisore Generale, Supervisore, V. Supervisore, Assistente Supervisore)</option>
+                  <option value="FUNZIONARI">FUNZIONARI (Responsabile Presidio, V. Responsabile, Primario, Vice Primario)</option>
                 </select>
               </div>
 
