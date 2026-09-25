@@ -28,6 +28,7 @@ import {
   getRoleBadgeStyle,
   getNextPromotionRole,
   canAccessCandidatura,
+  matchCanonicalMainHierarchyRole,
 } from "../types.js";
 
 interface CandidaturaPortalProps {
@@ -146,8 +147,9 @@ export default function CandidaturaPortal({ discordSession, onNavigate }: Candid
       setFullName(discordSession.username);
     }
     if (discordSession?.roleName) {
+      const canonical = matchCanonicalMainHierarchyRole(discordSession.roleName)?.name || discordSession.roleName;
       const match = CANDIDATURA_CURRENT_ROLES.find(
-        (r) => r.name.toLowerCase() === discordSession.roleName.toLowerCase()
+        (r) => r.name.toLowerCase() === canonical.toLowerCase() || r.name.toLowerCase() === discordSession.roleName.toLowerCase()
       );
       if (match) {
         setCurrentRole(match.name);

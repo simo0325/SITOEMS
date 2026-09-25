@@ -829,8 +829,8 @@ const AUTHORIZED_ROLE_GRADES: Record<string, number> = {
   "V. Responsabile Del Presidio": 11,
   "Vice Responsabile Del Presidio": 11,
   "Primario di Reparto": 10.5,
-  "V. Primario di Reparto": 9.5,
-  "Vice Primario di Reparto": 9.5,
+  "V. Primario di Reparto": 10.2,
+  "Vice Primario di Reparto": 10.2,
   "Primario": 10,
   "V. Primario": 9,
   "Vice Primario": 9,
@@ -881,11 +881,13 @@ const ROLE_GRADE_MAP_SERVER: Record<string, number> = {
   "vice responsabile del presidio": 11,
   "v responsabile del presidio": 11,
   "primario di reparto": 10.5,
-  "v. primario di reparto": 9.5,
-  "vice primario di reparto": 9.5,
-  "v primario di reparto": 9.5,
+  "v. primario di reparto": 10.2,
+  "v.primario di reparto": 10.2,
+  "vice primario di reparto": 10.2,
+  "v primario di reparto": 10.2,
   "primario": 10,
   "v. primario": 9,
+  "v.primario": 9,
   "vice primario": 9,
   "v primario": 9,
   "medico esperto": 6,
@@ -898,7 +900,7 @@ const ROLE_GRADE_MAP_SERVER: Record<string, number> = {
 // Helper to resolve numerical role grade for hierarchy sorting
 function getRoleGrade(roleName: string): number {
   if (!roleName) return 0;
-  const clean = roleName.trim().toLowerCase().replace(/[.'’®™┃-]/g, " ").replace(/\s+/g, " ").trim();
+  const clean = roleName.trim().toLowerCase().replace(/[.'’®™°┃|-]/g, " ").replace(/\s+/g, " ").trim();
   
   // CDA roles must NEVER be graded as EMS hospital hierarchy roles
   if (
@@ -1458,6 +1460,7 @@ app.get("/api/discord/session", async (req, res) => {
       displayGradeName = "";
     }
     const hasCdaAccess = Boolean(cdaRole || isMaster || registered.hasCdaAccess || allRoles.includes("1147840203285876746"));
+    const computedGrade = isMaster ? 100 : (getRoleGrade(displayRoleName) || registered.grade || 0);
 
     return res.json({
       authenticated: true,
@@ -1465,6 +1468,7 @@ app.get("/api/discord/session", async (req, res) => {
         ...registered,
         roleName: displayRoleName,
         gradeName: displayGradeName,
+        grade: computedGrade,
         cdaRoleName: cdaRole,
         hasCdaAccess,
         isMaster,
@@ -9066,13 +9070,15 @@ export async function syncAllDataWithFirestore(force = false) {
           cloudTokenKeys.add(uKey);
           ALLOWED_OFFICIAL_TOKEN_KEYS.add(uKey);
           const existingLocal = REGISTERED_DISCORD_USERS.get(uKey);
+          const mergedRoleName = isMaster ? "Proprietario" : (t.roleName || existingLocal?.roleName || "Membro");
+          const computedRoleGrade = getRoleGrade(mergedRoleName);
           const mergedSession: DiscordSession = {
             ...existingLocal,
             ...t,
             token: isMaster ? "EMS-2410PROP" : t.token,
-            roleName: isMaster ? "Proprietario" : (t.roleName || existingLocal?.roleName || "Membro"),
-            gradeName: isMaster ? "Proprietario" : (t.gradeName || existingLocal?.gradeName || "Membro"),
-            grade: isMaster ? 100 : (t.grade ?? existingLocal?.grade ?? 1),
+            roleName: mergedRoleName,
+            gradeName: isMaster ? "Proprietario" : (t.gradeName || existingLocal?.gradeName || mergedRoleName),
+            grade: isMaster ? 100 : (computedRoleGrade > 0 ? computedRoleGrade : (t.grade ?? existingLocal?.grade ?? 1)),
             isAllowed: true,
             isMaster: isMaster || t.isMaster || existingLocal?.isMaster,
             cdaRoleName: t.cdaRoleName || existingLocal?.cdaRoleName,

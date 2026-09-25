@@ -225,11 +225,13 @@ const ROLE_GRADE_MAP: Record<string, number> = {
   "vice responsabile del presidio": 11,
   "v responsabile del presidio": 11,
   "primario di reparto": 10.5,
-  "v. primario di reparto": 9.5,
-  "vice primario di reparto": 9.5,
-  "v primario di reparto": 9.5,
+  "v. primario di reparto": 10.2,
+  "v.primario di reparto": 10.2,
+  "vice primario di reparto": 10.2,
+  "v primario di reparto": 10.2,
   "primario": 10,
   "v. primario": 9,
+  "v.primario": 9,
   "vice primario": 9,
   "v primario": 9,
   "medico esperto": 6,
@@ -253,7 +255,7 @@ export const DISCORD_MAIN_HIERARCHY_ROLE_IDS: Record<string, { name: string; gra
   "1108482881510195322": { name: "Responsabile Del Presidio", grade: 12 },
   "1091808520652992572": { name: "V. Responsabile Del Presidio", grade: 11 },
   "1114126741351432294": { name: "Primario di Reparto", grade: 10.5 },
-  "1091807343597072515": { name: "V. Primario di Reparto", grade: 9.5 },
+  "1091807343597072515": { name: "V. Primario di Reparto", grade: 10.2 },
   "987106477217021954": { name: "Primario", grade: 10 },
   "1031477641640935424": { name: "V. Primario", grade: 9 },
   "1031477565635973210": { name: "Medico Esperto", grade: 6 },
@@ -332,7 +334,7 @@ export function isMainHierarchyRole(roleName?: string): boolean {
 
 export function matchCanonicalMainHierarchyRole(rawRole?: string): { name: string; grade: number } | null {
   if (!rawRole) return null;
-  const clean = rawRole.trim().toLowerCase().replace(/[.'’®™┃-]/g, " ").replace(/\s+/g, " ").trim();
+  const clean = rawRole.trim().toLowerCase().replace(/[.'’®™°┃|-]/g, " ").replace(/\s+/g, " ").trim();
 
   // EXPLICIT BLACKLIST: DGS, Formatori, and other external roles must NEVER match EMS main hierarchy!
   if (
@@ -395,7 +397,7 @@ export function matchCanonicalMainHierarchyRole(rawRole?: string): { name: strin
     return { name: "Responsabile Del Presidio", grade: 12 };
   }
   if (clean.includes("v primario di reparto") || clean.includes("vice primario di reparto") || (clean.includes("primario di reparto") && (clean.includes("vice") || clean.includes("v ")))) {
-    return { name: "V. Primario di Reparto", grade: 9.5 };
+    return { name: "V. Primario di Reparto", grade: 10.2 };
   }
   if (clean.includes("primario di reparto")) {
     return { name: "Primario di Reparto", grade: 10.5 };
@@ -427,7 +429,7 @@ export function matchCanonicalMainHierarchyRole(rawRole?: string): { name: strin
 
 export function matchCanonicalCdaRole(rawRole?: string): { name: string; rank: number } | null {
   if (!rawRole) return null;
-  const clean = rawRole.trim().toLowerCase().replace(/[.'’®™┃-]/g, " ").replace(/\s+/g, " ").trim();
+  const clean = rawRole.trim().toLowerCase().replace(/[.'’®™°┃|-]/g, " ").replace(/\s+/g, " ").trim();
 
   // Reject hospital direction roles
   if (clean.includes("segretario direzione") || (clean.includes("segretario") && clean.includes("direzione"))) {
@@ -458,7 +460,7 @@ export function matchCanonicalCdaRole(rawRole?: string): { name: string; rank: n
 
 export function getSingleRoleGrade(roleName?: string): number {
   if (!roleName) return 0;
-  const clean = roleName.trim().toLowerCase().replace(/[.'’®™┃-]/g, " ").replace(/\s+/g, " ").trim();
+  const clean = roleName.trim().toLowerCase().replace(/[.'’®™°┃|-]/g, " ").replace(/\s+/g, " ").trim();
 
   // CDA roles must NEVER be graded as EMS hospital hierarchy roles
   if (
@@ -482,11 +484,21 @@ export function getSingleRoleGrade(roleName?: string): number {
   return 0;
 }
 
-export function getUserEffectiveGrade(u: { roleName?: string; cdaRoleName?: string; token?: string; isMaster?: boolean }): number {
+export function getUserEffectiveGrade(u: { roleName?: string; cdaRoleName?: string; token?: string; isMaster?: boolean; roles?: string[]; discordRoles?: string[] }): number {
   if (u.isMaster) return 100;
   const clean = (u.roleName || "").trim().toLowerCase();
   if (clean.includes("proprietario") || clean.includes("master")) return 100;
-  const grade = getSingleRoleGrade(u.roleName);
+  let grade = getSingleRoleGrade(u.roleName);
+  const roleList = (u.roles || u.discordRoles || []) as string[];
+  if (Array.isArray(roleList)) {
+    for (const r of roleList) {
+      if (!r) continue;
+      const idMatch = DISCORD_MAIN_HIERARCHY_ROLE_IDS[String(r).trim()];
+      if (idMatch && idMatch.grade > grade) grade = idMatch.grade;
+      const g = getSingleRoleGrade(String(r));
+      if (g > grade) grade = g;
+    }
+  }
   return grade >= 99 ? 100 : grade;
 }
 
